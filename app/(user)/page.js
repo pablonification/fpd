@@ -5,7 +5,7 @@ export default function Home() {
     <main className="h-screen snap-y snap-mandatory overflow-y-scroll">
       {/* SECTION 1 */}
       <section className="flex h-screen w-screen snap-start items-center justify-center text-black">
-        <div className="flex max-w-4xl flex-col items-center gap-8 px-6 text-center">
+        <div className="flex max-w-6xl flex-col items-center gap-8 px-6 text-center">
           {/* Announcement Bar */}
           <div className="h-9 w-full max-w-[465px] rounded-[20px] border border-black/50 bg-white/10 px-4 pt-1 pb-3 text-xs backdrop-blur-md sm:text-sm md:text-sm">
             Suatu fitur baru penting yang dapat langsung di-klik redirect
@@ -37,7 +37,7 @@ export default function Home() {
 
       {/* SECTION 2 */}
       <section className="bg-bgMain flex h-screen w-screen snap-start items-center justify-center">
-        <div className="flex max-w-4xl flex-col items-center gap-8 px-6 text-center">
+        <div className="flex max-w-6xl flex-col items-center gap-8 px-6 text-center">
           <div className="flex flex-col gap-4">
             <h1 className="text-3xl leading-tight font-bold sm:text-4xl md:text-5xl lg:text-6xl">
               Who Are We
@@ -53,13 +53,13 @@ export default function Home() {
 
       {/* SECTION 3 */}
       <section className="flex h-screen w-screen snap-start items-center justify-center">
-        <div className="flex max-w-full flex-col items-center gap-8 px-6 text-center">
+        <div className="flex max-w-6xl flex-col items-center gap-8 px-6 text-center">
           <div>
             <h1 className="text-grayDark text-2xl font-bold sm:text-3xl md:text-4xl lg:text-5xl">
               What We Do
             </h1>
           </div>
-          <div className="flex flex-wrap justify-center gap-6">
+          <div className="flex flex-wrap justify-center gap-8">
             <Card
               imageSrc="https://picsum.photos/300/200"
               texts={[
@@ -87,7 +87,7 @@ export default function Home() {
 
       {/* SECTION 4 - Latest Events */}
       <section className="flex h-screen w-screen snap-start items-center justify-center">
-        <div className="flex max-w-4xl flex-col items-center gap-8 px-6 text-center">
+        <div className="flex max-w-6xl flex-col items-center gap-8 px-6 text-center">
           <div className="flex flex-col gap-4">
             <h1 className="text-3xl leading-tight font-bold sm:text-4xl md:text-5xl lg:text-6xl">
               Latest Events
