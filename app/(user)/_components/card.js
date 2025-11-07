@@ -8,7 +8,7 @@ export default function Card({
 }) {
   return (
     <div
-      className={`flex w-full max-w-[300px] flex-col items-center ${className}`}
+      className={`flex w-full max-w-[360px] flex-col items-center ${className}`}
     >
       {/* Gambar */}
       {imageSrc && (
