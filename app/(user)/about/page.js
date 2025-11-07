@@ -1,3 +1,3 @@
 export default async function AboutPage() {
-  return <div>Halo dari Admin About Page</div>;
+  return <div>Halo dari About Page</div>;
 }
