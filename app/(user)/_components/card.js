@@ -7,24 +7,26 @@ export default function Card({
   className = '',
 }) {
   return (
-    <div className={`flex w-[300px] flex-col items-center ${className}`}>
+    <div
+      className={`flex w-full max-w-[300px] flex-col items-center ${className}`}
+    >
       {/* Gambar */}
       {imageSrc && (
         <img
           src={imageSrc}
           alt={imageAlt}
-          className="h-60 w-[338px] rounded-xl object-cover"
+          className="h-48 w-full rounded-xl object-cover sm:h-60"
         />
       )}
 
       {/* Konten teks */}
-      <div className="mt-4 flex flex-col gap-2 text-left">
+      <div className="mt-4 flex w-full flex-col gap-2 px-2 text-left sm:px-0">
         {texts.map((t, index) => (
           <p
             key={index}
             className={`${
               t.bold ? 'text-grayDark font-bold' : 'text-gray-600'
-            } ${t.size === 'large' ? 'text-lg' : 'text-sm'}`}
+            } ${t.size === 'large' ? 'text-lg sm:text-lg' : 'text-sm sm:text-sm'}`}
           >
             {t.text}
           </p>
