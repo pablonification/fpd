@@ -12,7 +12,6 @@ export default function CardProfile({
     <div
       className={`flex w-full max-w-[360px] flex-col items-center sm:max-w-[320px] md:max-w-[300px] ${className}`}
     >
-      {/* 🖼️ Foto Profil */}
       {imageSrc && (
         <img
           src={imageSrc}
@@ -21,19 +20,15 @@ export default function CardProfile({
         />
       )}
 
-      {/* 📄 Konten */}
       <div className="mt-4 flex w-full flex-col gap-3 px-2 text-left sm:px-0">
-        {/* Bidang */}
         {bidang && (
           <span className="inline-block w-fit rounded-full border border-blue-800 bg-blue-100 px-3 py-1 text-sm font-semibold text-blue-800">
             {bidang}
           </span>
         )}
 
-        {/* Nama */}
         <p className="text-grayDark text-lg font-bold sm:text-xl">{name}</p>
 
-        {/* Deskripsi */}
         {description && (
           <p className="text-sm text-gray-600 sm:text-base">{description}</p>
         )}

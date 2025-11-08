@@ -17,7 +17,6 @@ export default function FilterRow() {
   return (
     <div className="flex w-full justify-center">
       <div className="flex w-full max-w-7xl flex-col gap-4 md:flex-row md:items-center md:gap-6">
-        {/* 🔍 Row 1: Search bar */}
         <div className="relative w-full flex-grow">
           <input
             type="text"
@@ -27,7 +26,6 @@ export default function FilterRow() {
           <HiSearch className="absolute top-1/2 right-4 h-5 w-5 -translate-y-1/2 text-gray-500" />
         </div>
 
-        {/* 🔽 Row 2: Two dropdowns side by side on mobile */}
         <div className="flex w-full gap-4 md:w-auto">
           {/* Role Dropdown */}
           <div className="relative flex-1 md:w-[180px] md:flex-none">
