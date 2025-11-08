@@ -53,7 +53,7 @@ export default function Home() {
 
       {/* SECTION 3 */}
       <section className="flex h-screen w-screen snap-start items-center justify-center">
-        <div className="flex max-w-6xl flex-col items-center gap-8 px-6 text-center">
+        <div className="flex max-w-7xl flex-col items-center gap-8 px-6 text-center">
           <div>
             <h1 className="text-grayDark text-2xl font-bold sm:text-3xl md:text-4xl lg:text-5xl">
               What We Do
