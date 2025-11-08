@@ -120,7 +120,7 @@ export default function Navbar() {
             <div>
               <div
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="text-grayDark flex cursor-pointer items-center gap-2 px-2 py-1 select-none hover:opacity-90"
+                className="text-grayDark flex cursor-pointer items-center gap-2 py-1 select-none hover:opacity-90 md:px-2"
               >
                 Researchers
                 <img
@@ -139,22 +139,14 @@ export default function Navbar() {
                     className="flex flex-col gap-1 pl-4"
                   >
                     <Link
-                      href="/researcher/1"
-                      className="text-grayDark hover:text-primaryGradientEnd transition"
+                      href="/researcher/participant"
+                      className="block w-full"
                     >
-                      Researcher 1
+                      Participant
                     </Link>
-                    <Link
-                      href="/researcher/2"
-                      className="text-grayDark hover:text-primaryGradientEnd transition"
-                    >
-                      Researcher 2
-                    </Link>
-                    <Link
-                      href="/researcher/3"
-                      className="text-grayDark hover:text-primaryGradientEnd transition"
-                    >
-                      Researcher 3
+
+                    <Link href="/researcher/project" className="block w-full">
+                      Project
                     </Link>
                   </motion.div>
                 )}
