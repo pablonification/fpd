@@ -51,18 +51,16 @@ export default function Navbar() {
                 >
                   <ul className="text-grayDark flex flex-col">
                     <li className="hover:bg-grayLight cursor-pointer rounded-md px-4 py-2">
-                      <Link href="/researcher/1" className="block w-full">
-                        Researcher 1
+                      <Link
+                        href="/researcher/participant"
+                        className="block w-full"
+                      >
+                        Participant
                       </Link>
                     </li>
                     <li className="hover:bg-grayLight cursor-pointer rounded-md px-4 py-2">
-                      <Link href="/researcher/2" className="block w-full">
-                        Researcher 2
-                      </Link>
-                    </li>
-                    <li className="hover:bg-grayLight cursor-pointer rounded-md px-4 py-2">
-                      <Link href="/researcher/3" className="block w-full">
-                        Researcher 3
+                      <Link href="/researcher/project" className="block w-full">
+                        Project
                       </Link>
                     </li>
                   </ul>
