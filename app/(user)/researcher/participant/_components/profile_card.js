@@ -7,9 +7,11 @@ export default function CardProfile({
   bidang = '',
   description = '',
   className = '',
+  onClick,
 }) {
   return (
     <div
+      onClick={onClick}
       className={`flex w-full max-w-[360px] flex-col items-center sm:max-w-[320px] md:max-w-[300px] ${className}`}
     >
       {imageSrc && (
