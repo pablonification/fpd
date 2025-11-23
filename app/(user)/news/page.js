@@ -41,7 +41,7 @@ export default function NewsPage() {
   return (
     <main className="bg-bgMain mt-32 min-h-screen snap-y snap-mandatory overflow-y-scroll">
       {/* SECTION 1 - Header */}
-      <section className="flex w-full snap-start items-center justify-center px-4 text-black">
+      <section className="flex min-h-screen w-full snap-start items-center justify-center px-4 text-black">
         <div className="flex w-full max-w-5xl flex-col gap-12 md:gap-16">
           {/* Title */}
           <div className="flex flex-col items-center gap-4 text-center">
