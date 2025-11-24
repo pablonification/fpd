@@ -1,3 +1,7 @@
 export default async function NotFound() {
-  return <div>Halo dari Not Found</div>;
+  return (
+    <div>
+      The page you are looking for was not found or is no longer available.
+    </div>
+  );
 }

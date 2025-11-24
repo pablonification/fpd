@@ -9,47 +9,51 @@ export default function TeamSection() {
   const team = [
     {
       imageSrc: 'https://picsum.photos/400/300?random=1',
-      name: 'John Doe',
-      bidang: 'Technical Researcher',
-      expertise: 'System development & prototyping',
+      name: 'Full name of researcher or team member',
+      bidang: 'Position or role of researcher in the team',
+      expertise:
+        'Main area of expertise of researcher, such as research focus or technology',
       affiliation:
-        'School of Electrical Engineering and Informatics, Institut Teknologi Bandung',
-      email: 'bastian.evandi@email.com',
+        'Official affiliation of researcher, such as faculty, study program, and university',
+      email: 'Official email address of researcher for contact',
       description:
-        'Mengolah data untuk menghasilkan insight strategis bagi tim produk.',
+        'Brief summary about researcher role in the team and type of contributions provided',
     },
     {
       imageSrc: 'https://picsum.photos/400/300?random=1',
-      name: 'John Doe',
-      bidang: 'Technical Researcher',
-      expertise: 'System development & prototyping',
+      name: 'Full name of researcher or team member',
+      bidang: 'Position or role of researcher in the team',
+      expertise:
+        'Main area of expertise of researcher, such as research focus or technology',
       affiliation:
-        'School of Electrical Engineering and Informatics, Institut Teknologi Bandung',
-      email: 'bastian.evandi@email.com',
+        'Official affiliation of researcher, such as faculty, study program, and university',
+      email: 'Official email address of researcher for contact',
       description:
-        'Mengolah data untuk menghasilkan insight strategis bagi tim produk.',
+        'Brief summary about researcher role in the team and type of contributions provided',
     },
     {
       imageSrc: 'https://picsum.photos/400/300?random=1',
-      name: 'John Doe',
-      bidang: 'Technical Researcher',
-      expertise: 'System development & prototyping',
+      name: 'Full name of researcher or team member',
+      bidang: 'Position or role of researcher in the team',
+      expertise:
+        'Main area of expertise of researcher, such as research focus or technology',
       affiliation:
-        'School of Electrical Engineering and Informatics, Institut Teknologi Bandung',
-      email: 'bastian.evandi@email.com',
+        'Official affiliation of researcher, such as faculty, study program, and university',
+      email: 'Official email address of researcher for contact',
       description:
-        'Mengolah data untuk menghasilkan insight strategis bagi tim produk.',
+        'Brief summary about researcher role in the team and type of contributions provided',
     },
     {
       imageSrc: 'https://picsum.photos/400/300?random=1',
-      name: 'John Doe',
-      bidang: 'Technical Researcher',
-      expertise: 'System development & prototyping',
+      name: 'Full name of researcher or team member',
+      bidang: 'Position or role of researcher in the team',
+      expertise:
+        'Main area of expertise of researcher, such as research focus or technology',
       affiliation:
-        'School of Electrical Engineering and Informatics, Institut Teknologi Bandung',
-      email: 'bastian.evandi@email.com',
+        'Official affiliation of researcher, such as faculty, study program, and university',
+      email: 'Official email address of researcher for contact',
       description:
-        'Mengolah data untuk menghasilkan insight strategis bagi tim produk.',
+        'Brief summary about researcher role in the team and type of contributions provided',
     },
   ];
 

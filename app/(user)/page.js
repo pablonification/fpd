@@ -8,24 +8,26 @@ export default function Home() {
         <div className="flex max-w-6xl flex-col items-center gap-8 px-6 text-center">
           {/* Announcement Bar */}
           <div className="h-9 w-full max-w-[465px] rounded-[20px] border border-black/50 bg-white/10 px-4 pt-1 pb-3 text-xs backdrop-blur-md sm:text-sm md:text-sm">
-            Suatu fitur baru penting yang dapat langsung di-klik redirect
+            Brief highlight of latest feature or important announcement that can
+            be clicked to view details
           </div>
 
           {/* Title + Description */}
           <div className="flex flex-col gap-4">
             <h1 className="text-3xl leading-tight font-bold sm:text-4xl md:text-5xl lg:text-6xl">
-              Lorem ipsum dolor sit amet, consectetur adipiscing.
+              Main headline explaining the core value proposition of this
+              platform for visitors
             </h1>
             <p className="text-sm text-black/50 sm:text-base md:text-lg lg:text-xl">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua.
+              Brief paragraph summarizing what this platform is, who the users
+              are, and the main reasons why this platform matters to them.
             </p>
           </div>
 
           {/* Buttons */}
           <div className="mt-2 flex flex-col gap-4 md:flex-row md:gap-6">
             <button className="from-primaryGradientStart to-primaryGradientEnd shadow-primaryGradientEnd/30 rounded-full bg-gradient-to-r px-6 py-3 font-semibold text-white shadow-lg transition hover:scale-105 hover:shadow-xl">
-              PlaceHolder CTA
+              Main call-to-action text, e.g. "Start exploring research here"
             </button>
 
             <button className="rounded-full border border-black/40 px-6 py-3 font-semibold text-black transition hover:bg-black/40 hover:text-white">
@@ -43,9 +45,9 @@ export default function Home() {
               Who Are We
             </h1>
             <p className="text-sm text-black/50 sm:text-base md:text-lg lg:text-xl">
-              Ini deskripsi about dari client. Jika ada testimoni yang ingin
-              ditambahkan bisa. Tapi konten ini masih bisa berubah-ubah, depends
-              on brief yang dikasih
+              Brief description of who we are as an institution or program,
+              including our main focus and values we aim to bring. Can also
+              include short quotes or testimonials if needed by the client.
             </p>
           </div>
         </div>
@@ -63,22 +65,40 @@ export default function Home() {
             <Card
               imageSrc="https://picsum.photos/300/200"
               texts={[
-                { text: 'Judul Random', bold: true, size: 'large' },
-                { text: 'Gambar ini diambil secara acak dari internet.' },
+                {
+                  text: 'Service or research area title to be highlighted',
+                  bold: true,
+                  size: 'large',
+                },
+                {
+                  text: 'Brief sentence explaining the content or main benefits of this service or research activity.',
+                },
               ]}
             />
             <Card
               imageSrc="https://picsum.photos/300/200"
               texts={[
-                { text: 'Judul Random', bold: true, size: 'large' },
-                { text: 'Gambar ini diambil secara acak dari internet.' },
+                {
+                  text: 'Service or research area title to be highlighted',
+                  bold: true,
+                  size: 'large',
+                },
+                {
+                  text: 'Brief sentence explaining the content or main benefits of this service or research activity.',
+                },
               ]}
             />
             <Card
               imageSrc="https://picsum.photos/300/200"
               texts={[
-                { text: 'Judul Random', bold: true, size: 'large' },
-                { text: 'Gambar ini diambil secara acak dari internet.' },
+                {
+                  text: 'Service or research area title to be highlighted',
+                  bold: true,
+                  size: 'large',
+                },
+                {
+                  text: 'Brief sentence explaining the content or main benefits of this service or research activity.',
+                },
               ]}
             />
           </div>
@@ -93,7 +113,9 @@ export default function Home() {
               Latest Events
             </h1>
             <p className="text-sm text-black/50 sm:text-base md:text-lg lg:text-xl">
-              tunggu hasil component gallery
+              THIS SECTION NOT IMPLEMENTED YET.
+              Brief description of recent event series such as seminars,
+              workshops, or field activities that have been or will be held.
             </p>
           </div>
         </div>
@@ -107,7 +129,9 @@ export default function Home() {
               News
             </h1>
             <p className="text-sm text-black/50 sm:text-base md:text-lg lg:text-xl">
-              tunggu hasil component news
+            THIS SECTION NOT IMPLEMENTED YET.
+              Opening paragraph inviting visitors to read latest news, research
+              updates, and other important announcements.
             </p>
           </div>
         </div>

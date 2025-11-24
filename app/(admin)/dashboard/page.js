@@ -1,3 +1,8 @@
 export default async function AdminDashboardPage() {
-  return <div>Halo dari Admin Admin Dashboard Page</div>;
+  return (
+    <div>
+      Admin dashboard page displaying main data summary and quick access to
+      management menus.
+    </div>
+  );
 }

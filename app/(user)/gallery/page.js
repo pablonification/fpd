@@ -15,75 +15,87 @@ export default function GalleryPage() {
     {
       type: 'photo',
       imageSrc: 'https://picsum.photos/400/250?random=1',
-      title: 'Field Activity',
+      title: 'Photo title explaining the field activity documented here',
       typeLabel: 'Field Research',
-      date: 'Wednesday 17 September 2025',
-      description: 'Collecting soil samples in Jatinangor',
+      date: 'Date of activity according to this photo documentation',
+      description:
+        'Brief description of what is happening in the photo, such as activity and location',
     },
     {
       type: 'photo',
       imageSrc: 'https://picsum.photos/400/250?random=2',
-      title: 'Laboratory Activities dd',
+      title: 'Photo title explaining the field activity documented here',
       typeLabel: 'Laboratory Activities',
-      date: 'Monday 20 October 2025',
-      description: 'Microscopic organism observation',
+      date: 'Date of activity according to this photo documentation',
+      description:
+        'Brief description of what is happening in the photo, such as activity and location',
     },
     {
       type: 'photo',
       imageSrc: 'https://picsum.photos/400/250?random=1',
-      title: 'Field Activity',
+      title: 'Photo title explaining the field activity documented here',
       typeLabel: 'Field Research',
-      date: 'Wednesday 17 September 2025',
-      description: 'Collecting soil samples in Jatinangor',
+      date: 'Date of activity according to this photo documentation',
+      description:
+        'Brief description of what is happening in the photo, such as activity and location',
     },
     {
       type: 'photo',
       imageSrc: 'https://picsum.photos/400/250?random=2',
-      title: 'Laboratory Activities dd',
+      title: 'Photo title explaining the field activity documented here',
       typeLabel: 'Laboratory Activities',
-      date: 'Monday 20 October 2025',
-      description: 'Microscopic organism observation',
+      date: 'Date of activity according to this photo documentation',
+      description:
+        'Brief description of what is happening in the photo, such as activity and location',
     },
   ];
 
   const videoCards = [
     {
       type: 'video',
-      title: 'Trip to Mountains',
-      activityType: 'Adventure',
-      date: 'Monday 8 July 2025',
+      title:
+        'Video title summarizing the main content of the documented activity',
+      activityType:
+        'Type of activity shown in the video, such as field visit or educational session',
+      date: 'Date of activity recorded in the video',
       typeLabel: 'Field Research',
-      description: 'A thrilling journey into the mountain range...',
+      description: 'Brief summary of what viewers will see in this video',
       youtubeUrl: 'https://www.youtube.com/embed/o6zb6_TTVWo',
       thumbnail: 'https://picsum.photos/400/250?random=3',
     },
     {
       type: 'video',
-      title: 'Cooking Class',
-      activityType: 'Education',
+      title:
+        'Video title summarizing the main content of the documented activity',
+      activityType:
+        'Type of activity shown in the video, such as field visit or educational session',
       typeLabel: 'Field Research',
-      date: 'Saturday 20 December 2025',
-      description: 'Learning how to cook with a professional chef...',
+      date: 'Date of activity recorded in the video',
+      description: 'Brief summary of what viewers will see in this video',
       youtubeUrl: 'https://www.youtube.com/embed/o6zb6_TTVWo',
       thumbnail: 'https://picsum.photos/400/250?random=4',
     },
     {
       type: 'video',
-      title: 'Trip to Mountains',
-      activityType: 'Adventure',
-      date: 'Monday 8 July 2025',
+      title:
+        'Video title summarizing the main content of the documented activity',
+      activityType:
+        'Type of activity shown in the video, such as field visit or educational session',
+      date: 'Date of activity recorded in the video',
       typeLabel: 'Laboratories Activity',
-      description: 'A thrilling journey into the mountain range...',
+      description: 'Brief summary of what viewers will see in this video',
       youtubeUrl: 'https://www.youtube.com/embed/o6zb6_TTVWo',
       thumbnail: 'https://picsum.photos/400/250?random=3',
     },
     {
       type: 'video',
-      title: 'Cooking Class',
-      activityType: 'Education',
-      date: 'Saturday 20 December 2025',
+      title:
+        'Video title summarizing the main content of the documented activity',
+      activityType:
+        'Type of activity shown in the video, such as field visit or educational session',
+      date: 'Date of activity recorded in the video',
       typeLabel: 'Laboratories Activity',
-      description: 'Learning how to cook with a professional chef...',
+      description: 'Brief summary of what viewers will see in this video',
       youtubeUrl: 'https://www.youtube.com/embed/o6zb6_TTVWo',
       thumbnail: 'https://picsum.photos/400/250?random=4',
     },
@@ -108,8 +120,8 @@ export default function GalleryPage() {
           </h1>
 
           <p className="max-w-[900px] text-[18px] leading-[28px] tracking-[-1%] text-[#7C7C7C] sm:text-[24px] sm:leading-[32px]">
-            Explore visual highlights from our laboratory work, field research,
-            seminars, and workshops
+            Collection of photos and videos showcasing laboratory activities,
+            field research, seminars, and workshops organized by our team.
           </p>
         </header>
 

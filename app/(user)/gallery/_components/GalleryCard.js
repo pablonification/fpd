@@ -106,19 +106,21 @@ export function PhotoModal({ cards = [], index = 0, onClose, setIndex }) {
             {/* TEXT DETAILS */}
             <div className="flex flex-col gap-3 text-left">
               <h2 className="text-[32px] leading-[40px] font-bold text-black">
-                {card?.title || 'Judul'}
+                {card?.title ||
+                  'Photo title will be displayed here when filled'}
               </h2>
 
               <p className="w-fit rounded-md bg-[#2497A9]/10 px-2 py-1 text-[16px] font-medium text-[#2497A9]">
-                {card?.typeLabel || 'Activity type'}
+                {card?.typeLabel || 'Photo activity type will appear here'}
               </p>
 
               <p className="text-[14px] text-[#989898]">
-                {card?.date || 'Wednesday 17 September 2025'}
+                {card?.date || 'Activity date will be displayed here'}
               </p>
 
               <p className="max-w-[722px] text-[18px] leading-[24px] text-[#7C7C7C]">
-                {card?.description || 'Deskripsi belum tersedia.'}
+                {card?.description ||
+                  'Brief description of activity will appear here when filled'}
               </p>
             </div>
           </div>
