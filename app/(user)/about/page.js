@@ -11,7 +11,7 @@ export default function AboutPage() {
     <div className="w-full flex flex-col items-center text-[14px] md:text-[14px]"> 
       
       {/* About Us Section */}
-      <section className="max-w-4xl text-left md:text-center py-16 px-6">
+      <section className="max-w-4xl text-left md:text-center px-6 pt-35 pb-16">
         <h1 className="text-[24px] md:text-[44px] font-bold mb-4">About Us</h1>
         <p className="leading-relaxed text-neutral-500 text-[16px] md:text-[24px]">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
