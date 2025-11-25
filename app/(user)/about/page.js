@@ -54,7 +54,7 @@ export default function AboutPage() {
               className="text-blue-500" 
             />
           </div>
-          <h3 className="text-[20px] font-semibold mb-2">Our Values</h3>
+          <h3 className="text-[16px] md:text-[20px] font-semibold mb-2">Our Values</h3>
           <p className="text-neutral-500 text-sm-[16px] leading-relaxed">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
             incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
