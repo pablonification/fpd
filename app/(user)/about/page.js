@@ -8,19 +8,12 @@ import ValuesImage from './_components/OurValuesIcon.png';
 
 export default function AboutPage() {
   return (
-    // PENTING: Untuk menerapkan font Hanken Grotesk, Anda harus tahu nama
-    // class CSS yang merepresentasikannya. 
-    // Jika Anda belum mendefinisikannya, kode ini hanya akan menggunakan font default Arial.
-    // Jika Anda telah mendefinisikannya secara manual di CSS lain, gunakan class tersebut.
-    // ASUMSI: Kita hanya akan memasukkan LOGO seperti permintaan sebelumnya.
-    
-    // Jika Anda TIDAK menambahkan class font pada elemen ini, font akan menggunakan Arial (sesuai body {} di CSS Anda)
-    <div className="w-full flex flex-col items-center font-family-Hanken-Grotesk text-[16px]"> 
+    <div className="w-full flex flex-col items-center text-[14px] md:text-[14px]"> 
       
       {/* About Us Section */}
-      <section className="max-w-4xl text-center py-16 px-6">
-        <h1 className="text-[44px] font-bold mb-4">About Us</h1>
-        <p className="leading-relaxed text-neutral-500 text-[24px]">
+      <section className="max-w-4xl text-left md:text-center py-16 px-6">
+        <h1 className="text-[24px] md:text-[44px] font-bold mb-4">About Us</h1>
+        <p className="leading-relaxed text-neutral-500 text-[16px] md:text-[24px]">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
           incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
           nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
@@ -42,7 +35,7 @@ export default function AboutPage() {
               className="text-blue-500" // Gunakan className untuk styling
             />
           </div>
-          <h3 className="text-[20px] font-semibold mb-2">Vision</h3>
+          <h3 className="text-[16px] md:text-[20px] font-semibold mb-2">Vision</h3>
           <p className="text-neutral-500 text-sm-[16px] leading-relaxed">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
             incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
@@ -72,8 +65,8 @@ export default function AboutPage() {
       
 
       {/* Company Timeline */}
-      <section className="w-full bg-gray-50 py-16">
-        <h2 className="text-[44px] font-bold text-center mb-12">Company Timeline</h2>
+      <section className="w-full py-1 px-6">
+        <h2 className="text-[24px] md:text-[44px] font-bold text-left md:text-center mb-12">Company Timeline</h2>
 
         <div className="max-w-3xl mx-auto px-6 space-y-10">
           {[1, 2, 3, 4].map((i) => (
@@ -92,7 +85,7 @@ export default function AboutPage() {
               </div>
               
               <div>
-                <h4 className="font-semibold **italic**">17 Agustus 1945</h4>
+                <h4 className="text-left font-semibold italic">17 Agustus 1945</h4>
                 <p className="text-neutral-500 text-sm leading-relaxed">
                   Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
                   tempor incididunt ut labore et dolore magna aliqua.
@@ -107,13 +100,13 @@ export default function AboutPage() {
 
       {/* Contact Us */}
       <section className="py-16 text-center">
-        <h2 className="text-[44px] font-bold mb-10">Contact Us</h2>
+        <h2 className="text-[24px] md:text-[44px] font-bold mb-10">Contact Us</h2>
 
         <div className="flex justify-center gap-6">
           {["●", "●", "●", "●"].map((c, i) => (
             <div
               key={i}
-              className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center"
+              className="w-12 h-12 md:w-18 md:h-18 bg-gray-300 rounded-full flex items-center justify-center"
             >
               {/* Placeholder icon */}
             </div>
