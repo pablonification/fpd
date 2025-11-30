@@ -1,3 +1,7 @@
-export default async function ContactPage() {
-  return <div>Halo dari Admin Contact Page</div>;
+export default async function LoginPage() {
+  return (
+    <div>
+      Login page to enter credentials before accessing the management panel.
+    </div>
+  );
 }
