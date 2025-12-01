@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 export default function ErrorPage({
   code = '400',
-  message = 'Terjadi Kesalahan Pada Page',
+  message = 'An error occurred on this page, please try again in a few moments.',
 }) {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-6 text-black">

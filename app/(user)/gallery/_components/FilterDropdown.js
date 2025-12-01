@@ -24,7 +24,11 @@ export default function FilterDropdown({ tab, filter, setFilter }) {
         onClick={() => setOpen(!open)}
         className="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-gray-700 select-none hover:opacity-90"
       >
-        <span>{filter === 'All' ? 'Activity Type' : filter}</span>
+        <span>
+          {filter === 'All'
+            ? 'Activity type (select to filter documentation by activity type)'
+            : filter}
+        </span>
         <img
           src="/icon/arrow-down.png"
           alt="arrow down"

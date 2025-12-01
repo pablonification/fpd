@@ -7,33 +7,57 @@ export default function NewsPage() {
     {
       imageSrc: 'https://picsum.photos/400/250?random=1',
       texts: [
-        { text: 'Judul Berita 1', bold: true, size: 'large' },
-        { text: 'Ringkasan singkat berita 1.' },
-        { text: 'Kategori' },
+        {
+          text: 'Short headline for each additional news item to be displayed',
+          bold: true,
+          size: 'large',
+        },
+        {
+          text: 'Brief summary of one to two sentences explaining the content of this news',
+        },
+        { text: 'News category' },
       ],
     },
     {
       imageSrc: 'https://picsum.photos/400/250?random=2',
       texts: [
-        { text: 'Judul Berita 2', bold: true, size: 'large' },
-        { text: 'Ringkasan singkat berita 2.' },
-        { text: 'Kategori' },
+        {
+          text: 'Short headline for each additional news item to be displayed',
+          bold: true,
+          size: 'large',
+        },
+        {
+          text: 'Brief summary of one to two sentences explaining the content of this news',
+        },
+        { text: 'News category' },
       ],
     },
     {
       imageSrc: 'https://picsum.photos/400/250?random=3',
       texts: [
-        { text: 'Judul Berita 3', bold: true, size: 'large' },
-        { text: 'Ringkasan singkat berita 3.' },
-        { text: 'Kategori' },
+        {
+          text: 'Short headline for each additional news item to be displayed',
+          bold: true,
+          size: 'large',
+        },
+        {
+          text: 'Brief summary of one to two sentences explaining the content of this news',
+        },
+        { text: 'News category' },
       ],
     },
     {
       imageSrc: 'https://picsum.photos/400/250?random=4',
       texts: [
-        { text: 'Judul Berita 4', bold: true, size: 'large' },
-        { text: 'Ringkasan singkat berita 4.' },
-        { text: 'Kategori' },
+        {
+          text: 'Short headline for each additional news item to be displayed',
+          bold: true,
+          size: 'large',
+        },
+        {
+          text: 'Brief summary of one to two sentences explaining the content of this news',
+        },
+        { text: 'News category' },
       ],
     },
   ];
@@ -64,13 +88,16 @@ export default function NewsPage() {
             {/* Kolom Kiri - Teks */}
             <div className="order-last flex flex-col gap-4 md:order-first">
               <h2 className="text-xl font-bold sm:text-2xl md:text-3xl lg:text-4xl">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit
+                Main news headline that summarizes the key information in one
+                clear sentence
               </h2>
               <p className="text-sm text-black/60 sm:text-base md:text-lg">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                Brief summary of 2-3 sentences explaining the news context, what
+                happened, and why this information is important to readers.
               </p>
-              <p className="mt-2 text-sm sm:text-base md:text-base">Kategori</p>
+              <p className="mt-2 text-sm sm:text-base md:text-base">
+                News category
+              </p>
             </div>
           </div>
 
