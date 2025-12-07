@@ -23,16 +23,14 @@ export default function CardProfile({
       )}
 
       <div className="mt-4 flex w-full flex-col gap-3 px-2 text-left sm:px-0">
-        {bidang && (
-          <span className="inline-block w-fit rounded-full border border-blue-800 bg-blue-100 px-3 py-1 text-sm font-semibold text-blue-800">
-            {bidang}
-          </span>
-        )}
-
         <p className="text-grayDark text-lg font-bold sm:text-xl">{name}</p>
 
         {description && (
           <p className="text-sm text-gray-600 sm:text-base">{description}</p>
+        )}
+
+        {bidang && (
+          <p className="text-sm text-[#2497A9] sm:text-base">{bidang}</p>
         )}
       </div>
     </div>
