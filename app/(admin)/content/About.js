@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import FormField from '../_components/FormField';
+import toast from 'react-hot-toast';
 
 export default function AboutForm() {
   // State untuk 4 field
@@ -9,10 +10,33 @@ export default function AboutForm() {
   const [mission, setMission] = useState('');
   const [values, setValues] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: lakukan submit data ke backend
-    console.log({ title, description, mission, vision });
+
+    const payload = {
+      about_description: title,
+      vision,
+      mission,
+      values,
+    };
+
+    try {
+      const res = await fetch('/api/about', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) throw new Error('Failed to update');
+
+      const data = await res.json();
+      console.log('Update result:', data);
+
+      toast.success('About page updated successfully!');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to update About page.');
+    }
   };
 
   return (
@@ -61,6 +85,9 @@ export default function AboutForm() {
         <button
           type="submit"
           className="mt-4 h-11 w-[752px] rounded-[16px] bg-[#2AB2C7] px-6 py-3 text-sm font-medium text-white transition hover:opacity-90"
+          onClick={() => {
+            handleSubmit;
+          }}
         >
           Save changes
         </button>

@@ -1,33 +1,17 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
-import FormField from '../_components/FormField';
+import FormField from '../_components/FormField'; // Asumsi path benar
+import { CgSpinner } from 'react-icons/cg'; // Menggunakan icon spinner untuk loading
 
-const users = [
-  {
-    id: 1,
-    name: 'Clement Nathanael',
-    email: 'clement@example.com',
-    role: 'Admin',
-    avatar: '/icon/db-user-1.png',
-  },
-  {
-    id: 2,
-    name: 'Muhammad Zaki',
-    email: 'zaki@example.com',
-    role: 'Editor',
-    avatar: '/icon/db-user-1.png',
-  },
-  {
-    id: 3,
-    name: 'Alfian Hanif',
-    email: 'alfian@example.com',
-    role: 'Viewer',
-    avatar: '/icon/db-user-1.png',
-  },
-];
+// Menggantikan data mock
+// const users = [...]
 
 export default function UserForm() {
+  const [users, setUsers] = useState([]); // State untuk menyimpan data pengguna dari API
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -37,36 +21,233 @@ export default function UserForm() {
     email: '',
     password: '',
     role: '',
-    status: 'Active',
+    status: 'Active', // Active/Inactive
   });
 
+  // --- STATE BARU UNTUK FILE AVATAR ---
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(null);
+
+  // --- REF BARU UNTUK INPUT FILE ---
+  const fileInputRef = useRef(null);
+  // --- Fungsi Pengambilan Data (Fetching) ---
+  const fetchUsers = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch('/api/users');
+      if (!response.ok) {
+        throw new Error('Failed to fetch users');
+      }
+      const data = await response.json();
+      const usersWithAvatar = data.map((user) => ({
+        ...user,
+        status: user.is_active ? 'Active' : 'Inactive',
+        avatar: user.avatar || '/icon/db-user-1.png',
+        name: user.name,
+      }));
+      setUsers(usersWithAvatar);
+    } catch (err) {
+      setError(err.message);
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
+
+  // --- Filter Lokal ---
   const filteredUsers = users.filter(
     (user) =>
       user.name.toLowerCase().includes(search.toLowerCase()) &&
       (roleFilter ? user.role === roleFilter : true)
   );
 
-  // Fungsi untuk membuka modal baru atau edit
+  // --- Modal Logic ---
   const openModal = (user = null) => {
     setCurrentUser(user);
     if (user) {
       setFormData({
         fullName: user.name,
         email: user.email,
-        password: '',
+        password: '', // Jangan isi password saat edit
         role: user.role,
-        status: 'Active', // bisa sesuaikan jika ada field status di user
+        status: user.status, // Ambil dari data yang sudah diolah
       });
+      setAvatarPreview(user.avatar);
     } else {
       setFormData({
         fullName: '',
         email: '',
         password: '',
-        role: '',
+        role: 'admin', // Default role
         status: 'Active',
       });
     }
+    setAvatarFile(null); // Reset file yang dipilih
     setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setCurrentUser(null);
+    setFormData({
+      fullName: '',
+      email: '',
+      password: '',
+      role: '',
+      status: 'Active',
+    });
+    setAvatarFile(null); // Reset file
+    setAvatarPreview(null); // Reset preview
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setAvatarFile(file);
+      // Membuat URL lokal untuk preview
+      setAvatarPreview(URL.createObjectURL(file));
+    } else {
+      setAvatarFile(null);
+      setAvatarPreview(currentUser?.avatar || null);
+    }
+  };
+
+  const triggerFileInput = () => {
+    fileInputRef.current.click();
+  };
+
+  // --- Handler Submit Form (Create/Update) ---
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    const isCreating = !currentUser;
+
+    // 1. Upload Avatar ke Supabase Storage (JIKA ADA FILE BARU)
+    let avatarUrl = currentUser?.avatar; // Default: gunakan URL yang sudah ada
+
+    if (avatarFile) {
+      try {
+        const formData = new FormData();
+        formData.append('file', avatarFile);
+
+        const uploadResponse = await fetch('/api/upload-image', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const uploadData = await uploadResponse.json();
+
+        if (!uploadResponse.ok) throw new Error(uploadData.message);
+
+        avatarUrl = uploadData.publicUrl;
+        console.log(avatarUrl);
+      } catch (err) {
+        setError(`Avatar upload failed: ${err.message}`);
+        setLoading(false);
+        return;
+      }
+    }
+
+    // 2. Persiapan Payload Pengguna
+    const payload = {
+      name: formData.fullName,
+      email: formData.email,
+      role: formData.role,
+      isActive: formData.status === 'Active',
+      avatar: avatarUrl, // Tambahkan URL avatar yang baru/lama
+    };
+
+    console.log(payload);
+
+    if (formData.password || isCreating) {
+      payload.password = formData.password;
+    }
+
+    // ... (Validasi dasar tetap sama) ...
+    if (
+      !payload.name ||
+      !payload.email ||
+      !payload.role ||
+      (isCreating && !payload.password)
+    ) {
+      alert(
+        'Please fill in all required fields (Full Name, Email, Role, and Password for new user).'
+      );
+      setLoading(false);
+      return;
+    }
+
+    // 3. Panggil API User (Create/Update)
+    try {
+      let response;
+      if (isCreating) {
+        // CREATE
+        response = await fetch('/api/users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+      } else {
+        // UPDATE
+        response = await fetch(`/api/users/${currentUser.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+      }
+
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(
+          errData.message ||
+            `Failed to ${isCreating ? 'create' : 'update'} user`
+        );
+      }
+
+      closeModal();
+      fetchUsers(); // Refresh data
+    } catch (err) {
+      setError(err.message);
+      console.error(err);
+      alert(`Error: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // --- Handler Delete ---
+  const handleDelete = async (userId, userName) => {
+    if (!window.confirm(`Are you sure you want to delete user ${userName}?`)) {
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`/api/users/${userId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete user');
+      }
+
+      fetchUsers(); // Refresh data
+    } catch (err) {
+      setError(err.message);
+      console.error(err);
+      alert(`Error: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -96,33 +277,58 @@ export default function UserForm() {
             onChange={(e) => setRoleFilter(e.target.value)}
             className="h-[44px] w-[143px] rounded-md border border-gray-300 px-4 text-sm"
           >
-            <option value="">Role</option>
-            <option value="Admin">Admin</option>
-            <option value="Editor">Editor</option>
-            <option value="Viewer">Viewer</option>
+            <option value="">All Roles</option>
+            <option value="admin">Admin</option>
+            <option value="editor">Editor</option>
+            <option value="viewer">Viewer</option>
           </select>
 
           <div className="flex flex-1 justify-end">
             <button
               onClick={() => openModal()}
-              className="h-[44px] w-[177px] rounded-[12px] bg-[#2AB2C7] px-6 font-medium text-white"
+              className="h-[44px] w-[177px] rounded-[12px] bg-[#2AB2C7] px-6 font-medium text-white transition-opacity hover:opacity-90"
+              disabled={loading}
             >
               Add New User +
             </button>
           </div>
         </div>
 
-        {/* Table */}
+        {/* --- Table --- */}
         <div className="flex min-h-[596px] w-full flex-col overflow-hidden rounded-lg border border-gray-200">
           {/* Table Header */}
           <div className="grid grid-cols-[3fr_1fr_1fr] items-center border-b border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-700">
             <span>Users</span>
             <span>Role</span>
-            <span className="justify-self-end">Action</span>{' '}
-            {/* Pastikan header Action sejajar kanan */}
+            <span className="justify-self-end">Action</span>
           </div>
 
-          {/* Table Row */}
+          {/* Loading State */}
+          {loading && users.length === 0 && (
+            <div className="flex items-center justify-center py-10">
+              <CgSpinner className="animate-spin text-4xl text-[#2AB2C7]" />
+              <span className="ml-2 text-gray-500">Loading users...</span>
+            </div>
+          )}
+
+          {/* Error State */}
+          {error && (
+            <div
+              className="relative m-4 rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700"
+              role="alert"
+            >
+              <strong className="font-bold">Error:</strong>
+              <span className="ml-2 block sm:inline">{error}</span>
+            </div>
+          )}
+
+          {/* Table Rows */}
+          {!loading && filteredUsers.length === 0 && (
+            <div className="flex items-center justify-center py-10 text-gray-500">
+              No users found.
+            </div>
+          )}
+
           {filteredUsers.map((user) => (
             <div
               key={user.id}
@@ -131,11 +337,11 @@ export default function UserForm() {
               {/* User Info */}
               <div className="flex items-center gap-3">
                 <Image
-                  src={user.avatar}
+                  src={user.avatar_url} // Menggunakan avatar dari data yang sudah diolah
                   alt={user.name}
                   width={40}
                   height={40}
-                  className="rounded-full"
+                  className="rounded-full object-cover"
                 />
                 <div className="flex flex-col">
                   <span className="font-medium">{user.name}</span>
@@ -149,7 +355,7 @@ export default function UserForm() {
               {/* Actions */}
               <div className="flex items-center justify-end gap-4">
                 <Image
-                  src="/icon/db-u-edit.png" // icon dari folder public
+                  src="/icon/db-u-edit.png"
                   alt="Edit"
                   width={20}
                   height={20}
@@ -162,6 +368,7 @@ export default function UserForm() {
                   width={20}
                   height={20}
                   className="cursor-pointer"
+                  onClick={() => handleDelete(user.id, user.name)}
                 />
                 <Image
                   src="/icon/db-u-right.png"
@@ -169,6 +376,7 @@ export default function UserForm() {
                   width={20}
                   height={20}
                   className="cursor-pointer"
+                  // Logika untuk menampilkan detail pengguna bisa ditambahkan di sini
                 />
               </div>
             </div>
@@ -178,126 +386,186 @@ export default function UserForm() {
         {/* Footer */}
         <div className="w-max-screen flex h-[40px] w-full items-center justify-between px-4">
           <span className="text-sm text-gray-600">
-            Showing 10 from 1000 users
+            Showing {filteredUsers.length} from {users.length} users
           </span>
           <div className="flex gap-2">
-            <button className="flex h-[40px] w-[142px] items-center justify-center gap-[10px] rounded-[16px] border border-[#DCDCDC] bg-white px-[20px] py-[8px] text-sm hover:bg-gray-200">
+            {/* Paginasi yang sebenarnya membutuhkan state dan logika tambahan. Sementara, tombol hanya placeholder. */}
+            <button
+              className="flex h-[40px] w-[142px] items-center justify-center gap-[10px] rounded-[16px] border border-[#DCDCDC] bg-white px-[20px] py-[8px] text-sm hover:bg-gray-200"
+              disabled
+            >
               Previous
             </button>
-            <button className="flex h-[40px] w-[142px] items-center justify-center gap-[10px] rounded-[16px] border border-[#DCDCDC] bg-white px-[24px] py-[8px] text-sm hover:bg-gray-200">
+            <button
+              className="flex h-[40px] w-[142px] items-center justify-center gap-[10px] rounded-[16px] border border-[#DCDCDC] bg-white px-[24px] py-[8px] text-sm hover:bg-gray-200"
+              disabled
+            >
               Next
             </button>
           </div>
         </div>
       </div>
 
-      {/* Modal Overlay */}
+      {/* --- Modal Overlay --- */}
       {isModalOpen && (
-        <div className="bg-opacity-50 fixed inset-0 z-50 backdrop-blur-md">
-          <div
-            className={`fixed top-0 right-0 h-full w-[1070px] bg-white shadow-2xl transition-transform duration-300 ${
+        <div className="bg-opacity-20 fixed inset-0 z-50 backdrop-blur-sm">
+          <form
+            onSubmit={handleSubmit}
+            // Ganti w-[1070px] agar lebih responsif, tapi tetap lebar
+            className={`max-w-8xl fixed top-0 right-0 h-full w-full bg-white shadow-2xl transition-transform duration-300 sm:w-[500px] md:w-[700px] lg:w-[1070px] ${
               isModalOpen ? 'translate-x-0' : 'translate-x-full'
             }`}
           >
             {/* Header */}
             <div className="flex h-[80px] items-center border-b border-gray-200 px-8">
               <button
-                onClick={() => setIsModalOpen(false)}
-                className="mr-4 text-2xl text-gray-600 hover:text-gray-800"
+                type="button"
+                onClick={closeModal}
+                // Ikon kembali sesuai dengan gaya yang baru (diperbesar dan berlatar)
+                className="mr-4 flex h-8 w-8 items-center justify-center rounded-full bg-zinc-100 text-xl text-black transition-colors hover:bg-zinc-200"
               >
                 ←
               </button>
-              <h2 className="text-2xl font-semibold">
+              <h2 className="font-hanken text-3xl leading-10 font-bold text-black">
                 {currentUser ? 'Edit User' : 'Create New User'}
               </h2>
             </div>
-
             {/* Content */}
-            <div className="h-[calc(100%-160px)] overflow-y-auto px-8 py-6">
-              {/* Profile Picture */}
-              <div className="mb-6 flex items-center gap-4">
-                <div className="h-[80px] w-[80px] rounded-full bg-gray-200"></div>
-                <div>
-                  <p className="text-sm font-bold text-gray-700">
-                    Profile Picture
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    Upload a picture to display on the user list and profile
-                    page
-                  </p>
-                  <button className="mt-2 text-sm font-medium text-[#2AB2C7]">
-                    Browse File
-                  </button>
+            {/* Menggunakan padding lebih besar (px-8 py-10) dan wrapper untuk membatasi lebar konten (~855px) */}
+            <div className="h-[calc(100%-160px)] overflow-y-auto px-8 py-10">
+              <div className="mx-auto flex w-full max-w-[855px] flex-col gap-9">
+                {/* 1. Profile Picture */}
+                <div className="flex items-center gap-5">
+                  <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-gray-200 text-xs text-gray-500">
+                    <Image
+                      src={avatarPreview || '/icon/db-user-1.png'}
+                      alt="Profile"
+                      width={96} // 24 * 4 = 96px (3rem)
+                      height={96}
+                      className="h-full w-full rounded-full object-cover"
+                    />
+                  </div>
+                  <div className="flex flex-1 flex-col items-start gap-2">
+                    <div className="flex flex-col gap-1">
+                      <div className="text-base font-medium text-black">
+                        Profile Picture
+                      </div>
+                      <div className="text-xs font-normal text-neutral-400">
+                        Upload a profile image to display on the user list and
+                        profile page.
+                      </div>
+                    </div>
+
+                    {/* Tombol Upload New Photo (Menggantikan Browse File) */}
+                    <button
+                      type="button"
+                      onClick={triggerFileInput}
+                      className="inline-flex items-center justify-center gap-2.5 rounded-2xl border border-zinc-300 bg-white px-5 py-2 text-base font-medium text-zinc-800 outline outline-1 outline-offset-[-1px] transition-colors hover:bg-zinc-50"
+                      disabled={loading}
+                    >
+                      Upload New Photo
+                    </button>
+                    {avatarFile && (
+                      <p className="mt-1 text-xs text-green-600">
+                        File selected: **{avatarFile.name}**
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
 
-              {/* Form Fields */}
-              <div className="flex flex-col gap-6">
-                <FormField
-                  label="Full Name"
-                  description="Enter the user's full name as it should appear across the system"
-                  placeholder="Enter full name"
-                  value={formData.fullName}
-                  onChange={(e) =>
-                    setFormData({ ...formData, fullName: e.target.value })
-                  }
+                {/* Input File Tersembunyi (Tidak diubah) */}
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  accept="image/*"
+                  className="hidden"
                 />
 
-                <FormField
-                  label="Email Address"
-                  description="Provide a valid email address for account identification and notifications"
-                  type="email"
-                  placeholder="Enter email address"
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                />
+                {/* 2. Form Fields Lainnya (Menggunakan FormField dengan gaya baru) */}
+                {/* Catatan: Karena kita tidak dapat mengubah internal FormField, kita hanya dapat memengaruhi styling eksternal.
+            Jika FormField Anda mendukung styling baru (rounded-2xl, px-4 py-3, dll.) ini akan terlihat lebih baik.
+            Untuk saat ini, kita mengasumsikan FormField telah diperbarui atau hanya mempengaruhi label/deskripsi. */}
 
-                <FormField
-                  label="Password"
-                  description="Set a secure password for this user. Leave blank if you don't want to change the password"
-                  type="password"
-                  placeholder="Enter password"
-                  value={formData.password}
-                  onChange={(e) =>
-                    setFormData({ ...formData, password: e.target.value })
-                  }
-                />
+                <div className="flex flex-col gap-6">
+                  <FormField
+                    label="Full Name"
+                    description="Enter the user's full name as it should appear across the system."
+                    placeholder="Enter full name"
+                    value={formData.fullName}
+                    onChange={(e) =>
+                      setFormData({ ...formData, fullName: e.target.value })
+                    }
+                    // Anda mungkin perlu menambahkan `inputClassName="rounded-2xl px-4 py-3 border border-zinc-300"` jika FormField mendukung
+                  />
 
-                {/* Role Dropdown */}
+                  <FormField
+                    label="Email Address"
+                    description="Provide a valid email address for account identification and notifications."
+                    type="email"
+                    placeholder="Enter email address"
+                    value={formData.email}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
+                  />
+
+                  <FormField
+                    label="Password"
+                    description={
+                      currentUser
+                        ? 'Set a new password. Leave blank to keep current password.'
+                        : 'Set a secure password for this user.'
+                    }
+                    type="password"
+                    placeholder="Enter password"
+                    value={formData.password}
+                    onChange={(e) =>
+                      setFormData({ ...formData, password: e.target.value })
+                    }
+                  />
+                </div>
+
+                {/* 3. Role Dropdown */}
                 <div className="flex w-full flex-col gap-2">
-                  <label className="text-sm font-bold text-gray-700">
-                    Role
-                  </label>
-                  <span className="text-xs text-gray-400">
-                    Select the role that defines the users access level and
-                    permissions
-                  </span>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-base font-medium text-black">
+                      Role
+                    </label>
+                    <span className="text-xs font-normal text-neutral-400">
+                      Select the role that defines the user’s access level and
+                      permissions.
+                    </span>
+                  </div>
                   <select
                     value={formData.role}
                     onChange={(e) =>
                       setFormData({ ...formData, role: e.target.value })
                     }
-                    className="h-[44px] w-full rounded-[12px] border border-gray-300 px-4 py-3 text-sm outline-none"
+                    className="h-[44px] w-full appearance-none rounded-xl border border-zinc-300 bg-white px-4 py-3 text-base transition-colors outline-none focus:border-[#2AB2C7]" // rounded-xl dan outline style baru
                   >
-                    <option value="">Role</option>
-                    <option value="Admin">Admin</option>
-                    <option value="Editor">Editor</option>
-                    <option value="Viewer">Viewer</option>
+                    <option value="" disabled>
+                      Select Role
+                    </option>
+                    <option value="admin">Admin</option>
+                    <option value="editor">Editor</option>
+                    <option value="viewer">Viewer</option>
                   </select>
                 </div>
 
-                {/* Status Radio Buttons */}
-                <div className="flex w-full flex-col gap-2">
-                  <label className="text-sm font-bold text-gray-700">
-                    Status
-                  </label>
-                  <span className="text-xs text-gray-400">
-                    Choose whether the user is currently active in the system
-                  </span>
+                {/* 4. Status Radio Buttons */}
+                <div className="flex w-full flex-col gap-4">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-base font-medium text-black">
+                      Status
+                    </label>
+                    <span className="text-xs font-normal text-neutral-400">
+                      Choose whether the user is currently active in the system.
+                    </span>
+                  </div>
                   <div className="flex gap-6">
-                    <label className="flex items-center gap-2">
+                    {/* Active */}
+                    <label className="flex items-center gap-2.5">
                       <input
                         type="radio"
                         name="status"
@@ -306,11 +574,17 @@ export default function UserForm() {
                         onChange={(e) =>
                           setFormData({ ...formData, status: e.target.value })
                         }
-                        className="h-4 w-4"
+                        // Styling radio button yang lebih modern
+                        className="h-6 w-6 border-[1.71px] border-[#2AB2C7] text-[#2AB2C7] focus:ring-0"
                       />
-                      <span className="text-sm">Active</span>
+                      <span
+                        className={`text-sm leading-5 ${formData.status === 'Active' ? 'text-[#2AB2C7]' : 'text-gray-400'}`}
+                      >
+                        Active
+                      </span>
                     </label>
-                    <label className="flex items-center gap-2">
+                    {/* Inactive */}
+                    <label className="flex items-center gap-2.5">
                       <input
                         type="radio"
                         name="status"
@@ -319,28 +593,47 @@ export default function UserForm() {
                         onChange={(e) =>
                           setFormData({ ...formData, status: e.target.value })
                         }
-                        className="h-4 w-4"
+                        // Styling radio button yang lebih modern
+                        className="h-6 w-6 border-[1.71px] border-gray-400 text-[#2AB2C7] focus:ring-0"
                       />
-                      <span className="text-sm">Inactive</span>
+                      <span
+                        className={`text-sm leading-5 ${formData.status === 'Inactive' ? 'text-[#2AB2C7]' : 'text-gray-400'}`}
+                      >
+                        Inactive
+                      </span>
                     </label>
                   </div>
                 </div>
-              </div>
-            </div>
-
+              </div>{' '}
+              {/* Akhir dari wrapper max-w-[855px] */}
+            </div>{' '}
+            {/* Akhir dari Content */}
             {/* Footer Buttons */}
-            <div className="absolute right-0 bottom-0 left-0 flex h-[80px] items-center justify-end gap-4 border-t border-gray-200 px-8">
+            {/* Menggunakan styling dan ukuran font baru: rounded-xl/2xl, font-semibold, text-xl */}
+            <div className="absolute right-0 bottom-0 left-0 flex h-[80px] items-center justify-end gap-5 border-t border-gray-200 px-8">
               <button
-                onClick={() => setIsModalOpen(false)}
-                className="h-[44px] w-[120px] rounded-[12px] border border-gray-300 bg-white px-6 font-medium text-gray-700"
+                type="button"
+                onClick={closeModal}
+                className="flex h-auto w-48 items-center justify-center gap-5 rounded-xl border border-stone-300 bg-white px-6 py-3 text-xl font-semibold text-neutral-600 outline outline-1 outline-offset-[-1px] transition-colors hover:bg-gray-50"
+                disabled={loading}
               >
                 Cancel
               </button>
-              <button className="h-[44px] w-[120px] rounded-[12px] bg-[#2AB2C7] px-6 font-medium text-white">
-                {currentUser ? 'Update' : 'Save'}
+              <button
+                type="submit"
+                className="flex h-auto w-48 items-center justify-center gap-3 rounded-2xl bg-[#2AB2C7] px-6 py-3 text-xl font-semibold text-white transition-opacity hover:opacity-90"
+                disabled={loading}
+              >
+                {loading ? (
+                  <CgSpinner className="animate-spin text-xl" />
+                ) : currentUser ? (
+                  'Update'
+                ) : (
+                  'Save'
+                )}
               </button>
             </div>
-          </div>
+          </form>
         </div>
       )}
     </div>
