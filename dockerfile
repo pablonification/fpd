@@ -14,6 +14,7 @@ RUN npm install
 
 # Copy all source code
 COPY . .
+# s
 
 # Build Next.js
 RUN npm run build
