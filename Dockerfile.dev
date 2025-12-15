@@ -1,0 +1,16 @@
+# Development with Hot Reload (Next.js dev mode)
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install dependencies first (cache layer)
+COPY package.json package-lock.json ./
+RUN npm install
+
+# Copy the rest of the project
+COPY . .
+
+# Expose Next.js development port
+EXPOSE 3000
+
+CMD ["npm", "run", "dev"]
