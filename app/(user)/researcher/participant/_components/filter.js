@@ -4,12 +4,15 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HiChevronDown, HiCheck, HiSearch } from 'react-icons/hi';
 
-export default function FilterRow() {
+export default function FilterRow({ search = '', onSearchChange }) {
   const [roleOpen, setRoleOpen] = useState(false);
   const [expertiseOpen, setExpertiseOpen] = useState(false);
 
   const [selectedRole, setSelectedRole] = useState('');
   const [selectedExpertise, setSelectedExpertise] = useState('');
+
+  // Local search state fallback when parent doesn't control it
+  const [localSearch, setLocalSearch] = useState('');
 
   const roles = ['Admin', 'Researcher', 'Participant'];
   const expertises = ['Frontend', 'Backend', 'AI', 'Data Science'];
@@ -21,6 +24,15 @@ export default function FilterRow() {
           <input
             type="text"
             placeholder="Search researchers by name or expertise"
+            value={onSearchChange ? search : localSearch}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (onSearchChange) {
+                onSearchChange(val);
+              } else {
+                setLocalSearch(val);
+              }
+            }}
             className="h-[48px] w-full rounded-[16px] border border-gray-300 bg-white/70 px-5 pr-12 text-gray-700 shadow-sm backdrop-blur-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
           />
           <HiSearch className="absolute top-1/2 right-4 h-5 w-5 -translate-y-1/2 text-gray-500" />
