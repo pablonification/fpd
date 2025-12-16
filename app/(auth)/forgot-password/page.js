@@ -38,15 +38,20 @@ export default function ForgotPassPage() {
         </div>
 
         {/* Button */}
-        <button className="w-full rounded-2xl bg-[#2AB2C7] px-6 py-3 text-base font-medium text-white">
-          Send password reset link
-        </button>
+        <a href="/new-password">
+          <button className="w-full rounded-2xl bg-[#2AB2C7] px-6 py-3 text-base font-medium text-white">
+            Send password reset link
+          </button>
+        </a>
 
         {/* Footer: Back to Login & Resend */}
         <div className="mt-2 flex w-full justify-between">
-          <span className="cursor-pointer text-sm leading-4 font-normal text-stone-500 underline">
-            Back to Login
-          </span>
+          <a href="/login">
+            <span className="cursor-pointer text-sm leading-4 font-normal text-stone-500 underline">
+              Back to Login
+            </span>
+          </a>
+
           <span className="text-Primary600 cursor-pointer text-sm leading-4 font-bold">
             Resend link
           </span>
