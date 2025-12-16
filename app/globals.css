@@ -3,6 +3,13 @@
 :root {
   --background: #f8f8f8;
   --foreground: #3d3d3d;
+  --primary-700: #2497a9;
+  --primary-100: #dff5f8;
+  --neutral-200: #dcdcdc;
+  --neutral-400: #989898;
+  --neutral-500: #7c7c7c;
+  --neutral-800: #464646;
+  --black: #000000;
 }
 
 @theme inline {
@@ -29,4 +36,36 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.bg-primary-100 {
+  background-color: var(--primary-100);
+}
+
+.bg-primary-700 {
+  background-color: var(--primary-700);
+}
+
+.text-neutral-500 {
+  color: var(--neutral-500);
+}
+
+.text-neutral-400 {
+  color: var(--neutral-400);
+}
+
+.text-neutral-800 {
+  color: var(--neutral-800);
+}
+
+.text-black {
+  color: var(--black);
+}
+
+.outline-neutral-200 {
+  outline-color: var(--neutral-200);
+}
+
+.bg-neutral-200 {
+  background-color: var(--neutral-200);
 }
