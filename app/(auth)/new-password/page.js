@@ -63,9 +63,11 @@ export default function NewPassPage() {
 
         {/* Back to login */}
         <div className="mt-2 flex w-full justify-center">
-          <span className="cursor-pointer text-sm leading-4 font-normal text-stone-500 underline">
-            Back to Login
-          </span>
+          <a href="/login">
+            <span className="cursor-pointer text-sm leading-4 font-normal text-stone-500 underline">
+              Back to Login
+            </span>
+          </a>
         </div>
       </div>
     </div>
