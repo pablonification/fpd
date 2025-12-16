@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function LoginPage() {
   return (
     <div className="relative flex h-screen w-full items-center justify-center bg-gradient-to-b from-[#DFF5F8] to-white">
@@ -38,15 +40,22 @@ export default function LoginPage() {
             />
             <div className="mt-1 text-sm leading-4 font-normal text-neutral-500">
               Forgot password?{' '}
-              <span className="cursor-pointer underline">Click here</span>
+              <Link
+                href="/forgot-password"
+                className="cursor-pointer underline"
+              >
+                Click here
+              </Link>
             </div>
           </div>
         </div>
 
         {/* Button */}
-        <button className="bg-Primary600 w-full rounded-2xl px-6 py-3 text-base font-medium text-white">
-          Login
-        </button>
+        <a href="/dashboard">
+          <button className="w-full rounded-2xl bg-[#2AB2C7] px-6 py-3 text-base font-medium text-white">
+            Login
+          </button>
+        </a>
       </div>
     </div>
   );
