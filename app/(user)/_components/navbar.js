@@ -81,11 +81,17 @@ export default function Navbar() {
           >
             Gallery
           </Link>
+          <Link
+            href="/about"
+            className="text-grayDark hover:text-primaryGradientEnd transition"
+          >
+            About
+          </Link>
         </div>
 
         {/* Sign Up */}
         <Link
-          href="/signup"
+          href="/login"
           className="bg-grayDark hidden items-center rounded-3xl px-4 py-2 text-white transition hover:opacity-90 md:flex"
         >
           Sign Up
@@ -166,7 +172,7 @@ export default function Navbar() {
               Gallery
             </Link>
             <Link
-              href="/signup"
+              href="/login"
               className="bg-grayDark flex items-center justify-center rounded-3xl px-4 py-2 text-white transition hover:opacity-90"
             >
               Sign Up
