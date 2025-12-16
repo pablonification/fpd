@@ -7,7 +7,8 @@ import ContentRenderer from '../_components/ContentRenderer';
 const navItems = [
   { name: 'Home', icon: '/icon/db-home-1.png' },
   { name: 'Users', icon: '/icon/db-user-1.png' },
-  { name: 'Projects/Researcher', icon: '/icon/db-research-1.png' },
+  { name: 'Research Projects', icon: '/icon/db-research-1.png' },
+  { name: 'Researcher', icon: '/icon/db-researcher.png' },
   { name: 'Gallery', icon: '/icon/db-gallery.png' },
   { name: 'Contact', icon: '/icon/db-contact.png' },
   { name: 'About', icon: '/icon/db-about.png' },
