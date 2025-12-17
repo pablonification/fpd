@@ -53,38 +53,36 @@ export default function ResearchProject() {
       : projects.filter((p) => p.researcherCategory === filter);
 
   return (
-    <main className="mt-32 min-h-screen w-full overflow-visible overflow-x-hidden">
-      <div className="mx-auto flex w-full max-w-[1296px] flex-col gap-6 px-4 py-10">
+    <main className="mt-24 min-h-screen w-full overflow-visible overflow-x-hidden sm:mt-16 md:mt-20 lg:mt-32">
+      <div className="mx-auto flex w-full max-w-[1296px] flex-col gap-4 px-4 py-6 sm:gap-6 sm:px-6 sm:py-10">
         {/* HEADER */}
-        <header className="flex w-full flex-col items-center gap-3 text-center">
-          <h1 className="text-[48px] leading-[60px] font-bold tracking-[-1%] text-black sm:text-[60px] sm:leading-[72px]">
+        <header className="flex w-full flex-col items-center gap-2 text-center sm:gap-3">
+          <h1 className="text-2xl font-bold tracking-tight text-black sm:text-3xl md:text-4xl lg:text-5xl">
             Research & Projects
           </h1>
-          <p className="max-w-[900px] text-[18px] leading-[28px] tracking-[-1%] text-[#7C7C7C] sm:text-[24px] sm:leading-[32px]">
+          <p className="max-w-[900px] text-sm text-gray-600 sm:text-base md:text-lg lg:text-xl">
             Explore our ongoing studies, completed works, upcoming initiatives,
             and scientific publications.
           </p>
         </header>
 
         {/* NAVBAR KECIL */}
-        <div className="mt-4 flex h-[48px] w-full items-center justify-between">
-          <div className="flex gap-6">
-            <FilterDropdown filter={filter} setFilter={setFilter} />
+        <div className="mt-2 flex w-full flex-col gap-4 sm:mt-4">
+          {/* First row: Tab buttons */}
+          <div className="flex flex-wrap gap-3 sm:gap-6">
             <button
               onClick={() => setTab('ongoing')}
-              className={`pb-1 text-lg ${
-                tab === 'ongoing'
-                  ? 'border-b-2 border-black font-semibold'
-                  : 'text-gray-500'
+              className={`pb-1 text-sm font-medium sm:text-base ${
+                tab === 'ongoing' ? 'border-b-2 border-black' : 'text-gray-500'
               }`}
             >
               Ongoing
             </button>
             <button
               onClick={() => setTab('completed')}
-              className={`pb-1 text-lg ${
+              className={`pb-1 text-sm font-medium sm:text-base ${
                 tab === 'completed'
-                  ? 'border-b-2 border-black font-semibold'
+                  ? 'border-b-2 border-black'
                   : 'text-gray-500'
               }`}
             >
@@ -92,9 +90,9 @@ export default function ResearchProject() {
             </button>
             <button
               onClick={() => setTab('upcomming')}
-              className={`pb-1 text-lg ${
+              className={`pb-1 text-sm font-medium sm:text-base ${
                 tab === 'upcomming'
-                  ? 'border-b-2 border-black font-semibold'
+                  ? 'border-b-2 border-black'
                   : 'text-gray-500'
               }`}
             >
@@ -102,11 +100,15 @@ export default function ResearchProject() {
             </button>
           </div>
 
-          <YearDropdown />
+          {/* Second row: Filter dropdowns */}
+          <div className="flex flex-wrap gap-3 sm:gap-6">
+            <FilterDropdown filter={filter} setFilter={setFilter} />
+            <YearDropdown />
+          </div>
         </div>
 
         {/* GRID PROJECT CARD */}
-        <div className="grid w-full gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
           {loading ? (
             <div className="col-span-full flex items-center justify-center py-8">
               <span className="text-gray-500">Loading...</span>

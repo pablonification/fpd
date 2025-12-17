@@ -57,7 +57,7 @@ export default function FilterDropdown() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.2 }}
-            className="absolute right-0 z-30 mt-2 w-56 rounded-lg border border-gray-200 bg-white shadow-lg"
+            className="absolute left-0 z-30 mt-2 w-56 rounded-lg border border-gray-200 bg-white shadow-lg"
           >
             <ul className="flex flex-col py-1 text-gray-700" role="listbox">
               {options.map((opt) => {
