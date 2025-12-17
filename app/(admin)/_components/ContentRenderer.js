@@ -1,6 +1,7 @@
 import ContactForm from '../content/Contact';
 import Gallery from '../content/Gallery';
 import Home from '../content/Home';
+import NewsAdmin from '../content/News';
 import Researcher from '../content/Researcher';
 import ResearchProjectManagement from '../content/ResearchProject';
 import UserForm from '../content/User';
@@ -23,6 +24,8 @@ export default function ContentRenderer({ activeItem }) {
       return <Gallery></Gallery>;
     case 'Researcher':
       return <Researcher></Researcher>;
+    case 'News':
+      return <NewsAdmin></NewsAdmin>;
     default:
       return <div>Pilih menu</div>;
   }
