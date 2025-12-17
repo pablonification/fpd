@@ -10,6 +10,7 @@ const navItems = [
   { name: 'Research Projects', icon: '/icon/db-research-1.png' },
   { name: 'Researcher', icon: '/icon/db-researcher.png' },
   { name: 'Gallery', icon: '/icon/db-gallery.png' },
+  { name: 'News', icon: '/icon/db-gallery.png' },
   { name: 'Contact', icon: '/icon/db-contact.png' },
   { name: 'About', icon: '/icon/db-about.png' },
 ];

@@ -30,7 +30,7 @@ export const usersRelations = relations(users, ({ many }) => ({
 }));
 
 export const projectStatusEnum = pgEnum('project_status', [
-  'running',
+  'ongoing',
   'completed',
   'upcoming',
 ]);
@@ -42,19 +42,14 @@ export const projects = pgTable('projects', {
   status: projectStatusEnum('status').notNull().default('upcoming'),
   description: text('description'),
   results: text('results'),
-
-  // Mengubah ke `integer` karena `serial` hanya boleh digunakan sebagai PK
-  leadResearcherId: serial('lead_researcher_id').references(() => users.id),
+  principalInvestigator: text('principal_investigator'),
+  researcherCategory: text('researcher_category'),
 
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
 export const projectsRelations = relations(projects, ({ one, many }) => ({
-  leadResearcher: one(users, {
-    fields: [projects.leadResearcherId],
-    references: [users.id],
-  }),
   publications: many(publications),
 }));
 

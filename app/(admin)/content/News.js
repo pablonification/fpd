@@ -2,24 +2,21 @@
 
 import { useEffect, useState, useMemo } from 'react';
 
-export default function GalleryAdmin() {
+export default function NewsAdmin() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState('add');
-  const [contentType, setContentType] = useState('image');
   const [currentEditId, setCurrentEditId] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
-    description: '',
-    activityType: '',
+    slug: '',
+    content: '',
     imageUrl: '',
-    youtubeUrl: '',
-    activityDate: '',
+    isFeatured: false,
   });
   const [currentPage, setCurrentPage] = useState(1);
-  const [filterType, setFilterType] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const itemsPerPage = 10;
 
@@ -29,14 +26,14 @@ export default function GalleryAdmin() {
       setLoading(true);
       setError('');
       try {
-        const res = await fetch('/api/gallery', { cache: 'no-store' });
+        const res = await fetch('/api/news', { cache: 'no-store' });
         if (!res.ok) throw new Error(`Failed to load: ${res.status}`);
         const response = await res.json();
         if (!active) return;
         const list = response.data || [];
         setItems(list);
       } catch (e) {
-        setError(e.message || 'Failed to load gallery');
+        setError(e.message || 'Failed to load news');
       } finally {
         if (active) setLoading(false);
       }
@@ -52,32 +49,22 @@ export default function GalleryAdmin() {
     setIsModalOpen(true);
     if (data) {
       setCurrentEditId(data.id);
-      const itemType = data.media_type_column || data.type;
       setFormData({
         title: data.title || '',
-        description: data.description || '',
-        activityType: data.category || '',
-        imageUrl:
-          itemType === 'image' || itemType === 'photo'
-            ? data.media_url || data.mediaUrl
-            : '',
-        youtubeUrl: itemType === 'video' ? data.media_url || data.mediaUrl : '',
-        activityDate: data.activity_date || data.activityDate || '',
+        slug: data.slug || '',
+        content: data.content || '',
+        imageUrl: data.imageUrl || data.image_url || '',
+        isFeatured: data.isFeatured || data.is_featured || false,
       });
-      setContentType(
-        itemType === 'image' || itemType === 'photo' ? 'image' : 'video'
-      );
     } else {
       setCurrentEditId(null);
       setFormData({
         title: '',
-        description: '',
-        activityType: '',
+        slug: '',
+        content: '',
         imageUrl: '',
-        youtubeUrl: '',
-        activityDate: '',
+        isFeatured: false,
       });
-      setContentType('image');
     }
   };
 
@@ -85,28 +72,32 @@ export default function GalleryAdmin() {
     setIsModalOpen(false);
     setFormData({
       title: '',
-      description: '',
-      activityType: '',
+      slug: '',
+      content: '',
       imageUrl: '',
-      youtubeUrl: '',
-      activityDate: '',
+      isFeatured: false,
     });
-    setContentType('image');
     setCurrentEditId(null);
   };
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
   };
 
-  const youtubeEmbedUrl = useMemo(() => {
-    if (!formData.youtubeUrl) return '';
-    const regex = /(?:v=|\.be\/)([A-Za-z0-9_-]{6,11})/;
-    const match = formData.youtubeUrl.match(regex);
-    const id = match ? match[1] : null;
-    return id ? `https://www.youtube.com/embed/${id}` : '';
-  }, [formData.youtubeUrl]);
+  // Auto-generate slug from title
+  const generateSlug = () => {
+    const slug = formData.title
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-');
+    setFormData((prev) => ({ ...prev, slug }));
+  };
 
   const onUploadImage = async (file) => {
     if (!file) return;
@@ -135,20 +126,12 @@ export default function GalleryAdmin() {
       setError('Title is required');
       return;
     }
-    if (!formData.activityType) {
-      setError('Activity Type is required');
+    if (!formData.slug.trim()) {
+      setError('Slug is required');
       return;
     }
-    if (!formData.activityDate) {
-      setError('Activity Date is required');
-      return;
-    }
-    if (contentType === 'image' && !formData.imageUrl.trim()) {
-      setError('Please upload an image');
-      return;
-    }
-    if (contentType === 'video' && !formData.youtubeUrl.trim()) {
-      setError('Please enter a YouTube URL');
+    if (!formData.content.trim()) {
+      setError('Content is required');
       return;
     }
 
@@ -156,18 +139,15 @@ export default function GalleryAdmin() {
     setError('');
     try {
       const payload = {
-        type: contentType === 'image' ? 'photo' : 'video',
-        mediaUrl:
-          contentType === 'image'
-            ? formData.imageUrl.trim()
-            : formData.youtubeUrl.trim(),
         title: formData.title.trim(),
-        description: formData.description.trim(),
-        activityDate: formData.activityDate,
+        slug: formData.slug.trim(),
+        content: formData.content.trim(),
+        imageUrl: formData.imageUrl.trim(),
+        isFeatured: formData.isFeatured,
       };
 
       if (currentEditId) {
-        const res = await fetch(`/api/gallery/${currentEditId}`, {
+        const res = await fetch(`/api/news/${currentEditId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
@@ -181,7 +161,7 @@ export default function GalleryAdmin() {
           prev.map((it) => (it.id === currentEditId ? result.data : it))
         );
       } else {
-        const res = await fetch('/api/gallery', {
+        const res = await fetch('/api/news', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
@@ -203,11 +183,11 @@ export default function GalleryAdmin() {
 
   const onDelete = async (id) => {
     if (!id) return;
-    if (!confirm('Are you sure you want to delete this item?')) return;
+    if (!confirm('Are you sure you want to delete this news?')) return;
     setLoading(true);
     setError('');
     try {
-      const res = await fetch(`/api/gallery/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/news/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error(`Delete failed: ${res.status}`);
       setItems((prev) => prev.filter((it) => it.id !== id));
     } catch (e) {
@@ -220,22 +200,17 @@ export default function GalleryAdmin() {
   // Filter and pagination
   const filteredItems = useMemo(() => {
     return items.filter((item) => {
-      const itemType = item.type || item.media_type_column;
-      if (filterType && itemType !== filterType) return false;
-
       // Search filter
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         const matchTitle = item.title?.toLowerCase().includes(query);
-        const matchDescription = item.description
-          ?.toLowerCase()
-          .includes(query);
-        if (!matchTitle && !matchDescription) return false;
+        const matchContent = item.content?.toLowerCase().includes(query);
+        if (!matchTitle && !matchContent) return false;
       }
 
       return true;
     });
-  }, [items, filterType, searchQuery]);
+  }, [items, searchQuery]);
 
   const paginatedItems = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -249,7 +224,7 @@ export default function GalleryAdmin() {
       {/* Header with Search */}
       <div className="inline-flex w-[752px] flex-col items-start justify-start gap-4">
         <div className="text-2xl leading-8 font-semibold text-black">
-          All Gallery
+          All News
         </div>
         <div className="inline-flex items-center justify-start gap-3 self-stretch rounded-2xl bg-white px-5 py-4 outline outline-1 outline-offset-[-1px] outline-zinc-300">
           <div className="relative h-5 w-5">
@@ -279,18 +254,6 @@ export default function GalleryAdmin() {
       {/* Filter Section & Add Button */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <select
-            value={filterType}
-            onChange={(e) => {
-              setFilterType(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="h-[44px] w-[180px] rounded-xl border border-zinc-300 px-4 text-sm transition-colors outline-none focus:border-[#2AB2C7]"
-          >
-            <option value="">All Types</option>
-            <option value="photo">Photos</option>
-            <option value="video">Videos</option>
-          </select>
           <div className="text-sm text-neutral-500">
             Showing {filteredItems.length} items
           </div>
@@ -299,7 +262,7 @@ export default function GalleryAdmin() {
           onClick={() => openModal('add')}
           className="flex items-center justify-center gap-2.5 rounded-2xl bg-[#2AB2C7] px-6 py-3 text-white transition-opacity hover:opacity-90"
         >
-          <div className="text-base leading-5 font-medium">Add New Content</div>
+          <div className="text-base leading-5 font-medium">Add New News</div>
         </button>
       </div>
 
@@ -309,36 +272,7 @@ export default function GalleryAdmin() {
           <div className="relative w-full max-w-3xl overflow-hidden rounded-3xl bg-white shadow-2xl">
             <div className="max-h-[90vh] overflow-y-auto p-8">
               <div className="mb-6 text-2xl font-semibold text-zinc-800">
-                {modalType === 'add' ? 'Add New Content' : 'Edit Content'}
-              </div>
-
-              {/* Content Type Selector */}
-              <div className="mb-6 flex items-center gap-3">
-                <div className="text-base text-neutral-600">Content Type:</div>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setContentType('image')}
-                    className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
-                      contentType === 'image'
-                        ? 'bg-primary-700 text-white'
-                        : 'bg-zinc-100 text-neutral-600 hover:bg-zinc-200'
-                    }`}
-                  >
-                    Image
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setContentType('video')}
-                    className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
-                      contentType === 'video'
-                        ? 'bg-primary-700 text-white'
-                        : 'bg-zinc-100 text-neutral-600 hover:bg-zinc-200'
-                    }`}
-                  >
-                    Video (YouTube)
-                  </button>
-                </div>
+                {modalType === 'add' ? 'Add New News' : 'Edit News'}
               </div>
 
               {/* Form Fields */}
@@ -352,7 +286,8 @@ export default function GalleryAdmin() {
                     name="title"
                     value={formData.title}
                     onChange={handleInputChange}
-                    placeholder="Enter content title"
+                    onBlur={generateSlug}
+                    placeholder="Enter news title"
                     className="w-full rounded-xl border border-zinc-200 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                     required
                   />
@@ -360,129 +295,104 @@ export default function GalleryAdmin() {
 
                 <div>
                   <label className="mb-2 block text-sm font-medium text-zinc-700">
-                    Description
+                    Slug <span className="text-red-500">*</span>
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      name="slug"
+                      value={formData.slug}
+                      onChange={handleInputChange}
+                      placeholder="url-friendly-slug"
+                      className="flex-1 rounded-xl border border-zinc-200 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={generateSlug}
+                      className="rounded-xl border border-zinc-300 bg-white px-4 py-3 text-sm font-medium text-neutral-600 hover:bg-zinc-50"
+                    >
+                      Auto-generate
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-zinc-700">
+                    Content <span className="text-red-500">*</span>
                   </label>
                   <textarea
-                    name="description"
-                    value={formData.description}
+                    name="content"
+                    value={formData.content}
                     onChange={handleInputChange}
-                    placeholder="Enter description"
-                    rows={4}
-                    className="w-full rounded-xl border border-zinc-200 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                  />
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-medium text-zinc-700">
-                    Activity Type <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    name="activityType"
-                    value={formData.activityType}
-                    onChange={handleInputChange}
-                    className="w-full rounded-xl border border-zinc-200 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                    required
-                  >
-                    <option value="">Select Activity Type</option>
-                    <option value="Laboratory Activities">
-                      Laboratory Activities
-                    </option>
-                    <option value="Field Research">Field Research</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-medium text-zinc-700">
-                    Activity Date <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="date"
-                    name="activityDate"
-                    value={formData.activityDate}
-                    onChange={handleInputChange}
+                    placeholder="Enter news content"
+                    rows={8}
                     className="w-full rounded-xl border border-zinc-200 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                     required
                   />
                 </div>
 
-                {contentType === 'image' ? (
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-zinc-700">
-                      Upload Image <span className="text-red-500">*</span>
-                    </label>
-                    <div className="flex flex-col gap-3">
-                      {/* Custom Upload Area */}
-                      <div
-                        onClick={() =>
-                          document.getElementById('fileInput')?.click()
-                        }
-                        className="inline-flex cursor-pointer flex-col items-center justify-start gap-4 self-stretch rounded-2xl px-5 py-8 outline outline-1 outline-offset-[-1px] outline-stone-300 transition-colors hover:bg-zinc-50"
-                      >
-                        <div className="flex flex-col items-center justify-start gap-2">
-                          <div className="relative h-8 w-8">
-                            <div className="absolute top-[14.67px] left-[9.33px] h-2 w-[2.67px] outline outline-1 outline-offset-[-0.55px] outline-stone-500" />
-                            <div className="absolute top-[14.67px] left-[12px] h-[2.67px] w-[2.67px] outline outline-1 outline-offset-[-0.55px] outline-stone-500" />
-                            <div className="absolute top-[2.67px] left-[2.67px] h-7 w-7 outline outline-1 outline-offset-[-0.55px] outline-stone-500" />
-                            <div className="absolute top-[2.67px] left-[18.67px] h-2.5 w-2.5 outline outline-1 outline-offset-[-0.55px] outline-stone-500" />
-                            <div className="absolute top-0 left-0 h-8 w-8 opacity-0" />
-                          </div>
-                          <div className="w-60 text-center text-base leading-5 font-normal text-stone-500">
-                            Attach documents, PDFs, or images related to your
-                            gallery content
-                          </div>
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-zinc-700">
+                    Featured Image
+                  </label>
+                  <div className="flex flex-col gap-3">
+                    {/* Custom Upload Area */}
+                    <div
+                      onClick={() =>
+                        document.getElementById('newsFileInput')?.click()
+                      }
+                      className="inline-flex cursor-pointer flex-col items-center justify-start gap-4 self-stretch rounded-2xl px-5 py-8 outline outline-1 outline-offset-[-1px] outline-stone-300 transition-colors hover:bg-zinc-50"
+                    >
+                      <div className="flex flex-col items-center justify-start gap-2">
+                        <div className="relative h-8 w-8">
+                          <div className="absolute top-[14.67px] left-[9.33px] h-2 w-[2.67px] outline outline-1 outline-offset-[-0.55px] outline-stone-500" />
+                          <div className="absolute top-[14.67px] left-[12px] h-[2.67px] w-[2.67px] outline outline-1 outline-offset-[-0.55px] outline-stone-500" />
+                          <div className="absolute top-[2.67px] left-[2.67px] h-7 w-7 outline outline-1 outline-offset-[-0.55px] outline-stone-500" />
+                          <div className="absolute top-[2.67px] left-[18.67px] h-2.5 w-2.5 outline outline-1 outline-offset-[-0.55px] outline-stone-500" />
+                          <div className="absolute top-0 left-0 h-8 w-8 opacity-0" />
                         </div>
-                        <div className="inline-flex items-center justify-center gap-2.5 rounded-2xl bg-white px-5 py-2 outline outline-1 outline-offset-[-1px] outline-zinc-300">
-                          <div className="text-base leading-5 font-medium text-zinc-800">
-                            Browse File
-                          </div>
+                        <div className="w-60 text-center text-base leading-5 font-normal text-stone-500">
+                          Attach a featured image for this news article
                         </div>
                       </div>
-                      <input
-                        id="fileInput"
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => onUploadImage(e.target.files?.[0])}
-                        className="hidden"
-                      />
-                      {formData.imageUrl && (
-                        <div className="overflow-hidden rounded-xl border border-zinc-200">
-                          <img
-                            src={formData.imageUrl}
-                            alt="Preview"
-                            className="h-64 w-full object-cover"
-                          />
+                      <div className="inline-flex items-center justify-center gap-2.5 rounded-2xl bg-white px-5 py-2 outline outline-1 outline-offset-[-1px] outline-zinc-300">
+                        <div className="text-base leading-5 font-medium text-zinc-800">
+                          Browse File
                         </div>
-                      )}
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-zinc-700">
-                      YouTube Link <span className="text-red-500">*</span>
-                    </label>
                     <input
-                      type="url"
-                      name="youtubeUrl"
-                      value={formData.youtubeUrl}
-                      onChange={handleInputChange}
-                      placeholder="Paste YouTube link here"
-                      className="w-full rounded-xl border border-zinc-200 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                      id="newsFileInput"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => onUploadImage(e.target.files?.[0])}
+                      className="hidden"
                     />
-                    {youtubeEmbedUrl && (
-                      <div className="mt-3 overflow-hidden rounded-xl border border-zinc-200">
-                        <div className="relative h-0 pb-[56.25%]">
-                          <iframe
-                            src={youtubeEmbedUrl}
-                            title="YouTube preview"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                            className="absolute top-0 left-0 h-full w-full"
-                          />
-                        </div>
+                    {formData.imageUrl && (
+                      <div className="overflow-hidden rounded-xl border border-zinc-200">
+                        <img
+                          src={formData.imageUrl}
+                          alt="Preview"
+                          className="h-64 w-full object-cover"
+                        />
                       </div>
                     )}
                   </div>
-                )}
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    name="isFeatured"
+                    checked={formData.isFeatured}
+                    onChange={handleInputChange}
+                    className="h-5 w-5 rounded border-zinc-300 text-[#2AB2C7] focus:ring-2 focus:ring-[#2AB2C7]"
+                  />
+                  <label className="text-sm font-medium text-zinc-700">
+                    Mark as Featured News
+                  </label>
+                </div>
               </div>
 
               {/* Modal Actions */}
@@ -496,7 +406,7 @@ export default function GalleryAdmin() {
                 <button
                   onClick={handleSubmit}
                   disabled={loading}
-                  className="bg-primary-700 hover:bg-primary-700 rounded-xl px-6 py-3 text-base font-medium text-white disabled:opacity-50"
+                  className="rounded-xl bg-[#2AB2C7] px-6 py-3 text-base font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
                 >
                   {loading ? 'Saving...' : 'Save Changes'}
                 </button>
@@ -506,7 +416,7 @@ export default function GalleryAdmin() {
         </div>
       )}
 
-      {/* Gallery Content */}
+      {/* News Content */}
       <div className="overflow-hidden rounded-2xl bg-white px-6 py-3 shadow-sm outline outline-1 outline-offset-[-1px] outline-zinc-100">
         <div className="border-b border-zinc-100 py-4">
           <div className="flex items-center justify-between">
@@ -514,17 +424,17 @@ export default function GalleryAdmin() {
               <div className="w-5 text-base text-neutral-400">Pin</div>
               <div className="w-96 text-base text-neutral-400">Content</div>
             </div>
-            <div className="w-36 text-base text-neutral-400">Category</div>
+            <div className="w-36 text-base text-neutral-400">Featured</div>
             <div className="w-20 text-base text-neutral-400">Date</div>
             <div className="w-28 text-base text-neutral-400">Actions</div>
           </div>
         </div>
 
-        {/* Gallery Items */}
+        {/* News Items */}
         {paginatedItems.map((item) => {
-          const itemType = item.media_type_column || item.type;
-          const mediaUrl = item.media_url || item.mediaUrl;
-          const activityDate = item.activity_date || item.activityDate;
+          const imageUrl = item.imageUrl || item.image_url;
+          const createdAt = item.createdAt || item.created_at;
+          const isFeatured = item.isFeatured || item.is_featured;
 
           return (
             <div
@@ -537,38 +447,36 @@ export default function GalleryAdmin() {
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="relative h-24 w-32 overflow-hidden rounded-3xl bg-stone-300">
-                    {(itemType === 'image' || itemType === 'photo') &&
-                      mediaUrl && (
-                        <img
-                          src={mediaUrl}
-                          alt={item.title}
-                          className="h-full w-full object-cover"
-                        />
-                      )}
-                    {itemType === 'video' && (
-                      <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-neutral-800 to-neutral-600 text-xs font-semibold text-white">
-                        Video
-                      </div>
+                    {imageUrl && (
+                      <img
+                        src={imageUrl}
+                        alt={item.title}
+                        className="h-full w-full object-cover"
+                      />
                     )}
                   </div>
                   <div className="flex flex-col gap-2 px-2">
                     <div className="line-clamp-2 self-stretch text-base leading-5 font-normal text-black">
                       {item.title}
                     </div>
-                    <div className="w-80 text-sm leading-4 font-normal text-neutral-500">
-                      {item.description}
+                    <div className="line-clamp-2 w-80 text-sm leading-4 font-normal text-neutral-500">
+                      {item.content}
                     </div>
                   </div>
                 </div>
               </div>
               <div className="w-36 text-base leading-5 font-normal text-zinc-800">
-                {itemType === 'image' || itemType === 'photo'
-                  ? 'Image'
-                  : 'Video'}
+                {isFeatured ? (
+                  <span className="rounded-full bg-[#2AB2C7]/10 px-3 py-1 text-sm font-medium text-[#2AB2C7]">
+                    Featured
+                  </span>
+                ) : (
+                  <span className="text-neutral-400">-</span>
+                )}
               </div>
               <div className="w-20 text-base leading-5 font-normal text-zinc-800">
-                {activityDate
-                  ? new Date(activityDate).toLocaleDateString('id-ID', {
+                {createdAt
+                  ? new Date(createdAt).toLocaleDateString('id-ID', {
                       day: '2-digit',
                       month: 'short',
                       year: 'numeric',
@@ -621,7 +529,7 @@ export default function GalleryAdmin() {
 
         {paginatedItems.length === 0 && !loading && (
           <div className="py-12 text-center text-neutral-400">
-            No gallery items yet. Click Add New Content to get started.
+            No news yet. Click Add New News to get started.
           </div>
         )}
 

@@ -1,9 +1,20 @@
 import Link from 'next/link';
 
-export default function ProjectCard({ title, date, description }) {
+export default function ProjectCard({
+  id,
+  title,
+  date,
+  description,
+  category,
+}) {
   return (
-    <Link href="/researcher/project/detail" className="block">
+    <Link href={`/researcher/project/${id}`} className="block">
       <div className="flex min-h-[200px] w-full cursor-pointer flex-col gap-2 rounded-3xl bg-white p-4 outline outline-1 outline-zinc-300 transition hover:shadow-md sm:p-6">
+        {category && (
+          <div className="mb-1 text-xs font-medium text-blue-600 sm:text-sm">
+            {category}
+          </div>
+        )}
         <div className="text-lg font-medium text-zinc-800 sm:text-xl">
           {title}
         </div>
