@@ -1,6 +1,7 @@
 'use client';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 
 // FormField Component
 function FormField({
@@ -58,42 +59,9 @@ function TextAreaField({
   );
 }
 
-const projects = [
-  {
-    id: 1,
-    title: 'Drone Survey for Peatland Restoration Drone Sur...',
-    year: 2023,
-    principalInvestigator: 'Prof. Sarah Collins',
-    category: 'Supervisor',
-    status: 'Ongoing',
-  },
-  {
-    id: 2,
-    title: 'Drone Survey for Peatland Restoration Drone Sur...',
-    year: 2023,
-    principalInvestigator: 'Prof. Sarah Collins',
-    category: "Master's Student",
-    status: 'Completed',
-  },
-  {
-    id: 3,
-    title: 'Drone Survey for Peatland Restoration Drone Sur...',
-    year: 2023,
-    principalInvestigator: 'Dr. Leonard Mills Schuett',
-    category: 'Undergraduate Student',
-    status: 'Upcoming',
-  },
-  {
-    id: 4,
-    title: 'Drone Survey for Peatland Restoration Drone Sur...',
-    year: 2023,
-    principalInvestigator: 'Prof. Sarah Collins',
-    category: 'Alumni Researchers',
-    status: 'Completed',
-  },
-];
-
 export default function ResearchProjectManagement() {
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [yearFilter, setYearFilter] = useState('');
   const [specificYear, setSpecificYear] = useState('');
@@ -109,10 +77,101 @@ export default function ResearchProjectManagement() {
     outputs: '',
   });
 
+  // Fetch projects from API
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  const fetchProjects = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/projects');
+      const data = await response.json();
+
+      if (data.success) {
+        setProjects(data.data);
+      } else {
+        toast.error('Failed to fetch projects');
+      }
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+      toast.error('Error loading projects');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const projectData = {
+        title: formData.projectTitle,
+        principalInvestigator: formData.principalInvestigator,
+        researcherCategory: formData.category,
+        year: formData.year,
+        status: formData.status,
+        description: formData.description,
+        results: formData.outputs,
+      };
+
+      const url = currentProject
+        ? `/api/projects/${currentProject.id}`
+        : '/api/projects';
+
+      const method = currentProject ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(projectData),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success(
+          currentProject
+            ? 'Project updated successfully'
+            : 'Project created successfully'
+        );
+        setIsModalOpen(false);
+        fetchProjects(); // Refresh list
+      } else {
+        toast.error(data.error || 'Failed to save project');
+      }
+    } catch (error) {
+      console.error('Error saving project:', error);
+      toast.error('Error saving project');
+    }
+  };
+
+  const handleDelete = async (projectId) => {
+    if (!confirm('Are you sure you want to delete this project?')) return;
+
+    try {
+      const response = await fetch(`/api/projects/${projectId}`, {
+        method: 'DELETE',
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success('Project deleted successfully');
+        fetchProjects();
+      } else {
+        toast.error(data.error || 'Failed to delete project');
+      }
+    } catch (error) {
+      console.error('Error deleting project:', error);
+      toast.error('Error deleting project');
+    }
+  };
+
   const filteredProjects = projects.filter(
     (project) =>
       project.title.toLowerCase().includes(search.toLowerCase()) &&
-      (specificYear ? project.year.toString() === specificYear : true)
+      (specificYear ? project.year === specificYear : true)
   );
 
   const openModal = (project = null) => {
@@ -120,12 +179,14 @@ export default function ResearchProjectManagement() {
     if (project) {
       setFormData({
         projectTitle: project.title,
-        principalInvestigator: project.principalInvestigator,
-        category: project.category,
-        year: project.year.toString(),
-        status: project.status,
-        description: '',
-        outputs: '',
+        principalInvestigator: project.principalInvestigator || '',
+        category: project.researcherCategory || '',
+        year: project.year || '',
+        status: project.status
+          ? project.status.charAt(0).toUpperCase() + project.status.slice(1)
+          : '',
+        description: project.description || '',
+        outputs: project.results || '',
       });
     } else {
       setFormData({
@@ -142,12 +203,14 @@ export default function ResearchProjectManagement() {
   };
 
   const getStatusColor = (status) => {
-    switch (status) {
-      case 'Completed':
+    const statusLower = status?.toLowerCase();
+    switch (statusLower) {
+      case 'completed':
         return 'bg-green-500';
-      case 'Ongoing':
+      case 'ongoing':
+      case 'running':
         return 'bg-yellow-500';
-      case 'Upcoming':
+      case 'upcoming':
         return 'bg-gray-400';
       default:
         return 'bg-gray-400';
@@ -220,49 +283,66 @@ export default function ResearchProjectManagement() {
           </div>
 
           {/* Table Rows */}
-          {filteredProjects.map((project) => (
-            <div
-              key={project.id}
-              className="grid grid-cols-[2fr_0.8fr_1.5fr_1.2fr_0.8fr_0.8fr] items-center gap-4 border-b border-gray-100 px-6 py-4 hover:bg-gray-50"
-            >
-              <span className="text-sm">{project.title}</span>
-              <span className="text-sm">{project.year}</span>
-              <span className="text-sm">{project.principalInvestigator}</span>
-              <span className="text-sm">{project.category}</span>
-              <div className="flex items-center gap-2">
-                <span
-                  className={`h-2 w-2 rounded-full ${getStatusColor(project.status)}`}
-                ></span>
-                <span className="text-sm">{project.status}</span>
-              </div>
-              <div className="flex items-center justify-end gap-3">
-                <div className="flex items-center justify-end gap-4">
-                  <Image
-                    src="/icon/db-u-edit.png" // icon dari folder public
-                    alt="Edit"
-                    width={20}
-                    height={20}
-                    className="cursor-pointer"
-                    onClick={() => openModal(project)}
-                  />
-                  <Image
-                    src="/icon/db-u-trash.png"
-                    alt="Delete"
-                    width={20}
-                    height={20}
-                    className="cursor-pointer"
-                  />
-                  <Image
-                    src="/icon/db-u-right.png"
-                    alt="Info"
-                    width={20}
-                    height={20}
-                    className="cursor-pointer"
-                  />
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <span className="text-gray-500">Loading...</span>
+            </div>
+          ) : filteredProjects.length === 0 ? (
+            <div className="flex items-center justify-center py-8">
+              <span className="text-gray-500">No projects found</span>
+            </div>
+          ) : (
+            filteredProjects.map((project) => (
+              <div
+                key={project.id}
+                className="grid grid-cols-[2fr_0.8fr_1.5fr_1.2fr_0.8fr_0.8fr] items-center gap-4 border-b border-gray-100 px-6 py-4 hover:bg-gray-50"
+              >
+                <span className="text-sm">{project.title}</span>
+                <span className="text-sm">{project.year || '-'}</span>
+                <span className="text-sm">
+                  {project.principalInvestigator || '-'}
+                </span>
+                <span className="text-sm">
+                  {project.researcherCategory || '-'}
+                </span>
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`h-2 w-2 rounded-full ${getStatusColor(project.status)}`}
+                  ></span>
+                  <span className="text-sm capitalize">
+                    {project.status || 'upcoming'}
+                  </span>
+                </div>
+                <div className="flex items-center justify-end gap-3">
+                  <div className="flex items-center justify-end gap-4">
+                    <Image
+                      src="/icon/db-u-edit.png"
+                      alt="Edit"
+                      width={20}
+                      height={20}
+                      className="cursor-pointer"
+                      onClick={() => openModal(project)}
+                    />
+                    <Image
+                      src="/icon/db-u-trash.png"
+                      alt="Delete"
+                      width={20}
+                      height={20}
+                      className="cursor-pointer"
+                      onClick={() => handleDelete(project.id)}
+                    />
+                    <Image
+                      src="/icon/db-u-right.png"
+                      alt="Info"
+                      width={20}
+                      height={20}
+                      className="cursor-pointer"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
 
         {/* Footer Pagination */}
@@ -462,7 +542,10 @@ export default function ResearchProjectManagement() {
               >
                 Cancel
               </button>
-              <button className="h-[44px] w-[120px] rounded-[12px] bg-[#2AB2C7] font-medium text-white hover:opacity-90">
+              <button
+                onClick={handleSubmit}
+                className="h-[44px] w-[120px] rounded-[12px] bg-[#2AB2C7] font-medium text-white hover:opacity-90"
+              >
                 {currentProject ? 'Update' : 'Save'}
               </button>
             </div>

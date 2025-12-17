@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import FilterDropdown from './_components/FilterDropdown';
 import YearDropdown from './_components/YearDropdown';
 import ProjectCard from './_components/ProjectCard';
@@ -8,6 +8,8 @@ import ProjectCard from './_components/ProjectCard';
 export default function ResearchProject() {
   const [tab, setTab] = useState('ongoing');
   const [filter, setFilter] = useState('All');
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const options = [
     'Supervisors',
@@ -16,21 +18,39 @@ export default function ResearchProject() {
     'Alumni Researchers',
   ];
 
-  // Buat dummy data ProjectCard berdasarkan options
-  const projects = options.flatMap((typeLabel) =>
-    Array.from({ length: 3 }).map((_, idx) => ({
-      typeLabel,
-      title: `${typeLabel} Project ${idx + 1}`,
-      date: `Wednesday ${10 + idx} September 2025`,
-      description: `Brief description for ${typeLabel} project ${idx + 1}. Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
-    }))
-  );
+  // Fetch projects from API
+  useEffect(() => {
+    fetchProjects();
+  }, [tab]);
+
+  const fetchProjects = async () => {
+    try {
+      setLoading(true);
+      const statusMap = {
+        ongoing: 'running',
+        completed: 'completed',
+        upcomming: 'upcoming',
+      };
+
+      const url = `/api/projects?status=${statusMap[tab]}`;
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (data.success) {
+        setProjects(data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Filter berdasarkan filter dropdown
   const filteredList =
     filter === 'All'
       ? projects
-      : projects.filter((c) => c.typeLabel === filter);
+      : projects.filter((p) => p.researcherCategory === filter);
 
   return (
     <main className="mt-32 min-h-screen w-full overflow-visible overflow-x-hidden">
@@ -87,14 +107,26 @@ export default function ResearchProject() {
 
         {/* GRID PROJECT CARD */}
         <div className="grid w-full gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {filteredList.map((card, idx) => (
-            <ProjectCard
-              key={idx}
-              title={card.title}
-              date={card.date}
-              description={card.description}
-            />
-          ))}
+          {loading ? (
+            <div className="col-span-full flex items-center justify-center py-8">
+              <span className="text-gray-500">Loading...</span>
+            </div>
+          ) : filteredList.length === 0 ? (
+            <div className="col-span-full flex items-center justify-center py-8">
+              <span className="text-gray-500">No projects found</span>
+            </div>
+          ) : (
+            filteredList.map((project) => (
+              <ProjectCard
+                key={project.id}
+                id={project.id}
+                title={project.title}
+                date={project.year || 'N/A'}
+                description={project.description || 'No description available'}
+                category={project.researcherCategory}
+              />
+            ))
+          )}
         </div>
       </div>
     </main>

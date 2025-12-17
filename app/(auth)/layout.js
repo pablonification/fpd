@@ -12,7 +12,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: 'Official title of this research platform',
+  title: 'Si-Zero Auth',
   description:
     'Brief description about the main purpose of this research platform',
 };

@@ -1,5 +1,5 @@
 import { supabase } from '../../../db/supabaseClient';
-import bcrypt from 'bcrypt'; // Pastikan import bcrypt
+import bcrypt from 'bcryptjs'; // Use bcryptjs (present in package.json)
 export async function GET(req) {
   const { data, error } = await supabase.from('users').select('*');
 

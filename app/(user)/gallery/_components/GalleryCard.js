@@ -156,6 +156,17 @@ export function PhotoModal({ cards = [], index = 0, onClose, setIndex }) {
 export function VideoModal({ index, data, onClose }) {
   if (!data) return null;
 
+  // Convert YouTube URL to embed format
+  const getYoutubeEmbedUrl = (url) => {
+    if (!url) return '';
+    const regex = /(?:v=|\.be\/)([A-Za-z0-9_-]{6,11})/;
+    const match = url.match(regex);
+    const id = match ? match[1] : null;
+    return id ? `https://www.youtube.com/embed/${id}` : url;
+  };
+
+  const embedUrl = getYoutubeEmbedUrl(data.videoUrl);
+
   return (
     <AnimatePresence>
       <motion.div
@@ -175,7 +186,7 @@ export function VideoModal({ index, data, onClose }) {
             {/* VIDEO */}
             <div className="h-[550px] w-[934px] overflow-hidden rounded-[32px] bg-black">
               <iframe
-                src={data.youtubeUrl}
+                src={embedUrl}
                 className="h-full w-full"
                 allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
@@ -187,11 +198,11 @@ export function VideoModal({ index, data, onClose }) {
               <h1 className="text-[32px] font-bold text-black">{data.title}</h1>
 
               <span className="text-[16px] font-medium text-[#2497A9]">
-                {data.activityType}
+                {data.activityType || 'Video Activity'}
               </span>
 
               <span className="text-[14px] font-normal text-[#989898]">
-                {data.date}
+                {data.date ? new Date(data.date).toLocaleDateString() : ''}
               </span>
 
               <p className="text-[18px] leading-[24px] font-medium text-[#7C7C7C]">

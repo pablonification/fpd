@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: 'Official title of this research platform admin panel',
+  title: 'Si-Zero Admin',
   description:
     'Brief description about the admin panel for platform management',
 };
