@@ -53,7 +53,7 @@ export default function DetailProject() {
 
   if (loading) {
     return (
-      <main className="mx-auto mt-[159px] flex min-h-screen w-full items-center justify-center px-[159px]">
+      <main className="mx-auto mt-8 flex min-h-screen w-full items-center justify-center px-4 sm:mt-16 sm:px-6 md:mt-20 lg:mt-32 lg:px-8">
         <div className="text-gray-500">Loading...</div>
       </main>
     );
@@ -61,75 +61,90 @@ export default function DetailProject() {
 
   if (!project) {
     return (
-      <main className="mx-auto mt-[159px] flex min-h-screen w-full items-center justify-center px-[159px]">
+      <main className="mx-auto mt-8 flex min-h-screen w-full items-center justify-center px-4 sm:mt-16 sm:px-6 md:mt-20 lg:mt-32 lg:px-8">
         <div className="text-gray-500">Project not found</div>
       </main>
     );
   }
 
   return (
-    <main className="mx-auto mt-[159px] min-h-screen w-full overflow-visible overflow-x-hidden px-[159px]">
-      <div className="relative flex w-full flex-col items-start justify-center gap-8 rounded-[48px] p-11 outline outline-1 outline-offset-[-1px] outline-zinc-300">
-        <div className="flex w-full items-center justify-end gap-8">
-          <div className="flex items-center gap-4">
-            <div
-              className={`h-2 w-2 rounded-full ${getStatusColor(project.status)}`}
-            />
-            <div className="text-base leading-5 font-normal text-zinc-800">
-              {getStatusText(project.status)}
+    <main className="mx-auto mt-26 min-h-screen w-full overflow-visible overflow-x-hidden px-4 sm:mt-16 sm:px-6 md:mt-20 lg:mt-32 lg:px-8">
+      <div className="lg:rounded-6xl relative flex w-full flex-col items-start justify-center gap-4 rounded-2xl border border-zinc-300 bg-white p-4 sm:gap-6 sm:rounded-3xl sm:p-6 md:rounded-4xl md:p-8 lg:p-11">
+        {/* Header with Status and Year */}
+        <div className="flex w-full flex-col items-start justify-between gap-4 sm:flex-row sm:items-center sm:gap-8">
+          <div />
+          <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-8">
+            <div className="flex items-center gap-2 sm:gap-4">
+              <div
+                className={`h-2 w-2 rounded-full ${getStatusColor(project.status)}`}
+              />
+              <div className="text-xs font-normal text-zinc-800 sm:text-sm lg:text-base">
+                {getStatusText(project.status)}
+              </div>
             </div>
-          </div>
-          <div className="text-base leading-5 font-normal text-zinc-800">
-            {project.year || 'N/A'}
+            <div className="text-xs font-normal text-zinc-800 sm:text-sm lg:text-base">
+              {project.year || 'N/A'}
+            </div>
           </div>
         </div>
 
-        <div className="flex w-full max-w-[1034px] flex-col items-start justify-center gap-3">
-          <div className="justify-center self-stretch text-3xl leading-10 font-bold text-black">
+        {/* Title and Info */}
+        <div className="flex w-full max-w-full flex-col items-start justify-center gap-1 sm:gap-2 md:gap-3">
+          <div className="text-xl font-bold text-black sm:text-2xl md:text-3xl">
             {project.title}
           </div>
-          <div className="justify-center self-stretch text-lg leading-6 font-medium text-black">
+          <div className="text-sm font-medium text-black sm:text-base md:text-lg">
             {project.principalInvestigator || 'N/A'}
           </div>
-          <div className="text-Primary800 justify-start self-stretch text-lg leading-6 font-medium">
+          <div className="text-sm font-medium text-blue-600 sm:text-base md:text-lg">
             {project.researcherCategory || 'N/A'}
           </div>
         </div>
 
+        {/* Divider */}
+        <div className="h-px w-full bg-zinc-100" />
+
+        {/* Description */}
         {project.description && (
-          <div className="justify-center self-stretch text-base leading-5 font-normal text-black">
+          <div className="w-full text-xs font-normal text-black sm:text-sm md:text-base">
             {project.description}
           </div>
         )}
 
+        {/* Research Results */}
         {project.results && (
-          <div className="justify-center self-stretch">
-            <span className="text-base leading-5 font-normal text-black">
+          <div className="w-full">
+            <div className="mb-2 text-xs font-semibold text-black sm:text-sm md:text-base">
               Research Results / Outcomes
-              <br />
-            </span>
-            <span className="text-base leading-5 font-normal text-black">
+            </div>
+            <div className="text-xs font-normal text-black sm:text-sm md:text-base">
               {project.results}
-            </span>
+            </div>
           </div>
         )}
 
-        <div className="relative inline-flex items-center justify-center gap-2 self-stretch">
-          <div className="h-64 w-96 rounded-[36px] bg-zinc-300" />
-          <div className="h-64 w-96 rounded-[36px] bg-zinc-300" />
-          <div className="h-64 flex-1 rounded-[36px] bg-zinc-300" />
-          <div className="absolute top-[115px] left-[877px] flex items-center justify-start gap-2">
-            <div className="justify-center text-base leading-5 font-normal text-black">
-              See More
-            </div>
-            <div data-style="linear" className="relative h-5 w-5">
-              <div className="absolute top-[4.94px] left-[12.03px] h-2.5 w-[5.06px] outline outline-[1.50px] outline-offset-[-0.75px] outline-neutral-900" />
-              <div className="absolute top-[10px] left-[2.92px] h-0 w-3.5 outline outline-[1.50px] outline-offset-[-0.75px] outline-neutral-900" />
-              <div className="absolute top-[20px] left-[20px] h-5 w-5 origin-top-left -rotate-180 opacity-0" />
+        {/* Images Grid */}
+        <div className="relative w-full">
+          <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:gap-4">
+            <div className="aspect-video w-full rounded-lg bg-zinc-300 sm:rounded-2xl md:rounded-3xl" />
+            <div className="aspect-video w-full rounded-lg bg-zinc-300 sm:rounded-2xl md:rounded-3xl" />
+            <div className="aspect-video w-full rounded-lg bg-zinc-300 sm:rounded-2xl md:rounded-3xl" />
+          </div>
+          <div className="mt-3 flex items-center justify-end gap-1 text-xs sm:text-sm md:text-base">
+            <div className="font-normal text-black">See More</div>
+            <div className="h-4 w-4">
+              <svg
+                className="h-full w-full"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
             </div>
           </div>
         </div>
-        <div className="absolute top-[80px] left-[44px] h-px w-[1034px] bg-zinc-100" />
       </div>
     </main>
   );
