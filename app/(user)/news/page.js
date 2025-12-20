@@ -53,16 +53,19 @@ export default function NewsPage() {
   }));
 
   return (
-    <main className="bg-bgMain mt-32 min-h-screen snap-y snap-mandatory overflow-y-scroll">
+    <main className="bg-bgMain mt-42 min-h-screen snap-y snap-mandatory overflow-y-scroll">
       {/* SECTION 1 - Header */}
-      <section className="flex min-h-screen w-full snap-start items-center justify-center px-4 text-black">
-        <div className="flex w-full max-w-5xl flex-col gap-12 md:gap-16">
+      <section className="flex min-h-screen w-full snap-start justify-center px-4 sm:px-6 text-black">
+        <div className="flex w-full max-w-7xl flex-col gap-12 md:gap-16">
           {/* Title */}
-          <div className="flex flex-col items-center gap-4 text-center">
-            <h1 className="text-3xl leading-tight font-bold sm:text-4xl md:text-5xl lg:text-6xl">
+          <header className="flex w-full flex-col items-center gap-3 text-center">
+            <h1 className="text-[48px] leading-[60px] font-bold tracking-[-1%] text-black sm:text-[60px] sm:leading-[72px]">
               News
             </h1>
-          </div>
+            <p className="max-w-[900px] text-[18px] leading-[28px] tracking-[-1%] text-[#7C7C7C] sm:text-[24px] sm:leading-[32px]">
+              Collection of news and updates from our team.
+            </p>
+          </header>
 
           {loading && (
             <div className="text-center text-gray-500">Loading news...</div>
