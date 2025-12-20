@@ -134,3 +134,25 @@ export const files = pgTable('files', {
   mimeType: varchar('mime_type', { length: 100 }),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
+
+export const researcherRoleEnum = pgEnum('researcher_role', [
+  'Principal Investigator',
+  "Master's Student",
+  'Undergraduate Student',
+  'Alumni Researcher',
+  'Collaborator',
+]);
+
+export const researchers = pgTable('researchers', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+  role: researcherRoleEnum('role').notNull(),
+  expertise: text('expertise'),
+  affiliation: text('affiliation'),
+  email: varchar('email', { length: 255 }).notNull(),
+  avatarUrl: text('avatar_url'),
+  description: text('description'),
+  isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
