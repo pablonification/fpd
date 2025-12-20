@@ -17,50 +17,53 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Middle Section - Buttons (Hidden on mobile, visible on sm+) */}
-        <div className="hidden flex-col items-start justify-start gap-4 sm:flex">
-          <div className="text-sm font-medium text-black sm:text-base lg:text-lg">
-            Get in Touch & Visit Us
-          </div>
-          <div className="flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-3">
-            <button className="flex items-center justify-center gap-2.5 rounded-2xl bg-white px-4 py-2 text-xs font-medium text-stone-500 outline outline-1 outline-zinc-300 transition hover:bg-zinc-50 sm:px-6 sm:py-2 sm:text-sm">
-              Visit Our Facility
-            </button>
-            <button className="flex items-center justify-center gap-2.5 rounded-2xl bg-white px-4 py-2 text-xs font-medium text-stone-500 outline outline-1 outline-zinc-300 transition hover:bg-zinc-50 sm:px-6 sm:py-2 sm:text-sm">
-              <div className="h-4 w-4 border-2 border-stone-500" />
-              Connect on LinkedIn
-            </button>
-          </div>
-        </div>
-
-        {/* Right Section - Contact */}
-        <div className="flex w-full flex-col items-start justify-start gap-4 sm:items-center lg:w-auto">
-          <div className="text-sm font-medium text-black sm:text-base lg:text-lg">
-            Contact
-          </div>
-          <div className="flex w-full flex-col items-start justify-start gap-3 sm:flex-row sm:gap-6 lg:gap-8">
-            {/* Contact 1 */}
-            <div className="flex flex-col items-start justify-start gap-1">
-              <div className="text-xs font-medium text-black sm:text-sm lg:text-base">
-                Prof. M. Akbar Rhamdhani
-              </div>
-              <div className="text-xs font-medium text-neutral-400 sm:text-sm lg:text-base">
-                arhamdani@swin.edu.au
-              </div>
-              <div className="text-xs font-medium text-neutral-400 sm:text-sm lg:text-base">
-                +61 3921 48528
-              </div>
+        {/* Right Section - Get in Touch (top) + Contact (bottom) */}
+        <div className="flex w-full flex-col items-start justify-start gap-6 sm:items-center lg:w-auto">
+          {/* Get in Touch & Visit Us */}
+          <div className="flex w-full flex-col items-start justify-start gap-4">
+            <div className="text-sm font-medium text-black sm:text-base lg:text-lg">
+              Get in Touch & Visit Us
             </div>
-            {/* Contact 2 - Hidden on mobile */}
-            <div className="hidden flex-col items-start justify-start gap-1 sm:flex">
-              <div className="text-xs font-medium text-black sm:text-sm lg:text-base">
-                Dr Bintang A. Nuraeni
+            <div className="flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-3">
+              <button className="flex items-center justify-center gap-2.5 rounded-2xl bg-white px-4 py-2 text-xs font-medium text-stone-500 outline outline-1 outline-zinc-300 transition hover:bg-zinc-50 sm:px-6 sm:py-2 sm:text-sm">
+                Visit Our Facility
+              </button>
+              <button className="flex items-center justify-center gap-2.5 rounded-2xl bg-white px-4 py-2 text-xs font-medium text-stone-500 outline outline-1 outline-zinc-300 transition hover:bg-zinc-50 sm:px-6 sm:py-2 sm:text-sm">
+                <div className="h-4 w-4 border-2 border-stone-500" />
+                Connect on LinkedIn
+              </button>
+            </div>
+          </div>
+
+          {/* Contact */}
+          <div className="flex w-full flex-col items-start justify-start gap-4">
+            <div className="text-sm font-medium text-black sm:text-base lg:text-lg">
+              Contact
+            </div>
+            <div className="flex w-full flex-col items-start justify-start gap-3 sm:flex-row sm:gap-6 lg:gap-8">
+              {/* Contact 1 */}
+              <div className="flex flex-col items-start justify-start gap-1">
+                <div className="text-xs font-medium text-black sm:text-sm lg:text-base">
+                  Prof. M. Akbar Rhamdhani
+                </div>
+                <div className="text-xs font-medium text-neutral-400 sm:text-sm lg:text-base">
+                  arhamdani@swin.edu.au
+                </div>
+                <div className="text-xs font-medium text-neutral-400 sm:text-sm lg:text-base">
+                  +61 3921 48528
+                </div>
               </div>
-              <div className="text-xs font-medium text-neutral-400 sm:text-sm lg:text-base">
-                bnuraeni@swin.edu.au
-              </div>
-              <div className="text-xs font-medium text-neutral-400 sm:text-sm lg:text-base">
-                +61 4812 49922
+              {/* Contact 2 */}
+              <div className="flex flex-col items-start justify-start gap-1">
+                <div className="text-xs font-medium text-black sm:text-sm lg:text-base">
+                  Dr Bintang A. Nuraeni
+                </div>
+                <div className="text-xs font-medium text-neutral-400 sm:text-sm lg:text-base">
+                  bnuraeni@swin.edu.au
+                </div>
+                <div className="text-xs font-medium text-neutral-400 sm:text-sm lg:text-base">
+                  +61 4812 49922
+                </div>
               </div>
             </div>
           </div>

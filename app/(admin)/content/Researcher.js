@@ -1,641 +1,478 @@
 'use client';
-import { useState, useEffect, useCallback, useRef } from 'react';
-import Image from 'next/image';
-import FormField from '../_components/FormField'; // Asumsi path benar
-import { CgSpinner } from 'react-icons/cg'; // Menggunakan icon spinner untuk loading
 
-// Menggantikan data mock
-// const users = [...]
+import { useState, useEffect, useCallback, useRef } from 'react';
+import FormField from '../_components/FormField';
 
 export default function Researcher() {
-  const [users, setUsers] = useState([]); // State untuk menyimpan data pengguna dari API
+  const [researchers, setResearchers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null); // <-- user yang sedang diedit
+  const [currentResearcher, setCurrentResearcher] = useState(null);
+
   const [formData, setFormData] = useState({
-    fullName: '',
+    name: '',
     email: '',
-    password: '',
-    role: '',
-    status: 'Active', // Active/Inactive
+    role: 'Principal Investigator',
+    expertise: '',
+    affiliation: '',
+    description: '',
   });
 
-  // --- STATE BARU UNTUK FILE AVATAR ---
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(null);
-
-  // --- REF BARU UNTUK INPUT FILE ---
   const fileInputRef = useRef(null);
-  // --- Fungsi Pengambilan Data (Fetching) ---
-  const fetchUsers = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+
+  const RESEARCHER_ROLES = [
+    'Principal Investigator',
+    "Master's Student",
+    'Undergraduate Student',
+    'Alumni Researcher',
+    'Collaborator',
+  ];
+
+  // Fetch researchers
+  const fetchResearchers = useCallback(async () => {
     try {
-      const response = await fetch('/api/users');
-      if (!response.ok) {
-        throw new Error('Failed to fetch users');
-      }
+      setLoading(true);
+      const response = await fetch('/api/researchers', { cache: 'no-store' });
       const data = await response.json();
-      const usersWithAvatar = data.map((user) => ({
-        ...user,
-        status: user.is_active ? 'Active' : 'Inactive',
-        avatar: user.avatar || '/icon/db-user-1.png',
-        name: user.name,
-      }));
-      setUsers(usersWithAvatar);
+
+      if (data.success) {
+        setResearchers(data.data);
+      } else {
+        setError(data.error || 'Failed to fetch researchers');
+      }
     } catch (err) {
+      console.error('Error fetching researchers:', err);
       setError(err.message);
-      console.error(err);
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
+    fetchResearchers();
+  }, [fetchResearchers]);
 
-  // --- Filter Lokal ---
-  const filteredUsers = users.filter(
-    (user) =>
-      user.name.toLowerCase().includes(search.toLowerCase()) &&
-      (roleFilter ? user.role === roleFilter : true)
+  // Filter researchers
+  const filteredResearchers = researchers.filter(
+    (researcher) =>
+      researcher.name.toLowerCase().includes(search.toLowerCase()) &&
+      (roleFilter ? researcher.role === roleFilter : true)
   );
 
-  // --- Modal Logic ---
-  const openModal = (user = null) => {
-    setCurrentUser(user);
-    if (user) {
+  // Modal handlers
+  const openModal = (researcher = null) => {
+    if (researcher) {
+      setCurrentResearcher(researcher);
       setFormData({
-        fullName: user.name,
-        email: user.email,
-        password: '', // Jangan isi password saat edit
-        role: user.role,
-        status: user.status, // Ambil dari data yang sudah diolah
+        name: researcher.name,
+        email: researcher.email,
+        role: researcher.role,
+        expertise: researcher.expertise || '',
+        affiliation: researcher.affiliation || '',
+        description: researcher.description || '',
       });
-      setAvatarPreview(user.avatar);
+      // Check both avatarUrl (camelCase from schema) and avatar_url (from DB)
+      const avatarUrl = researcher.avatarUrl || researcher.avatar_url;
+      console.log(
+        'Opening modal - Avatar URL:',
+        avatarUrl,
+        'Researcher:',
+        researcher
+      );
+      setAvatarPreview(avatarUrl || null);
     } else {
+      setCurrentResearcher(null);
       setFormData({
-        fullName: '',
+        name: '',
         email: '',
-        password: '',
-        role: 'admin', // Default role
-        status: 'Active',
+        role: 'Principal Investigator',
+        expertise: '',
+        affiliation: '',
+        description: '',
       });
+      setAvatarPreview(null);
     }
-    setAvatarFile(null); // Reset file yang dipilih
+    setAvatarFile(null);
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setCurrentUser(null);
+    setCurrentResearcher(null);
     setFormData({
-      fullName: '',
+      name: '',
       email: '',
-      password: '',
-      role: '',
-      status: 'Active',
+      role: 'Principal Investigator',
+      expertise: '',
+      affiliation: '',
+      description: '',
     });
-    setAvatarFile(null); // Reset file
-    setAvatarPreview(null); // Reset preview
+    setAvatarFile(null);
+    setAvatarPreview(null);
   };
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
     if (file) {
       setAvatarFile(file);
-      // Membuat URL lokal untuk preview
-      setAvatarPreview(URL.createObjectURL(file));
-    } else {
-      setAvatarFile(null);
-      setAvatarPreview(currentUser?.avatar || null);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
   const triggerFileInput = () => {
-    fileInputRef.current.click();
+    fileInputRef.current?.click();
   };
 
-  // --- Handler Submit Form (Create/Update) ---
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
 
-    const isCreating = !currentUser;
+    try {
+      // Get existing avatar URL - check both field names
+      let avatarUrl =
+        currentResearcher?.avatarUrl || currentResearcher?.avatar_url || null;
+      console.log('Form submit - Current avatar URL:', avatarUrl);
 
-    // 1. Upload Avatar ke Supabase Storage (JIKA ADA FILE BARU)
-    let avatarUrl = currentUser?.avatar; // Default: gunakan URL yang sudah ada
-
-    if (avatarFile) {
-      try {
-        const formData = new FormData();
-        formData.append('file', avatarFile);
+      // Upload avatar if new file selected
+      if (avatarFile) {
+        const uploadFormData = new FormData();
+        uploadFormData.append('file', avatarFile);
 
         const uploadResponse = await fetch('/api/upload-image', {
           method: 'POST',
-          body: formData,
+          body: uploadFormData,
         });
 
         const uploadData = await uploadResponse.json();
-
-        if (!uploadResponse.ok) throw new Error(uploadData.message);
-
-        avatarUrl = uploadData.publicUrl;
-        console.log(avatarUrl);
-      } catch (err) {
-        setError(`Avatar upload failed: ${err.message}`);
-        setLoading(false);
-        return;
+        if (uploadResponse.ok && uploadData.publicUrl) {
+          avatarUrl = uploadData.publicUrl;
+          console.log('Image uploaded successfully:', avatarUrl);
+        } else {
+          console.error('Upload failed:', uploadData);
+          setError(uploadData.message || 'Failed to upload image');
+          return;
+        }
       }
-    }
 
-    // 2. Persiapan Payload Pengguna
-    const payload = {
-      name: formData.fullName,
-      email: formData.email,
-      role: formData.role,
-      isActive: formData.status === 'Active',
-      avatar: avatarUrl, // Tambahkan URL avatar yang baru/lama
-    };
+      const url = currentResearcher
+        ? `/api/researchers/${currentResearcher.id}`
+        : '/api/researchers';
 
-    console.log(payload);
+      const method = currentResearcher ? 'PUT' : 'POST';
 
-    if (formData.password || isCreating) {
-      payload.password = formData.password;
-    }
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          avatarUrl,
+        }),
+      });
 
-    // ... (Validasi dasar tetap sama) ...
-    if (
-      !payload.name ||
-      !payload.email ||
-      !payload.role ||
-      (isCreating && !payload.password)
-    ) {
-      alert(
-        'Please fill in all required fields (Full Name, Email, Role, and Password for new user).'
-      );
-      setLoading(false);
-      return;
-    }
+      const data = await response.json();
 
-    // 3. Panggil API User (Create/Update)
-    try {
-      let response;
-      if (isCreating) {
-        // CREATE
-        response = await fetch('/api/users', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
+      if (data.success) {
+        await fetchResearchers();
+        closeModal();
       } else {
-        // UPDATE
-        response = await fetch(`/api/users/${currentUser.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
+        setError(data.error || 'Failed to save researcher');
       }
-
-      if (!response.ok) {
-        const errData = await response.json();
-        throw new Error(
-          errData.message ||
-            `Failed to ${isCreating ? 'create' : 'update'} user`
-        );
-      }
-
-      closeModal();
-      fetchUsers(); // Refresh data
     } catch (err) {
+      console.error('Error:', err);
       setError(err.message);
-      console.error(err);
-      alert(`Error: ${err.message}`);
-    } finally {
-      setLoading(false);
     }
   };
 
-  // --- Handler Delete ---
-  const handleDelete = async (userId, userName) => {
-    if (!window.confirm(`Are you sure you want to delete user ${userName}?`)) {
-      return;
-    }
+  // Handle delete
+  const handleDelete = async (researcherId, researcherName) => {
+    if (confirm(`Delete ${researcherName}?`)) {
+      try {
+        const response = await fetch(`/api/researchers/${researcherId}`, {
+          method: 'DELETE',
+        });
 
-    setLoading(true);
-    setError(null);
+        const data = await response.json();
 
-    try {
-      const response = await fetch(`/api/users/${userId}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete user');
+        if (data.success) {
+          await fetchResearchers();
+        } else {
+          setError(data.error || 'Failed to delete researcher');
+        }
+      } catch (err) {
+        console.error('Error deleting researcher:', err);
+        setError(err.message);
       }
-
-      fetchUsers(); // Refresh data
-    } catch (err) {
-      setError(err.message);
-      console.error(err);
-      alert(`Error: ${err.message}`);
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
-    <div className="flex justify-center px-4 py-6">
-      <div className="flex w-full max-w-full flex-col gap-6">
-        {/* Header */}
-        <div className="flex w-full flex-col gap-4">
-          <h1 className="font-hanken text-2xl leading-8 font-semibold tracking-tight">
-            All Researcher
-          </h1>
-          <div className="flex h-[52px] w-full max-w-md items-center gap-2 rounded-[16px] border border-gray-300 px-4">
-            <input
-              type="text"
-              placeholder="Search users..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="flex-1 text-sm outline-none"
-            />
-            <button className="text-sm text-gray-500">🔍</button>
-          </div>
+    <main className="flex h-screen flex-col bg-white">
+      {/* HEADER */}
+      <div className="flex h-16 w-full items-center justify-between border-b border-zinc-200 px-8 py-4">
+        <h1 className="text-2xl font-bold text-black">Manage Researchers</h1>
+        <button
+          onClick={() => openModal()}
+          className="rounded-lg bg-black px-6 py-2 text-white hover:bg-gray-800"
+        >
+          + Add Researcher
+        </button>
+      </div>
+
+      {/* ERROR MESSAGE */}
+      {error && (
+        <div className="mx-8 mt-4 rounded-lg bg-red-50 p-4 text-red-700">
+          {error}
         </div>
+      )}
 
-        {/* Filter & Add User */}
-        <div className="flex w-full max-w-screen items-center justify-between">
-          <select
-            value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value)}
-            className="h-[44px] w-[143px] rounded-md border border-gray-300 px-4 text-sm"
-          >
-            <option value="">All Roles</option>
-            <option value="admin">Admin</option>
-            <option value="editor">Editor</option>
-            <option value="viewer">Viewer</option>
-          </select>
-
-          <div className="flex flex-1 justify-end">
-            <button
-              onClick={() => openModal()}
-              className="h-[44px] w-[177px] rounded-[12px] bg-[#2AB2C7] px-6 font-medium text-white transition-opacity hover:opacity-90"
-              disabled={loading}
-            >
-              Add Researcher
-            </button>
-          </div>
-        </div>
-
-        {/* --- Table --- */}
-        <div className="flex min-h-[596px] w-full flex-col overflow-hidden rounded-lg border border-gray-200">
-          {/* Table Header */}
-          <div className="grid grid-cols-[3fr_1fr_1fr] items-center border-b border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-700">
-            <span>Users</span>
-            <span>Role</span>
-            <span className="justify-self-end">Action</span>
-          </div>
-
-          {/* Loading State */}
-          {loading && users.length === 0 && (
-            <div className="flex items-center justify-center py-10">
-              <CgSpinner className="animate-spin text-4xl text-[#2AB2C7]" />
-              <span className="ml-2 text-gray-500">Loading users...</span>
-            </div>
-          )}
-
-          {/* Error State */}
-          {error && (
-            <div
-              className="relative m-4 rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700"
-              role="alert"
-            >
-              <strong className="font-bold">Error:</strong>
-              <span className="ml-2 block sm:inline">{error}</span>
-            </div>
-          )}
-
-          {/* Table Rows */}
-          {!loading && filteredUsers.length === 0 && (
-            <div className="flex items-center justify-center py-10 text-gray-500">
-              No users found.
-            </div>
-          )}
-
-          {filteredUsers.map((user) => (
-            <div
-              key={user.id}
-              className="grid grid-cols-[3fr_1fr_1fr] items-center border-b border-gray-100 px-4 py-3 hover:bg-gray-50"
-            >
-              {/* User Info */}
-              <div className="flex items-center gap-3">
-                <Image
-                  src={user.avatar_url} // Menggunakan avatar dari data yang sudah diolah
-                  alt={user.name}
-                  width={40}
-                  height={40}
-                  className="rounded-full object-cover"
-                />
-                <div className="flex flex-col">
-                  <span className="font-medium">{user.name}</span>
-                  <span className="text-sm text-gray-500">{user.email}</span>
-                </div>
-              </div>
-
-              {/* Role */}
-              <span>{user.role}</span>
-
-              {/* Actions */}
-              <div className="flex items-center justify-end gap-4">
-                <Image
-                  src="/icon/db-u-edit.png"
-                  alt="Edit"
-                  width={20}
-                  height={20}
-                  className="cursor-pointer"
-                  onClick={() => openModal(user)}
-                />
-                <Image
-                  src="/icon/db-u-trash.png"
-                  alt="Delete"
-                  width={20}
-                  height={20}
-                  className="cursor-pointer"
-                  onClick={() => handleDelete(user.id, user.name)}
-                />
-                <Image
-                  src="/icon/db-u-right.png"
-                  alt="Info"
-                  width={20}
-                  height={20}
-                  className="cursor-pointer"
-                  // Logika untuk menampilkan detail pengguna bisa ditambahkan di sini
-                />
-              </div>
-            </div>
+      {/* SEARCH & FILTER */}
+      <div className="flex items-center gap-4 border-b border-zinc-100 px-8 py-4">
+        <input
+          type="text"
+          placeholder="Search researchers..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="flex-1 rounded-lg border border-zinc-200 px-4 py-2 text-sm"
+        />
+        <select
+          value={roleFilter}
+          onChange={(e) => setRoleFilter(e.target.value)}
+          className="rounded-lg border border-zinc-200 px-4 py-2 text-sm"
+        >
+          <option value="">All Roles</option>
+          {RESEARCHER_ROLES.map((role) => (
+            <option key={role} value={role}>
+              {role}
+            </option>
           ))}
-        </div>
+        </select>
+      </div>
 
-        {/* Footer */}
-        <div className="w-max-screen flex h-[40px] w-full items-center justify-between px-4">
-          <span className="text-sm text-gray-600">
-            Showing {filteredUsers.length} from {users.length} users
-          </span>
-          <div className="flex gap-2">
-            {/* Paginasi yang sebenarnya membutuhkan state dan logika tambahan. Sementara, tombol hanya placeholder. */}
-            <button
-              className="flex h-[40px] w-[142px] items-center justify-center gap-[10px] rounded-[16px] border border-[#DCDCDC] bg-white px-[20px] py-[8px] text-sm hover:bg-gray-200"
-              disabled
-            >
-              Previous
-            </button>
-            <button
-              className="flex h-[40px] w-[142px] items-center justify-center gap-[10px] rounded-[16px] border border-[#DCDCDC] bg-white px-[24px] py-[8px] text-sm hover:bg-gray-200"
-              disabled
-            >
-              Next
-            </button>
+      {/* TABLE HEADER */}
+      <div className="self-stretch border-b border-zinc-100 px-8 py-4">
+        <div className="inline-flex w-full items-center justify-between">
+          <div className="w-52 text-base leading-5 font-medium text-neutral-400">
+            Researchers
+          </div>
+          <div className="w-40 text-base leading-5 font-medium text-neutral-400">
+            Role
+          </div>
+          <div className="w-40 text-base leading-5 font-medium text-neutral-400">
+            Expertise
+          </div>
+          <div className="w-40 text-base leading-5 font-medium text-neutral-400">
+            Affiliation
+          </div>
+          <div className="w-40 text-base leading-5 font-medium text-neutral-400">
+            Contact / Email
+          </div>
+          <div className="flex items-center justify-end gap-8">
+            <div className="w-28 text-base leading-5 font-medium text-neutral-400">
+              Actions
+            </div>
           </div>
         </div>
       </div>
 
-      {/* --- Modal Overlay --- */}
-      {isModalOpen && (
-        <div className="bg-opacity-20 fixed inset-0 z-50 backdrop-blur-sm">
-          <form
-            onSubmit={handleSubmit}
-            // Ganti w-[1070px] agar lebih responsif, tapi tetap lebar
-            className={`max-w-8xl fixed top-0 right-0 h-full w-full bg-white shadow-2xl transition-transform duration-300 sm:w-[500px] md:w-[700px] lg:w-[1070px] ${
-              isModalOpen ? 'translate-x-0' : 'translate-x-full'
-            }`}
-          >
-            {/* Header */}
-            <div className="flex h-[80px] items-center border-b border-gray-200 px-8">
-              <button
-                type="button"
-                onClick={closeModal}
-                // Ikon kembali sesuai dengan gaya yang baru (diperbesar dan berlatar)
-                className="mr-4 flex h-8 w-8 items-center justify-center rounded-full bg-zinc-100 text-xl text-black transition-colors hover:bg-zinc-200"
-              >
-                ←
-              </button>
-              <h2 className="font-hanken text-3xl leading-10 font-bold text-black">
-                {currentUser ? 'Edit Researcher' : 'Create New Researcher'}
-              </h2>
+      {/* TABLE BODY */}
+      <div className="flex-1 overflow-y-auto px-8">
+        {loading ? (
+          <div className="flex items-center justify-center py-8">
+            <span className="text-gray-500">Loading...</span>
+          </div>
+        ) : filteredResearchers.length === 0 ? (
+          <div className="flex items-center justify-center py-8">
+            <span className="text-gray-500">No researchers found</span>
+          </div>
+        ) : (
+          filteredResearchers.map((researcher) => (
+            <div
+              key={researcher.id}
+              className="inline-flex items-center justify-between self-stretch border-b border-zinc-100 py-4 hover:bg-gray-50"
+            >
+              <div className="flex w-52 items-center gap-3">
+                <img
+                  src={researcher.avatarUrl || '/placeholder-avatar.png'}
+                  alt={researcher.name}
+                  className="h-8 w-8 rounded-full object-cover"
+                />
+                <span className="text-sm font-medium text-black">
+                  {researcher.name}
+                </span>
+              </div>
+              <div className="w-40 text-sm text-gray-600">
+                {researcher.role}
+              </div>
+              <div className="w-40 truncate text-sm text-gray-600">
+                {researcher.expertise || '-'}
+              </div>
+              <div className="w-40 truncate text-sm text-gray-600">
+                {researcher.affiliation || '-'}
+              </div>
+              <div className="w-40 text-sm text-gray-600">
+                {researcher.email}
+              </div>
+              <div className="flex items-center justify-end gap-3">
+                <button
+                  onClick={() => openModal(researcher)}
+                  className="text-sm font-medium text-blue-600 hover:text-blue-800"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(researcher.id, researcher.name)}
+                  className="text-sm font-medium text-red-600 hover:text-red-800"
+                >
+                  Delete
+                </button>
+              </div>
             </div>
-            {/* Content */}
-            {/* Menggunakan padding lebih besar (px-8 py-10) dan wrapper untuk membatasi lebar konten (~855px) */}
-            <div className="h-[calc(100%-160px)] overflow-y-auto px-8 py-10">
-              <div className="mx-auto flex w-full max-w-[855px] flex-col gap-9">
-                {/* 1. Profile Picture */}
-                <div className="flex items-center gap-5">
-                  <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-gray-200 text-xs text-gray-500">
-                    <Image
-                      src={avatarPreview || '/icon/db-user-1.png'}
-                      alt="Profile"
-                      width={96} // 24 * 4 = 96px (3rem)
-                      height={96}
-                      className="h-full w-full rounded-full object-cover"
+          ))
+        )}
+      </div>
+
+      {/* MODAL */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="w-full max-w-2xl rounded-lg bg-white p-8 shadow-lg">
+            <h2 className="mb-6 text-xl font-bold text-black">
+              {currentResearcher ? 'Edit Researcher' : 'Add New Researcher'}
+            </h2>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Avatar Section */}
+              <div className="mb-6 flex flex-col items-center gap-4">
+                <div
+                  onClick={triggerFileInput}
+                  className="flex h-24 w-24 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-zinc-300 bg-gray-100 transition hover:border-blue-500"
+                >
+                  {avatarPreview ? (
+                    <img
+                      src={avatarPreview}
+                      alt="Avatar preview"
+                      className="h-full w-full object-cover"
                     />
-                  </div>
-                  <div className="flex flex-1 flex-col items-start gap-2">
-                    <div className="flex flex-col gap-1">
-                      <div className="text-base font-medium text-black">
-                        Profile Picture
-                      </div>
-                      <div className="text-xs font-normal text-neutral-400">
-                        Upload a profile image to display on the user list and
-                        profile page.
-                      </div>
-                    </div>
-
-                    {/* Tombol Upload New Photo (Menggantikan Browse File) */}
-                    <button
-                      type="button"
-                      onClick={triggerFileInput}
-                      className="inline-flex items-center justify-center gap-2.5 rounded-2xl border border-zinc-300 bg-white px-5 py-2 text-base font-medium text-zinc-800 outline outline-1 outline-offset-[-1px] transition-colors hover:bg-zinc-50"
-                      disabled={loading}
-                    >
-                      Upload New Photo
-                    </button>
-                    {avatarFile && (
-                      <p className="mt-1 text-xs text-green-600">
-                        File selected: **{avatarFile.name}**
-                      </p>
-                    )}
-                  </div>
+                  ) : (
+                    <span className="text-xs text-gray-500">
+                      Click to upload
+                    </span>
+                  )}
                 </div>
-
-                {/* Input File Tersembunyi (Tidak diubah) */}
                 <input
-                  type="file"
                   ref={fileInputRef}
-                  onChange={handleFileChange}
+                  type="file"
                   accept="image/*"
+                  onChange={handleFileChange}
                   className="hidden"
                 />
+              </div>
 
-                {/* 2. Form Fields Lainnya (Menggunakan FormField dengan gaya baru) */}
-                {/* Catatan: Karena kita tidak dapat mengubah internal FormField, kita hanya dapat memengaruhi styling eksternal.
-            Jika FormField Anda mendukung styling baru (rounded-2xl, px-4 py-3, dll.) ini akan terlihat lebih baik.
-            Untuk saat ini, kita mengasumsikan FormField telah diperbarui atau hanya mempengaruhi label/deskripsi. */}
+              <FormField
+                label="Name"
+                type="text"
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                placeholder="Full name"
+                required
+              />
 
-                <div className="flex flex-col gap-6">
-                  <FormField
-                    label="Full Name"
-                    description="Enter the user's full name as it should appear across the system."
-                    placeholder="Enter full name"
-                    value={formData.fullName}
-                    onChange={(e) =>
-                      setFormData({ ...formData, fullName: e.target.value })
-                    }
-                    // Anda mungkin perlu menambahkan `inputClassName="rounded-2xl px-4 py-3 border border-zinc-300"` jika FormField mendukung
-                  />
+              <FormField
+                label="Email"
+                type="email"
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+                placeholder="Email address"
+                required
+              />
 
-                  <FormField
-                    label="Email Address"
-                    description="Provide a valid email address for account identification and notifications."
-                    type="email"
-                    placeholder="Enter email address"
-                    value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
-                  />
-
-                  <FormField
-                    label="Password"
-                    description={
-                      currentUser
-                        ? 'Set a new password. Leave blank to keep current password.'
-                        : 'Set a secure password for this user.'
-                    }
-                    type="password"
-                    placeholder="Enter password"
-                    value={formData.password}
-                    onChange={(e) =>
-                      setFormData({ ...formData, password: e.target.value })
-                    }
-                  />
-                </div>
-
-                {/* 3. Role Dropdown */}
-                <div className="flex w-full flex-col gap-2">
-                  <div className="flex flex-col gap-1">
-                    <label className="text-base font-medium text-black">
-                      Role
-                    </label>
-                    <span className="text-xs font-normal text-neutral-400">
-                      Select the role that defines the user’s access level and
-                      permissions.
-                    </span>
-                  </div>
-                  <select
-                    value={formData.role}
-                    onChange={(e) =>
-                      setFormData({ ...formData, role: e.target.value })
-                    }
-                    className="h-[44px] w-full appearance-none rounded-xl border border-zinc-300 bg-white px-4 py-3 text-base transition-colors outline-none focus:border-[#2AB2C7]" // rounded-xl dan outline style baru
-                  >
-                    <option value="" disabled>
-                      Select Role
+              <div>
+                <label className="mb-2 block text-sm font-medium text-black">
+                  Role
+                </label>
+                <select
+                  value={formData.role}
+                  onChange={(e) =>
+                    setFormData({ ...formData, role: e.target.value })
+                  }
+                  className="w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm"
+                  required
+                >
+                  {RESEARCHER_ROLES.map((role) => (
+                    <option key={role} value={role}>
+                      {role}
                     </option>
-                    <option value="admin">Admin</option>
-                    <option value="editor">Editor</option>
-                    <option value="viewer">Viewer</option>
-                  </select>
-                </div>
+                  ))}
+                </select>
+              </div>
 
-                {/* 4. Status Radio Buttons */}
-                <div className="flex w-full flex-col gap-4">
-                  <div className="flex flex-col gap-1">
-                    <label className="text-base font-medium text-black">
-                      Status
-                    </label>
-                    <span className="text-xs font-normal text-neutral-400">
-                      Choose whether the user is currently active in the system.
-                    </span>
-                  </div>
-                  <div className="flex gap-6">
-                    {/* Active */}
-                    <label className="flex items-center gap-2.5">
-                      <input
-                        type="radio"
-                        name="status"
-                        value="Active"
-                        checked={formData.status === 'Active'}
-                        onChange={(e) =>
-                          setFormData({ ...formData, status: e.target.value })
-                        }
-                        // Styling radio button yang lebih modern
-                        className="h-6 w-6 border-[1.71px] border-[#2AB2C7] text-[#2AB2C7] focus:ring-0"
-                      />
-                      <span
-                        className={`text-sm leading-5 ${formData.status === 'Active' ? 'text-[#2AB2C7]' : 'text-gray-400'}`}
-                      >
-                        Active
-                      </span>
-                    </label>
-                    {/* Inactive */}
-                    <label className="flex items-center gap-2.5">
-                      <input
-                        type="radio"
-                        name="status"
-                        value="Inactive"
-                        checked={formData.status === 'Inactive'}
-                        onChange={(e) =>
-                          setFormData({ ...formData, status: e.target.value })
-                        }
-                        // Styling radio button yang lebih modern
-                        className="h-6 w-6 border-[1.71px] border-gray-400 text-[#2AB2C7] focus:ring-0"
-                      />
-                      <span
-                        className={`text-sm leading-5 ${formData.status === 'Inactive' ? 'text-[#2AB2C7]' : 'text-gray-400'}`}
-                      >
-                        Inactive
-                      </span>
-                    </label>
-                  </div>
-                </div>
-              </div>{' '}
-              {/* Akhir dari wrapper max-w-[855px] */}
-            </div>{' '}
-            {/* Akhir dari Content */}
-            {/* Footer Buttons */}
-            {/* Menggunakan styling dan ukuran font baru: rounded-xl/2xl, font-semibold, text-xl */}
-            <div className="absolute right-0 bottom-0 left-0 flex h-[80px] items-center justify-end gap-5 border-t border-gray-200 px-8">
-              <button
-                type="button"
-                onClick={closeModal}
-                className="flex h-auto w-48 items-center justify-center gap-5 rounded-xl border border-stone-300 bg-white px-6 py-3 text-xl font-semibold text-neutral-600 outline outline-1 outline-offset-[-1px] transition-colors hover:bg-gray-50"
-                disabled={loading}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="flex h-auto w-48 items-center justify-center gap-3 rounded-2xl bg-[#2AB2C7] px-6 py-3 text-xl font-semibold text-white transition-opacity hover:opacity-90"
-                disabled={loading}
-              >
-                {loading ? (
-                  <CgSpinner className="animate-spin text-xl" />
-                ) : currentUser ? (
-                  'Update'
-                ) : (
-                  'Save'
-                )}
-              </button>
-            </div>
-          </form>
+              <FormField
+                label="Expertise"
+                type="text"
+                value={formData.expertise}
+                onChange={(e) =>
+                  setFormData({ ...formData, expertise: e.target.value })
+                }
+                placeholder="Main areas of expertise"
+              />
+
+              <FormField
+                label="Affiliation"
+                type="text"
+                value={formData.affiliation}
+                onChange={(e) =>
+                  setFormData({ ...formData, affiliation: e.target.value })
+                }
+                placeholder="University or institution"
+              />
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-black">
+                  Description
+                </label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
+                  placeholder="Researcher description"
+                  rows="4"
+                  className="w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm"
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 pt-6">
+                <button
+                  type="button"
+                  onClick={closeModal}
+                  className="rounded-lg border border-zinc-200 px-6 py-2 text-black hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="rounded-lg bg-black px-6 py-2 text-white hover:bg-gray-800"
+                >
+                  {currentResearcher ? 'Update' : 'Create'}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
-    </div>
+    </main>
   );
 }
