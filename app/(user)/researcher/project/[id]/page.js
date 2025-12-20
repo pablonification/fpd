@@ -96,7 +96,7 @@ export default function DetailProject() {
           <div className="text-sm font-medium text-black sm:text-base md:text-lg">
             {project.principalInvestigator || 'N/A'}
           </div>
-          <div className="text-sm font-medium text-blue-600 sm:text-base md:text-lg">
+          <div className="text-sm font-medium text-[#2497a9] sm:text-base md:text-lg">
             {project.researcherCategory || 'N/A'}
           </div>
         </div>
