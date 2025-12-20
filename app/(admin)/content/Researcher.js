@@ -218,11 +218,11 @@ export default function Researcher() {
   return (
     <main className="flex h-screen flex-col bg-white">
       {/* HEADER */}
-      <div className="flex h-16 w-full items-center justify-between border-b border-zinc-200 px-8 py-4">
-        <h1 className="text-2xl font-bold text-black">Manage Researchers</h1>
+      <div className="flex h-16 w-full items-center justify-between border-b border-zinc-200 px-4 md:px-8 py-4">
+        <h1 className="text-xl md:text-2xl font-bold text-black">Manage Researchers</h1>
         <button
           onClick={() => openModal()}
-          className="rounded-lg bg-black px-6 py-2 text-white hover:bg-gray-800"
+          className="rounded-lg bg-black px-4 md:px-6 py-2 text-sm md:text-base text-white hover:bg-gray-800"
         >
           + Add Researcher
         </button>
@@ -230,24 +230,24 @@ export default function Researcher() {
 
       {/* ERROR MESSAGE */}
       {error && (
-        <div className="mx-8 mt-4 rounded-lg bg-red-50 p-4 text-red-700">
+        <div className="mx-4 md:mx-8 mt-4 rounded-lg bg-red-50 p-4 text-red-700">
           {error}
         </div>
       )}
 
       {/* SEARCH & FILTER */}
-      <div className="flex items-center gap-4 border-b border-zinc-100 px-8 py-4">
+      <div className="flex flex-col md:flex-row items-center gap-4 border-b border-zinc-100 px-4 md:px-8 py-4">
         <input
           type="text"
           placeholder="Search researchers..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 rounded-lg border border-zinc-200 px-4 py-2 text-sm"
+          className="w-full md:flex-1 rounded-lg border border-zinc-200 px-4 py-2 text-sm"
         />
         <select
           value={roleFilter}
           onChange={(e) => setRoleFilter(e.target.value)}
-          className="rounded-lg border border-zinc-200 px-4 py-2 text-sm"
+          className="w-full md:w-auto rounded-lg border border-zinc-200 px-4 py-2 text-sm"
         >
           <option value="">All Roles</option>
           {RESEARCHER_ROLES.map((role) => (
@@ -258,93 +258,98 @@ export default function Researcher() {
         </select>
       </div>
 
-      {/* TABLE HEADER */}
-      <div className="self-stretch border-b border-zinc-100 px-8 py-4">
-        <div className="inline-flex w-full items-center justify-between">
-          <div className="w-52 text-base leading-5 font-medium text-neutral-400">
-            Researchers
-          </div>
-          <div className="w-40 text-base leading-5 font-medium text-neutral-400">
-            Role
-          </div>
-          <div className="w-40 text-base leading-5 font-medium text-neutral-400">
-            Expertise
-          </div>
-          <div className="w-40 text-base leading-5 font-medium text-neutral-400">
-            Affiliation
-          </div>
-          <div className="w-40 text-base leading-5 font-medium text-neutral-400">
-            Contact / Email
-          </div>
-          <div className="flex items-center justify-end gap-8">
-            <div className="w-28 text-base leading-5 font-medium text-neutral-400">
-              Actions
+      {/* TABLE CONTAINER (Enable Horizontal Scroll) */}
+      <div className="flex-1 overflow-auto px-4 md:px-8">
+        <div className="min-w-[1000px]">
+          {/* TABLE HEADER */}
+          <div className="border-b border-zinc-100 py-4">
+            <div className="flex items-center justify-between">
+              <div className="w-52 text-base leading-5 font-medium text-neutral-400">
+                Researchers
+              </div>
+              <div className="w-40 text-base leading-5 font-medium text-neutral-400">
+                Role
+              </div>
+              <div className="w-40 text-base leading-5 font-medium text-neutral-400">
+                Expertise
+              </div>
+              <div className="w-40 text-base leading-5 font-medium text-neutral-400">
+                Affiliation
+              </div>
+              <div className="w-40 text-base leading-5 font-medium text-neutral-400">
+                Contact / Email
+              </div>
+              <div className="flex items-center justify-end gap-8">
+                <div className="w-28 text-base leading-5 font-medium text-neutral-400">
+                  Actions
+                </div>
+              </div>
             </div>
+          </div>
+
+          {/* TABLE BODY */}
+          <div>
+            {loading ? (
+              <div className="flex items-center justify-center py-8">
+                <span className="text-gray-500">Loading...</span>
+              </div>
+            ) : filteredResearchers.length === 0 ? (
+              <div className="flex items-center justify-center py-8">
+                <span className="text-gray-500">No researchers found</span>
+              </div>
+            ) : (
+              filteredResearchers.map((researcher) => (
+                <div
+                  key={researcher.id}
+                  className="flex items-center justify-between border-b border-zinc-100 py-4 hover:bg-gray-50"
+                >
+                  <div className="flex w-52 items-center gap-3">
+                    <img
+                      src={researcher.avatarUrl || '/placeholder-avatar.png'}
+                      alt={researcher.name}
+                      className="h-8 w-8 rounded-full object-cover"
+                    />
+                    <span className="text-sm font-medium text-black">
+                      {researcher.name}
+                    </span>
+                  </div>
+                  <div className="w-40 text-sm text-gray-600">
+                    {researcher.role}
+                  </div>
+                  <div className="w-40 truncate text-sm text-gray-600">
+                    {researcher.expertise || '-'}
+                  </div>
+                  <div className="w-40 truncate text-sm text-gray-600">
+                    {researcher.affiliation || '-'}
+                  </div>
+                  <div className="w-40 text-sm text-gray-600">
+                    {researcher.email}
+                  </div>
+                  <div className="flex items-center justify-end gap-3">
+                    <button
+                      onClick={() => openModal(researcher)}
+                      className="text-sm font-medium text-blue-600 hover:text-blue-800"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(researcher.id, researcher.name)}
+                      className="text-sm font-medium text-red-600 hover:text-red-800"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>
 
-      {/* TABLE BODY */}
-      <div className="flex-1 overflow-y-auto px-8">
-        {loading ? (
-          <div className="flex items-center justify-center py-8">
-            <span className="text-gray-500">Loading...</span>
-          </div>
-        ) : filteredResearchers.length === 0 ? (
-          <div className="flex items-center justify-center py-8">
-            <span className="text-gray-500">No researchers found</span>
-          </div>
-        ) : (
-          filteredResearchers.map((researcher) => (
-            <div
-              key={researcher.id}
-              className="inline-flex items-center justify-between self-stretch border-b border-zinc-100 py-4 hover:bg-gray-50"
-            >
-              <div className="flex w-52 items-center gap-3">
-                <img
-                  src={researcher.avatarUrl || '/placeholder-avatar.png'}
-                  alt={researcher.name}
-                  className="h-8 w-8 rounded-full object-cover"
-                />
-                <span className="text-sm font-medium text-black">
-                  {researcher.name}
-                </span>
-              </div>
-              <div className="w-40 text-sm text-gray-600">
-                {researcher.role}
-              </div>
-              <div className="w-40 truncate text-sm text-gray-600">
-                {researcher.expertise || '-'}
-              </div>
-              <div className="w-40 truncate text-sm text-gray-600">
-                {researcher.affiliation || '-'}
-              </div>
-              <div className="w-40 text-sm text-gray-600">
-                {researcher.email}
-              </div>
-              <div className="flex items-center justify-end gap-3">
-                <button
-                  onClick={() => openModal(researcher)}
-                  className="text-sm font-medium text-blue-600 hover:text-blue-800"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(researcher.id, researcher.name)}
-                  className="text-sm font-medium text-red-600 hover:text-red-800"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-
       {/* MODAL */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="w-full max-w-2xl rounded-lg bg-white p-8 shadow-lg">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-2xl rounded-lg bg-white p-6 md:p-8 shadow-lg max-h-[90vh] overflow-y-auto">
             <h2 className="mb-6 text-xl font-bold text-black">
               {currentResearcher ? 'Edit Researcher' : 'Add New Researcher'}
             </h2>

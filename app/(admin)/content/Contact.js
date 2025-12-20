@@ -105,7 +105,7 @@ export default function ContactForm() {
 
       <form
         onSubmit={handleSubmit}
-        className="mt-6 flex w-[600px] flex-col gap-6 rounded-[16px] border border-gray-300 bg-white p-6"
+        className="mt-6 flex w-full max-w-[600px] flex-col gap-6 rounded-[16px] border border-gray-300 bg-white p-6"
       >
         {/* Email Field */}
         <div className="flex w-full flex-col gap-2">

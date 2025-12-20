@@ -238,12 +238,12 @@ export default function ResearchProjectManagement() {
         </div>
 
         {/* Filter & Add Button */}
-        <div className="flex w-full items-center justify-between">
-          <div className="flex gap-4">
+        <div className="flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="flex w-full gap-4 md:w-auto">
             <select
               value={yearFilter}
               onChange={(e) => setYearFilter(e.target.value)}
-              className="h-[44px] w-[120px] rounded-[12px] border border-gray-300 px-4 text-sm outline-none"
+              className="h-[44px] flex-1 rounded-[12px] border border-gray-300 px-4 text-sm outline-none md:flex-none md:w-[120px]"
             >
               <option value="">Year</option>
               <option value="2024">2024</option>
@@ -254,7 +254,7 @@ export default function ResearchProjectManagement() {
             <select
               value={specificYear}
               onChange={(e) => setSpecificYear(e.target.value)}
-              className="h-[44px] w-[120px] rounded-[12px] border border-gray-300 px-4 text-sm outline-none"
+              className="h-[44px] flex-1 rounded-[12px] border border-gray-300 px-4 text-sm outline-none md:flex-none md:w-[120px]"
             >
               <option value="2024">2024</option>
               <option value="2023">2023</option>
@@ -264,16 +264,16 @@ export default function ResearchProjectManagement() {
 
           <button
             onClick={() => openModal()}
-            className="h-[44px] rounded-[12px] bg-[#2AB2C7] px-6 font-medium text-white hover:opacity-90"
+            className="h-[44px] w-full rounded-[12px] bg-[#2AB2C7] px-6 font-medium text-white hover:opacity-90 md:w-auto"
           >
             Add New Project +
           </button>
         </div>
 
         {/* Table */}
-        <div className="w-full overflow-hidden rounded-lg border border-gray-200">
+        <div className="w-full overflow-x-auto rounded-lg border border-gray-200">
           {/* Table Header */}
-          <div className="grid grid-cols-[2fr_0.8fr_1.5fr_1.2fr_0.8fr_0.8fr] gap-4 border-b border-gray-200 bg-gray-50 px-6 py-3 text-sm font-medium text-gray-700">
+          <div className="grid min-w-[900px] grid-cols-[2fr_0.8fr_1.5fr_1.2fr_0.8fr_0.8fr] gap-4 border-b border-gray-200 bg-gray-50 px-6 py-3 text-sm font-medium text-gray-700">
             <span>Project Title</span>
             <span>Year</span>
             <span>Principal Investigator</span>
@@ -295,7 +295,7 @@ export default function ResearchProjectManagement() {
             filteredProjects.map((project) => (
               <div
                 key={project.id}
-                className="grid grid-cols-[2fr_0.8fr_1.5fr_1.2fr_0.8fr_0.8fr] items-center gap-4 border-b border-gray-100 px-6 py-4 hover:bg-gray-50"
+                className="grid min-w-[900px] grid-cols-[2fr_0.8fr_1.5fr_1.2fr_0.8fr_0.8fr] items-center gap-4 border-b border-gray-100 px-6 py-4 hover:bg-gray-50"
               >
                 <span className="text-sm">{project.title}</span>
                 <span className="text-sm">{project.year || '-'}</span>
@@ -365,19 +365,19 @@ export default function ResearchProjectManagement() {
       {isModalOpen && (
         <div className="bg-opacity-50 fixed inset-0 z-50 backdrop-blur-sm">
           <div
-            className={`fixed top-0 right-0 h-full w-[1070px] bg-white shadow-2xl transition-transform duration-300 ${
-              isModalOpen ? 'translate-x-0' : 'translate-x-full'
-            }`}
+            className={`fixed top-0 right-0 h-full bg-white shadow-2xl transition-transform duration-300 
+              w-full sm:w-[500px] md:w-[700px] lg:w-[1070px]
+              ${isModalOpen ? 'translate-x-0' : 'translate-x-full'}`}
           >
             {/* Header */}
-            <div className="flex h-[80px] items-center border-b border-gray-200 px-8">
+            <div className="flex h-[80px] items-center border-b border-gray-200 px-4 md:px-8">
               <button
                 onClick={() => setIsModalOpen(false)}
                 className="mr-4 flex h-10 w-10 items-center justify-center rounded-full hover:bg-gray-100"
               >
                 ←
               </button>
-              <h2 className="text-2xl font-semibold">
+              <h2 className="text-xl md:text-2xl font-semibold">
                 {currentProject
                   ? 'Edit Research Project'
                   : 'Create New Research Project'}
@@ -385,8 +385,8 @@ export default function ResearchProjectManagement() {
             </div>
 
             {/* Content */}
-            <div className="h-[calc(100%-160px)] overflow-y-auto px-8 py-6">
-              <div className="grid grid-cols-2 gap-6">
+            <div className="h-[calc(100%-160px)] overflow-y-auto px-4 py-6 md:px-8">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 {/* Left Column */}
                 <div className="flex flex-col gap-6">
                   <FormField
