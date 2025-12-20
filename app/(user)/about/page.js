@@ -40,7 +40,7 @@ export default function AboutPage() {
                 <div className="h-4 w-3/4 rounded bg-gray-200"></div>
               </div>
             ) : (
-              <p className="max-w-[900px] text-[18px] leading-[28px] tracking-[-1%] text-[#7C7C7C] sm:text-[24px] sm:leading-[32px]">
+              <p className="max-w-[900px] text-[16px] leading-[28px] tracking-[-1%] text-[#7C7C7C] sm:text-[24px] sm:leading-[32px]">
                 {aboutData.about_description}
               </p>
             )}

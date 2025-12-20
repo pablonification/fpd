@@ -102,10 +102,22 @@ export default function GalleryPage() {
         </header>
 
         {loading && (
-          <div className="mt-10 grid w-full grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-4">
-            {[...Array(8)].map((_, i) => (
-              <SkeletonGalleryCard key={i} />
-            ))}
+          <div className="w-full animate-pulse">
+            {/* Filter/Tab Skeleton */}
+            <div className="mt-4 flex h-[48px] w-full items-center justify-between">
+              <div className="flex gap-6">
+                <div className="h-8 w-20 rounded bg-gray-200"></div>
+                <div className="h-8 w-20 rounded bg-gray-200"></div>
+              </div>
+              <div className="h-10 w-32 rounded bg-gray-200"></div>
+            </div>
+
+            {/* Grid Skeleton */}
+            <div className="mt-4 grid w-full grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-4">
+              {[...Array(8)].map((_, i) => (
+                <SkeletonGalleryCard key={i} />
+              ))}
+            </div>
           </div>
         )}
         {error && <div className="mt-10 text-center text-red-500">{error}</div>}
