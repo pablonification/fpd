@@ -19,17 +19,22 @@ export default function AboutPage() {
   }, []);
 
   return (
-    <div className="flex w-full flex-col items-center text-[14px] md:text-[14px]">
+    <main className="mt-42 flex w-full max-w-7xl flex-col items-center gap-12 px-4 pb-20 sm:px-6 mx-auto text-[14px] md:text-[14px]">
       {/* About Us */}
-      <section className="max-w-4xl px-6 pt-35 pb-16 text-left md:text-center">
-        <h1 className="mb-4 text-[24px] font-bold md:text-[44px]">About Us</h1>
-        <p className="text-[16px] leading-relaxed text-neutral-500 md:text-[24px]">
-          {aboutData.about_description || 'Loading description...'}
-        </p>
+      <section className="w-full text-left md:text-center">
+        <header className="flex w-full flex-col items-center gap-3 text-center">
+          <h1 className="text-[48px] leading-[60px] font-bold tracking-[-1%] text-black sm:text-[60px] sm:leading-[72px]">
+            About Us
+          </h1>
+          <p className="max-w-[900px] text-[18px] leading-[28px] tracking-[-1%] text-[#7C7C7C] sm:text-[24px] sm:leading-[32px]">
+            {aboutData.about_description || 'Loading description...'}
+          </p>
+        </header>
+
       </section>
 
       {/* Vision & Values */}
-      <section className="grid max-w-6xl grid-cols-1 gap-8 px-6 pb-20 md:grid-cols-2">
+      <section className="grid w-full grid-cols-1 gap-8 md:grid-cols-2">
         {/* Vision */}
         <div className="rounded-2xl border border-neutral-200 p-8 shadow-sm transition hover:shadow-md">
           <div className="mb-4 flex justify-start text-3xl text-blue-400">
@@ -115,6 +120,6 @@ export default function AboutPage() {
           ))}
         </div>
       </section>
-    </div>
+    </main>
   );
 }

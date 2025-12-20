@@ -60,14 +60,14 @@ export default function TeamSection() {
     const matchesSearch = !q
       ? true
       : [t.name, t.affiliation, t.bidang, t.expertise, t.description]
-          .filter(Boolean)
-          .some((field) => field.toLowerCase().includes(q));
+        .filter(Boolean)
+        .some((field) => field.toLowerCase().includes(q));
 
     const matchesExpertise = !selectedExpertise
       ? true
       : (t.expertise || '')
-          .toLowerCase()
-          .includes(selectedExpertise.toLowerCase());
+        .toLowerCase()
+        .includes(selectedExpertise.toLowerCase());
 
     return matchesSearch && matchesExpertise;
   });
@@ -117,7 +117,7 @@ export default function TeamSection() {
   }
 
   return (
-    <section className="bg-bgMain mt-26 flex justify-center px-4 py-12 sm:px-8">
+    <section className="bg-bgMain mt-32 flex justify-center px-4 py-12 sm:px-6">
       <div className="w-full max-w-7xl">
         {/* Filter */}
         <div className="mb-10 w-full">
