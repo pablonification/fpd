@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import FilterDropdown from './_components/FilterDropdown';
 import YearDropdown from './_components/YearDropdown';
 import ProjectCard from './_components/ProjectCard';
+import SkeletonProjectCard from './_components/SkeletonProjectCard';
 
 export default function ResearchProject() {
   const [tab, setTab] = useState('ongoing');
@@ -113,9 +114,9 @@ export default function ResearchProject() {
         {/* GRID PROJECT CARD */}
         <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
           {loading ? (
-            <div className="col-span-full flex items-center justify-center py-8">
-              <span className="text-gray-500">Loading...</span>
-            </div>
+            [...Array(6)].map((_, i) => (
+              <SkeletonProjectCard key={i} />
+            ))
           ) : filteredList.length === 0 ? (
             <div className="col-span-full flex items-center justify-center py-8">
               <span className="text-gray-500">No projects found</span>

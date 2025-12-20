@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import CardProfile from './_components/profile_card';
 import ProfileModal from './_components/profile_modal';
 import FilterRow from './_components/filter';
+import SkeletonProfileCard from './_components/SkeletonProfileCard';
 
 export default function TeamSection() {
   const [search, setSearch] = useState('');
@@ -97,9 +98,24 @@ export default function TeamSection() {
   // Show loading state
   if (loading) {
     return (
-      <section className="bg-bgMain mt-26 flex justify-center px-4 py-12 sm:px-8">
-        <div className="flex items-center justify-center">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-neutral-200 border-t-blue-500"></div>
+      <section className="bg-bgMain mt-32 flex justify-center px-4 py-12 sm:px-6">
+        <div className="w-full max-w-7xl">
+          {/* Header Skeleton */}
+          <div className="flex w-full flex-col items-center gap-2 text-center sm:gap-3">
+            <div className="h-10 w-48 rounded bg-gray-200 animate-pulse"></div>
+            <div className="h-6 w-full max-w-2xl rounded bg-gray-200 animate-pulse"></div>
+          </div>
+
+          {/* Filter Skeleton */}
+          <div className="mb-10 w-full mt-10">
+            <div className="h-[56px] w-full rounded-[16px] bg-gray-200 animate-pulse"></div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {[...Array(8)].map((_, i) => (
+              <SkeletonProfileCard key={i} />
+            ))}
+          </div>
         </div>
       </section>
     );
