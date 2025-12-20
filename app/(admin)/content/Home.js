@@ -1,6 +1,50 @@
+'use client';
+import { useState, useEffect } from 'react';
 import '../../globals.css';
 
+function timeAgo(dateString) {
+  const date = new Date(dateString);
+  const now = new Date();
+  const seconds = Math.floor((now - date) / 1000);
+
+  if (seconds < 60) return 'Just now';
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h`;
+  const days = Math.floor(hours / 24);
+  return `${days}d`;
+}
+
 export default function Home() {
+  const [stats, setStats] = useState({
+    researchers: { active: 0 },
+    projects: { ongoing: 0, completed: 0 },
+    users: { active: 0 },
+    gallery: { total: 0 },
+    news: { published: 0 },
+    traffic: { monthly: 0 },
+    latestUpdates: [],
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const res = await fetch('/api/dashboard/stats');
+        const json = await res.json();
+        if (json.success) {
+          setStats(json.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch stats:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchStats();
+  }, []);
+
   return (
     <div className="flex h-full min-h-screen w-full flex-col items-start justify-start gap-4 p-4 md:p-10">
       {/* Welcome Section */}
@@ -33,7 +77,7 @@ export default function Home() {
             </div>
             <div className="inline-flex items-center justify-start gap-2">
               <div className="justify-start text-center text-2xl leading-8 font-semibold text-black">
-                32
+                {stats.researchers.active}
               </div>
               <div className="justify-start text-center text-base leading-5 font-normal text-neutral-500">
                 active
@@ -58,7 +102,7 @@ export default function Home() {
             <div className="flex w-full items-center justify-between self-stretch">
               <div className="flex items-center justify-start gap-2">
                 <div className="justify-start text-center text-2xl leading-8 font-semibold text-black">
-                  25
+                  {stats.projects.ongoing}
                 </div>
                 <div className="justify-start text-center text-base leading-5 font-normal text-neutral-500">
                   ongoing
@@ -67,7 +111,7 @@ export default function Home() {
               <div className="h-8 w-px bg-neutral-200" />
               <div className="flex items-center justify-start gap-2">
                 <div className="justify-start text-2xl leading-8 font-semibold text-black">
-                  8
+                  {stats.projects.completed}
                 </div>
                 <div className="justify-start text-center text-base leading-5 font-normal text-neutral-500">
                   completed
@@ -92,7 +136,7 @@ export default function Home() {
             </div>
             <div className="inline-flex items-center justify-start gap-2">
               <div className="justify-start text-center text-2xl leading-8 font-semibold text-black">
-                25
+                {stats.users.active}
               </div>
               <div className="justify-start text-center text-base leading-5 font-normal text-neutral-500">
                 active
@@ -119,7 +163,7 @@ export default function Home() {
             </div>
             <div className="inline-flex items-center justify-start gap-2">
               <div className="justify-start text-center text-2xl leading-8 font-semibold text-black">
-                128
+                {stats.gallery.total}
               </div>
               <div className="justify-start text-center text-base leading-5 font-normal text-neutral-500">
                 media
@@ -143,7 +187,7 @@ export default function Home() {
             </div>
             <div className="inline-flex items-center justify-start gap-2">
               <div className="justify-start text-center text-2xl leading-8 font-semibold text-black">
-                125
+                {stats.news.published}
               </div>
               <div className="justify-start text-center text-base leading-5 font-normal text-neutral-500">
                 published
@@ -166,7 +210,7 @@ export default function Home() {
             </div>
             <div className="inline-flex items-center justify-start gap-2">
               <div className="justify-start text-center text-2xl leading-8 font-semibold text-black">
-                1,230
+                {stats.traffic.monthly.toLocaleString()}
               </div>
               <div className="justify-start text-center text-base leading-5 font-normal text-neutral-500">
                 visits this month
@@ -185,22 +229,25 @@ export default function Home() {
         </div>
         <div className="h-px self-stretch bg-neutral-200" />
         <div className="flex flex-col items-start justify-start gap-1 self-stretch">
-          <div className="inline-flex items-center justify-center gap-1 self-stretch p-2">
-            <div className="flex-1 justify-start text-base leading-5 font-normal text-neutral-800">
-              Researcher profile updated: Dr. Bintang A. Nuraeni
+          {stats.latestUpdates.length === 0 ? (
+            <div className="p-4 text-center text-neutral-400">
+              No recent updates.
             </div>
-            <div className="justify-start text-sm leading-4 font-normal text-neutral-400">
-              1d
-            </div>
-          </div>
-          <div className="inline-flex items-center justify-center gap-1 self-stretch p-2">
-            <div className="flex-1 justify-start text-base leading-5 font-normal text-neutral-800">
-              New photo added to Laboratory Gallery
-            </div>
-            <div className="justify-start text-sm leading-4 font-normal text-neutral-400">
-              2hr
-            </div>
-          </div>
+          ) : (
+            stats.latestUpdates.map((update, index) => (
+              <div
+                key={index}
+                className="inline-flex items-center justify-center gap-1 self-stretch p-2"
+              >
+                <div className="flex-1 justify-start text-base leading-5 font-normal text-neutral-800">
+                  {update.text}
+                </div>
+                <div className="justify-start text-sm leading-4 font-normal text-neutral-400">
+                  {timeAgo(update.time)}
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>

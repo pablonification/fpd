@@ -266,7 +266,7 @@ export default function UserForm() {
               onChange={(e) => setSearch(e.target.value)}
               className="flex-1 text-sm outline-none"
             />
-            <button className="text-sm text-gray-500">🔍</button>
+            <img src="/icon/search.png" alt="Search" className="w-5 h-5" />
           </div>
         </div>
 
