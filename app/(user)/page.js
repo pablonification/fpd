@@ -152,9 +152,11 @@ export default function Home() {
               </button>
             </a>
 
-            <a href="/about"> <button className="rounded-full border border-black/40 px-4 py-2 text-sm font-semibold text-black transition hover:bg-black/40 hover:text-white sm:px-6 sm:py-3 sm:text-base">
-              Connect With Si-Zero
-            </button></a>
+            <a href="/about">
+              <button className="rounded-full border border-black/40 px-4 py-2 text-sm font-semibold text-black transition hover:bg-black/40 hover:text-white sm:px-6 sm:py-3 sm:text-base">
+                Connect With Si-Zero
+              </button>
+            </a>
 
           </div>
         </div>
