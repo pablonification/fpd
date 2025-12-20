@@ -1,6 +1,7 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import AboutForm from '../content/About';
 import ContentRenderer from '../_components/ContentRenderer';
 
@@ -15,10 +16,72 @@ const navItems = [
   { name: 'About', icon: '/icon/db-about.png' },
 ];
 
+function timeAgo(dateString) {
+  const date = new Date(dateString);
+  const now = new Date();
+  const seconds = Math.floor((now - date) / 1000);
+
+  if (seconds < 60) return 'Just now';
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h`;
+  const days = Math.floor(hours / 24);
+  return `${days}d`;
+}
+
 export default function AdminDashboardPage() {
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(true); // Desktop toggle
   const [mobileOpen, setMobileOpen] = useState(false); // Mobile toggle
   const [activeItem, setActiveItem] = useState('Home');
+
+  // Header State
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [latestUpdates, setLatestUpdates] = useState([]);
+  const [user, setUser] = useState(null);
+
+  // Fetch Data (Stats & User)
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        // Fetch Stats
+        const statsRes = await fetch('/api/dashboard/stats');
+        const statsJson = await statsRes.json();
+        if (statsJson.success) {
+          setLatestUpdates(statsJson.data.latestUpdates);
+        }
+
+        // Fetch User
+        const userRes = await fetch('/api/auth/me');
+        const userJson = await userRes.json();
+        if (userJson.success) {
+          setUser(userJson.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch dashboard data:', error);
+      }
+    }
+    fetchData();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      router.push('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Fallback redirect even if API fails
+      router.push('/login');
+    }
+  };
+
+  const getRoleLabel = (role) => {
+    if (role === 'admin') return 'Administrator';
+    if (role === 'editor') return 'Content Editor';
+    return 'Viewer';
+  };
 
   return (
     <div className="flex h-screen w-full bg-white overflow-hidden">
@@ -106,7 +169,7 @@ export default function AdminDashboardPage() {
       {/* MAIN CONTENT */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex h-16 items-center justify-between border-b border-gray-300 px-4 md:h-20 md:px-6 lg:px-8 bg-white">
+        <div className="flex h-16 items-center justify-between border-b border-gray-300 px-4 md:h-20 md:px-6 lg:px-8 bg-white relative z-30">
           <div className="flex items-center gap-4">
             {/* Mobile Hamburger Button */}
             <button
@@ -122,25 +185,119 @@ export default function AdminDashboardPage() {
             </h1>
           </div>
 
-          <div className="flex items-center gap-3 md:gap-4">
+          <div className="flex items-center gap-3 md:gap-4 relative">
             {/* Notifications */}
-            <button className="relative">
-              <Image
-                src="/icon/db-notifikasi.png"
-                alt="Notifications"
-                width={24}
-                height={24}
-              />
-              <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-red-500"></span>
-            </button>
+            <div className="relative">
+              <button
+                onClick={() => {
+                  setNotifOpen(!notifOpen);
+                  setProfileOpen(false);
+                }}
+                className="relative flex items-center justify-center p-2 rounded-full hover:bg-gray-100 outline-none"
+              >
+                <Image
+                  src="/icon/db-notifikasi.png"
+                  alt="Notifications"
+                  width={24}
+                  height={24}
+                />
+                {latestUpdates.length > 0 && (
+                  <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500"></span>
+                )}
+              </button>
+
+              {/* Notifications Dropdown */}
+              {notifOpen && (
+                <div className="absolute right-0 top-full mt-2 w-80 rounded-xl border border-gray-200 bg-white shadow-xl z-50 overflow-hidden">
+                  <div className="border-b border-gray-100 bg-gray-50 px-4 py-3 text-sm font-semibold text-gray-700">
+                    Notifications
+                  </div>
+                  <div className="max-h-[300px] overflow-y-auto">
+                    {latestUpdates.length === 0 ? (
+                      <div className="p-4 text-center text-gray-500 text-sm">
+                        No new updates.
+                      </div>
+                    ) : (
+                      <div className="flex flex-col">
+                        {latestUpdates.map((update, index) => (
+                          <div key={index} className="border-b border-gray-100 p-3 hover:bg-gray-50 last:border-0">
+                            <p className="text-sm text-gray-800 font-medium mb-1 line-clamp-2">
+                              {update.text}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {timeAgo(update.time)}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Profile */}
-            <div className="h-8 w-8 rounded-full bg-gray-300 md:h-10 md:w-10"></div>
+            <div className="relative">
+              <button
+                onClick={() => {
+                  setProfileOpen(!profileOpen);
+                  setNotifOpen(false);
+                }}
+                className="flex items-center gap-2 rounded-full hover:bg-gray-100 p-1 md:pr-3 transition-colors outline-none"
+              >
+                <div className="relative h-8 w-8 overflow-hidden rounded-full bg-gray-300 md:h-10 md:w-10">
+                  {/* Real User Avatar from DB */}
+                  <Image
+                    src={user?.avatarUrl || "https://api.dicebear.com/9.x/avataaars/svg?seed=Admin"}
+                    alt="User"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="hidden md:flex flex-col items-start">
+                  <span className="text-sm font-medium text-gray-900 leading-none">
+                    {user ? user.name : 'Loading...'}
+                  </span>
+                  <span className="text-xs text-gray-500">
+                    {user ? getRoleLabel(user.role) : '...'}
+                  </span>
+                </div>
+                <svg className="hidden md:block w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {/* Profile Dropdown */}
+              {profileOpen && (
+                <div className="absolute right-0 top-full mt-2 w-56 rounded-xl border border-gray-200 bg-white shadow-xl z-50 overflow-hidden py-1">
+                  <div className="border-b border-gray-100 px-4 py-3">
+                    <p className="text-sm font-medium text-gray-900 truncate">
+                      {user?.name || 'User'}
+                    </p>
+                    <p className="text-xs text-gray-500 truncate">
+                      {user?.email || ''}
+                    </p>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors text-left"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    Sign Out
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Content Content */}
-        <div className="flex-1 overflow-auto bg-gray-50 p-4 md:p-6">
+        <div className="flex-1 overflow-auto bg-gray-50 p-4 md:p-6" onClick={() => {
+          setNotifOpen(false);
+          setProfileOpen(false);
+        }}>
           <ContentRenderer activeItem={activeItem} />
         </div>
       </div>
