@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HiMenu, HiX } from 'react-icons/hi';
@@ -8,6 +8,20 @@ import { HiMenu, HiX } from 'react-icons/hi';
 export default function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Close dropdown if clicked outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   return (
     <nav className="bg-grayLight fixed top-6 left-1/2 z-50 w-[90%] max-w-[727px] -translate-x-1/2 rounded-[33px] px-6 py-3 shadow-md backdrop-blur-md">
@@ -27,7 +41,7 @@ export default function Navbar() {
           </Link>
 
           {/* Dropdown */}
-          <div className="relative">
+          <div className="relative" ref={dropdownRef}>
             <div
               onClick={() => setDropdownOpen(!dropdownOpen)}
               className="text-grayDark flex cursor-pointer items-center gap-2 rounded-lg px-4 py-2 transition select-none hover:opacity-90"
@@ -54,12 +68,17 @@ export default function Navbar() {
                       <Link
                         href="/researcher/participant"
                         className="block w-full"
+                        onClick={() => setDropdownOpen(false)}
                       >
                         Participant
                       </Link>
                     </li>
                     <li className="hover:bg-grayLight cursor-pointer rounded-md px-4 py-2">
-                      <Link href="/researcher/project" className="block w-full">
+                      <Link
+                        href="/researcher/project"
+                        className="block w-full"
+                        onClick={() => setDropdownOpen(false)}
+                      >
                         Project
                       </Link>
                     </li>
