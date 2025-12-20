@@ -42,8 +42,8 @@ export default function UserForm() {
       const data = await response.json();
       const usersWithAvatar = data.map((user) => ({
         ...user,
-        status: user.is_active ? 'Active' : 'Inactive',
-        avatar: user.avatar || '/icon/db-user-1.png',
+        status: user.isActive ? 'Active' : 'Inactive',
+        avatar: user.avatarUrl || '/icon/db-user-1.png',
         name: user.name,
       }));
       setUsers(usersWithAvatar);
@@ -337,7 +337,7 @@ export default function UserForm() {
               {/* User Info */}
               <div className="flex items-center gap-3">
                 <Image
-                  src={user.avatar_url} // Menggunakan avatar dari data yang sudah diolah
+                  src={user.avatar} // Menggunakan avatar dari data yang sudah diolah
                   alt={user.name}
                   width={40}
                   height={40}

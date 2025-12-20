@@ -17,7 +17,11 @@ export async function POST(req) {
     }
 
     const bucket = 'ContentBLOB';
-    const fileName = `${Date.now()}-${file.name}`;
+
+    // Sanitize filename: Generate unique alphanumeric string
+    const fileExt = file.name.split('.').pop().toLowerCase();
+    const randomString = crypto.randomUUID().replace(/-/g, '');
+    const fileName = `${randomString}.${fileExt}`;
 
     // Upload ke Supabase
     const { data: uploadData, error: uploadError } = await supabase.storage
@@ -37,7 +41,7 @@ export async function POST(req) {
       .from(bucket)
       .getPublicUrl(fileName);
 
-      
+
     return new Response(JSON.stringify({ publicUrl: urlData.publicUrl }), {
       status: 200,
     });

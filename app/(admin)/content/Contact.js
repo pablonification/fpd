@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import {
   DndContext,
@@ -16,6 +16,7 @@ import {
   useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import toast from 'react-hot-toast';
 
 // Component untuk item yang bisa di-drag
 function SortableItem({ id, link, onDelete }) {
@@ -57,20 +58,35 @@ function SortableItem({ id, link, onDelete }) {
 }
 
 export default function ContactForm() {
-  const [email, setEmail] = useState('michaeljordan@gmail.com');
-  const [labAddress, setLabAddress] = useState(
-    'Jl. Tubagus Ismail 1 Nomor 14, Coblong, Kota Bandung'
-  );
+  const [email, setEmail] = useState('');
+  const [labAddress, setLabAddress] = useState('');
   const [newLink, setNewLink] = useState('');
-  const [activeLinks, setActiveLinks] = useState([
-    'instagram.com',
-    'facebook.com',
-    'twitter.com',
-  ]);
+  const [activeLinks, setActiveLinks] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
   );
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const res = await fetch('/api/contact');
+        const data = await res.json();
+        if (data) {
+          setEmail(data.email || '');
+          setLabAddress(data.address || '');
+          setActiveLinks(data.links || []);
+        }
+      } catch (error) {
+        console.error('Failed to fetch contact info:', error);
+        toast.error('Failed to load contact info');
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
 
   const handleAddLink = () => {
     if (newLink.trim()) {
@@ -92,10 +108,31 @@ export default function ContactForm() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log({ email, labAddress, activeLinks });
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          address: labAddress,
+          links: activeLinks,
+        }),
+      });
+
+      if (res.ok) {
+        toast.success('Contact info updated!');
+      } else {
+        throw new Error('Failed to update');
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to update contact info');
+    }
   };
+
+  if (loading) return <div className="p-4 text-center">Loading...</div>;
 
   return (
     <div className="mt-6 flex flex-col items-center">
@@ -172,12 +209,12 @@ export default function ContactForm() {
                 items={activeLinks}
                 strategy={verticalListSortingStrategy}
               >
-                {activeLinks.map((link, index) => (
+                {activeLinks.map((link) => (
                   <SortableItem
                     key={link}
                     id={link}
                     link={link}
-                    onDelete={() => handleDeleteLink(index)}
+                    onDelete={() => handleDeleteLink(activeLinks.indexOf(link))}
                   />
                 ))}
               </SortableContext>

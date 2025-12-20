@@ -1,31 +1,44 @@
-import { supabase } from '../../../../db/supabaseClient.js';
+
+import { db } from '@/db/db';
+import { users } from '@/db/schema';
+import { eq } from 'drizzle-orm';
+import bcrypt from 'bcryptjs';
 
 export async function PUT(req, { params }) {
   try {
     const { id } = await params;
     const body = await req.json();
-    const { name, email, password, role, isActive } = body;
+    const { name, email, password, role, isActive, avatar } = body;
 
     const updates = {
       name,
       email,
       role,
-      is_active: isActive,
+      isActive: isActive,
+      avatarUrl: avatar,
+      updatedAt: new Date(),
     };
 
-    if (password) updates.password = password; // hash jika mau aman
+    if (password) {
+      const saltRounds = 10;
+      updates.passwordHash = await bcrypt.hash(password, saltRounds);
+    }
 
-    const { data, error } = await supabase
-      .from('users')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single();
+    const [updatedUser] = await db
+      .update(users)
+      .set(updates)
+      .where(eq(users.id, parseInt(id)))
+      .returning();
 
-    if (error) throw error;
+    if (!updatedUser) {
+      return new Response(JSON.stringify({ message: 'User not found' }), {
+        status: 404,
+      });
+    }
 
-    return new Response(JSON.stringify(data), { status: 200 });
+    return new Response(JSON.stringify(updatedUser), { status: 200 });
   } catch (err) {
+    console.error('Update User Error:', err);
     return new Response(JSON.stringify({ message: err.message }), {
       status: 500,
     });
@@ -36,18 +49,22 @@ export async function DELETE(req, { params }) {
   try {
     const { id } = await params;
 
-    const { data, error } = await supabase
-      .from('users')
-      .delete()
-      .eq('id', id)
-      .select();
+    const [deletedUser] = await db
+      .delete(users)
+      .where(eq(users.id, parseInt(id)))
+      .returning();
 
-    if (error) throw error;
+    if (!deletedUser) {
+      return new Response(JSON.stringify({ message: 'User not found' }), {
+        status: 404,
+      });
+    }
 
-    return new Response(JSON.stringify({ message: 'User deleted', data }), {
+    return new Response(JSON.stringify({ message: 'User deleted', data: deletedUser }), {
       status: 200,
     });
   } catch (err) {
+    console.error('Delete User Error:', err);
     return new Response(JSON.stringify({ message: err.message }), {
       status: 500,
     });
