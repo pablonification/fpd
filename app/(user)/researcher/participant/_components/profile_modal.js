@@ -69,6 +69,18 @@ export default function ProfileModal({
 
               {/* Middle Content */}
               <div className="w-full max-w-xl space-y-6 text-gray-700">
+                {/* Biography */}
+                {data?.description && (
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      About
+                    </h3>
+                    <p className="mt-2 text-base leading-relaxed text-gray-600">
+                      {data.description}
+                    </p>
+                  </div>
+                )}
+
                 {/* Position */}
                 <div>
                   <p className="text-sm text-gray-400">Position</p>
