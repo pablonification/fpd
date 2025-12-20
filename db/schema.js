@@ -52,8 +52,23 @@ export const projects = pgTable('projects', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
+export const projectMedia = pgTable('project_media', {
+  id: serial('id').primaryKey(),
+  projectId: integer('project_id').references(() => projects.id, { onDelete: 'cascade' }),
+  url: text('url').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
 export const projectsRelations = relations(projects, ({ one, many }) => ({
   publications: many(publications),
+  media: many(projectMedia),
+}));
+
+export const projectMediaRelations = relations(projectMedia, ({ one }) => ({
+  project: one(projects, {
+    fields: [projectMedia.projectId],
+    references: [projects.id],
+  }),
 }));
 
 export const publications = pgTable('publications', {

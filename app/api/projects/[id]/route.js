@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/db/db';
-import { projects } from '@/db/schema';
+import { projects, projectMedia } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 
 // GET single project by ID
@@ -8,13 +8,14 @@ export async function GET(request, { params }) {
   try {
     const { id } = await params;
 
-    const project = await db
-      .select()
-      .from(projects)
-      .where(eq(projects.id, parseInt(id)))
-      .limit(1);
+    const project = await db.query.projects.findFirst({
+      where: eq(projects.id, parseInt(id)),
+      with: {
+        media: true,
+      },
+    });
 
-    if (!project || project.length === 0) {
+    if (!project) {
       return NextResponse.json(
         { success: false, error: 'Project not found' },
         { status: 404 }
@@ -23,7 +24,7 @@ export async function GET(request, { params }) {
 
     return NextResponse.json({
       success: true,
-      data: project[0],
+      data: project,
     });
   } catch (error) {
     console.error('Error fetching project:', error);
@@ -47,33 +48,51 @@ export async function PUT(request, { params }) {
       results,
       principalInvestigator,
       researcherCategory,
+      images, // Array of image URLs
     } = body;
 
-    const updatedProject = await db
-      .update(projects)
-      .set({
-        title,
-        year: year || null,
-        status: status?.toLowerCase() || 'upcoming',
-        description: description || null,
-        results: results || null,
-        principalInvestigator: principalInvestigator || null,
-        researcherCategory: researcherCategory || null,
-        updatedAt: new Date(),
-      })
-      .where(eq(projects.id, parseInt(id)))
-      .returning();
+    const projectId = parseInt(id);
 
-    if (!updatedProject || updatedProject.length === 0) {
-      return NextResponse.json(
-        { success: false, error: 'Project not found' },
-        { status: 404 }
-      );
-    }
+    const result = await db.transaction(async (tx) => {
+      const updatedProject = await tx
+        .update(projects)
+        .set({
+          title,
+          year: year || null,
+          status: status?.toLowerCase() || 'upcoming',
+          description: description || null,
+          results: results || null,
+          principalInvestigator: principalInvestigator || null,
+          researcherCategory: researcherCategory || null,
+          updatedAt: new Date(),
+        })
+        .where(eq(projects.id, projectId))
+        .returning();
+
+      if (!updatedProject || updatedProject.length === 0) {
+        throw new Error('Project not found');
+      }
+
+      // Update media: delete existing and insert new
+      if (images && Array.isArray(images)) {
+        await tx.delete(projectMedia).where(eq(projectMedia.projectId, projectId));
+
+        if (images.length > 0) {
+          await tx.insert(projectMedia).values(
+            images.map((url) => ({
+              projectId,
+              url,
+            }))
+          );
+        }
+      }
+
+      return updatedProject[0];
+    });
 
     return NextResponse.json({
       success: true,
-      data: updatedProject[0],
+      data: result,
     });
   } catch (error) {
     console.error('Error updating project:', error);
@@ -89,6 +108,7 @@ export async function DELETE(request, { params }) {
   try {
     const { id } = await params;
 
+    // Media will be deleted automatically due to cascade reference in schema
     const deletedProject = await db
       .delete(projects)
       .where(eq(projects.id, parseInt(id)))

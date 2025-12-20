@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import Image from 'next/image';
 
 export default function DetailProject() {
   const params = useParams();
@@ -54,7 +55,10 @@ export default function DetailProject() {
   if (loading) {
     return (
       <main className="mx-auto mt-8 flex min-h-screen w-full items-center justify-center px-4 sm:mt-16 sm:px-6 md:mt-20 lg:mt-32 lg:px-8">
-        <div className="text-gray-500">Loading...</div>
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#2AB2C7] border-t-transparent" />
+          <span className="text-gray-500 font-medium">Loading project details...</span>
+        </div>
       </main>
     );
   }
@@ -69,7 +73,7 @@ export default function DetailProject() {
 
   return (
     <main className="mx-auto mt-26 min-h-screen w-full overflow-visible overflow-x-hidden px-4 sm:mt-16 sm:px-6 md:mt-20 lg:mt-32 lg:px-8">
-      <div className="lg:rounded-6xl relative flex w-full flex-col items-start justify-center gap-4 rounded-2xl border border-zinc-300 bg-white p-4 sm:gap-6 sm:rounded-3xl sm:p-6 md:rounded-4xl md:p-8 lg:p-11">
+      <div className="lg:rounded-6xl relative flex w-full flex-col items-start justify-center gap-4 rounded-2xl border border-zinc-300 bg-white p-4 sm:gap-6 sm:rounded-3xl sm:p-6 md:rounded-4xl md:p-8 lg:p-11 shadow-sm">
         {/* Header with Status and Year */}
         <div className="flex w-full flex-col items-start justify-between gap-4 sm:flex-row sm:items-center sm:gap-8">
           <div />
@@ -89,8 +93,8 @@ export default function DetailProject() {
         </div>
 
         {/* Title and Info */}
-        <div className="flex w-full max-w-full flex-col items-start justify-center gap-1 sm:gap-2 md:gap-3">
-          <div className="text-xl font-bold text-black sm:text-2xl md:text-3xl">
+        <div className="flex w-full max-w-full flex-col items-start justify-center gap-1 sm:gap-2 md:gap-3 break-words">
+          <div className="text-xl font-bold text-black sm:text-2xl md:text-3xl leading-tight">
             {project.title}
           </div>
           <div className="text-sm font-medium text-black sm:text-base md:text-lg">
@@ -106,45 +110,41 @@ export default function DetailProject() {
 
         {/* Description */}
         {project.description && (
-          <div className="w-full text-xs font-normal text-black sm:text-sm md:text-base">
-            {project.description}
+          <div className="prose prose-sm md:prose-base max-w-none w-full text-zinc-700 break-words overflow-hidden">
+            <div dangerouslySetInnerHTML={{ __html: project.description }} />
           </div>
         )}
 
         {/* Research Results */}
         {project.results && (
-          <div className="w-full">
-            <div className="mb-2 text-xs font-semibold text-black sm:text-sm md:text-base">
+          <div className="w-full mt-4">
+            <h3 className="mb-3 text-lg font-bold text-black sm:text-xl">
               Research Results / Outcomes
-            </div>
-            <div className="text-xs font-normal text-black sm:text-sm md:text-base">
-              {project.results}
+            </h3>
+            <div className="prose prose-sm md:prose-base max-w-none w-full text-zinc-700 break-words overflow-hidden">
+              <div dangerouslySetInnerHTML={{ __html: project.results }} />
             </div>
           </div>
         )}
 
         {/* Images Grid */}
-        <div className="relative w-full">
-          <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:gap-4">
-            <div className="aspect-video w-full rounded-lg bg-zinc-300 sm:rounded-2xl md:rounded-3xl" />
-            <div className="aspect-video w-full rounded-lg bg-zinc-300 sm:rounded-2xl md:rounded-3xl" />
-            <div className="aspect-video w-full rounded-lg bg-zinc-300 sm:rounded-2xl md:rounded-3xl" />
-          </div>
-          <div className="mt-3 flex items-center justify-end gap-1 text-xs sm:text-sm md:text-base">
-            <div className="font-normal text-black">See More</div>
-            <div className="h-4 w-4">
-              <svg
-                className="h-full w-full"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <polyline points="9 18 15 12 9 6" />
-              </svg>
+        {project.media && project.media.length > 0 && (
+          <div className="relative w-full mt-8">
+            <h3 className="mb-4 text-lg font-bold text-black">Supporting Documents</h3>
+            <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+              {project.media.map((item, idx) => (
+                <div key={idx} className="group relative aspect-video w-full rounded-2xl overflow-hidden border border-zinc-200 bg-zinc-50 shadow-sm transition-all hover:shadow-md">
+                  <Image
+                    src={item.url}
+                    alt={`Supporting doc ${idx + 1}`}
+                    fill
+                    className="object-cover transition-transform group-hover:scale-105"
+                  />
+                </div>
+              ))}
             </div>
           </div>
-        </div>
+        )}
       </div>
     </main>
   );
