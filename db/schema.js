@@ -22,6 +22,8 @@ export const users = pgTable('users', {
   role: userRoleEnum('role').notNull().default('viewer'),
   isActive: boolean('is_active').notNull().default(true),
   avatarUrl: text('avatar_url'),
+  resetToken: text('reset_token'),
+  resetTokenExpiry: timestamp('reset_token_expiry'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });

@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function ResetSuccess() {
   return (
@@ -26,9 +27,11 @@ export default function ResetSuccess() {
         {/* Form */}
 
         {/* Button */}
-        <button className="w-full rounded-2xl bg-[#2AB2C7] px-6 py-3 text-base font-medium text-white">
-          Login
-        </button>
+        <Link href="/login" className="w-full">
+          <button className="w-full rounded-2xl bg-[#2AB2C7] px-6 py-3 text-base font-medium text-white transition hover:opacity-90">
+            Login Now
+          </button>
+        </Link>
 
         {/* Back to login */}
       </div>
