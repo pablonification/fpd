@@ -247,11 +247,11 @@ export default function GalleryAdmin() {
   return (
     <div className="flex min-h-screen w-full flex-col gap-6 bg-zinc-50 p-6">
       {/* Header with Search */}
-      <div className="inline-flex w-[752px] flex-col items-start justify-start gap-4">
+      <div className="inline-flex w-full flex-col items-start justify-start gap-4">
         <div className="text-2xl leading-8 font-semibold text-black">
           All Gallery
         </div>
-        <div className="inline-flex items-center justify-start gap-3 self-stretch rounded-2xl bg-white px-5 py-4 outline outline-1 outline-offset-[-1px] outline-zinc-300">
+        <div className="inline-flex w-full md:w-auto items-center justify-start gap-3 self-stretch rounded-2xl bg-white px-5 py-4 outline outline-1 outline-offset-[-1px] outline-zinc-300">
           <div className="relative h-5 w-5">
             <div className="absolute top-[1.67px] left-[1.67px] h-4 w-4 outline outline-[1.25px] outline-offset-[-0.63px] outline-neutral-400" />
             <div className="absolute top-[16.67px] left-[16.67px] h-[1.67px] w-[1.67px] outline outline-[1.25px] outline-offset-[-0.63px] outline-neutral-400" />
@@ -277,15 +277,15 @@ export default function GalleryAdmin() {
       )}
 
       {/* Filter Section & Add Button */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-col w-full gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex w-full flex-col md:flex-row md:items-center gap-4">
           <select
             value={filterType}
             onChange={(e) => {
               setFilterType(e.target.value);
               setCurrentPage(1);
             }}
-            className="h-[44px] w-[180px] rounded-xl border border-zinc-300 px-4 text-sm transition-colors outline-none focus:border-[#2AB2C7]"
+            className="h-[44px] w-full md:w-[180px] rounded-xl border border-zinc-300 px-4 text-sm transition-colors outline-none focus:border-[#2AB2C7]"
           >
             <option value="">All Types</option>
             <option value="photo">Photos</option>
@@ -297,7 +297,7 @@ export default function GalleryAdmin() {
         </div>
         <button
           onClick={() => openModal('add')}
-          className="flex items-center justify-center gap-2.5 rounded-2xl bg-[#2AB2C7] px-6 py-3 text-white transition-opacity hover:opacity-90"
+          className="flex w-full md:w-auto items-center justify-center gap-2.5 rounded-2xl bg-[#2AB2C7] px-6 py-3 text-white transition-opacity hover:opacity-90"
         >
           <div className="text-base leading-5 font-medium">Add New Content</div>
         </button>
@@ -307,34 +307,32 @@ export default function GalleryAdmin() {
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="relative w-full max-w-3xl overflow-hidden rounded-3xl bg-white shadow-2xl">
-            <div className="max-h-[90vh] overflow-y-auto p-8">
+            <div className="max-h-[90vh] overflow-y-auto p-6 md:p-8">
               <div className="mb-6 text-2xl font-semibold text-zinc-800">
                 {modalType === 'add' ? 'Add New Content' : 'Edit Content'}
               </div>
 
               {/* Content Type Selector */}
-              <div className="mb-6 flex items-center gap-3">
+              <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-3">
                 <div className="text-base text-neutral-600">Content Type:</div>
                 <div className="flex gap-2">
                   <button
                     type="button"
                     onClick={() => setContentType('image')}
-                    className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
-                      contentType === 'image'
-                        ? 'bg-primary-700 text-white'
-                        : 'bg-zinc-100 text-neutral-600 hover:bg-zinc-200'
-                    }`}
+                    className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${contentType === 'image'
+                      ? 'bg-primary-700 text-white'
+                      : 'bg-zinc-100 text-neutral-600 hover:bg-zinc-200'
+                      }`}
                   >
                     Image
                   </button>
                   <button
                     type="button"
                     onClick={() => setContentType('video')}
-                    className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
-                      contentType === 'video'
-                        ? 'bg-primary-700 text-white'
-                        : 'bg-zinc-100 text-neutral-600 hover:bg-zinc-200'
-                    }`}
+                    className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${contentType === 'video'
+                      ? 'bg-primary-700 text-white'
+                      : 'bg-zinc-100 text-neutral-600 hover:bg-zinc-200'
+                      }`}
                   >
                     Video (YouTube)
                   </button>
@@ -426,7 +424,7 @@ export default function GalleryAdmin() {
                             <div className="absolute top-[2.67px] left-[18.67px] h-2.5 w-2.5 outline outline-1 outline-offset-[-0.55px] outline-stone-500" />
                             <div className="absolute top-0 left-0 h-8 w-8 opacity-0" />
                           </div>
-                          <div className="w-60 text-center text-base leading-5 font-normal text-stone-500">
+                          <div className="max-w-[240px] text-center text-base leading-5 font-normal text-stone-500">
                             Attach documents, PDFs, or images related to your
                             gallery content
                           </div>
@@ -507,8 +505,8 @@ export default function GalleryAdmin() {
       )}
 
       {/* Gallery Content */}
-      <div className="overflow-hidden rounded-2xl bg-white px-6 py-3 shadow-sm outline outline-1 outline-offset-[-1px] outline-zinc-100">
-        <div className="border-b border-zinc-100 py-4">
+      <div className="overflow-x-auto rounded-2xl bg-white px-6 py-3 shadow-sm outline outline-1 outline-offset-[-1px] outline-zinc-100">
+        <div className="min-w-[900px] border-b border-zinc-100 py-4">
           <div className="flex items-center justify-between">
             <div className="flex w-[548px] items-center gap-6">
               <div className="w-5 text-base text-neutral-400">Pin</div>
@@ -529,7 +527,7 @@ export default function GalleryAdmin() {
           return (
             <div
               key={item.id}
-              className="flex items-center justify-between rounded-[56px] py-3"
+              className="min-w-[900px] flex items-center justify-between rounded-[56px] py-3"
             >
               <div className="flex items-center gap-6">
                 <div className="relative h-6 w-6">
@@ -569,10 +567,10 @@ export default function GalleryAdmin() {
               <div className="w-20 text-base leading-5 font-normal text-zinc-800">
                 {activityDate
                   ? new Date(activityDate).toLocaleDateString('id-ID', {
-                      day: '2-digit',
-                      month: 'short',
-                      year: 'numeric',
-                    })
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric',
+                  })
                   : '-'}
               </div>
               <div className="flex w-28 items-center gap-4">
@@ -632,7 +630,7 @@ export default function GalleryAdmin() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between px-4">
+        <div className="flex flex-col items-center gap-4 md:flex-row md:justify-between px-4">
           <span className="text-sm text-gray-600">
             Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
             {Math.min(currentPage * itemsPerPage, filteredItems.length)} of{' '}
@@ -652,11 +650,10 @@ export default function GalleryAdmin() {
                   <button
                     key={page}
                     onClick={() => setCurrentPage(page)}
-                    className={`flex h-[40px] w-[40px] items-center justify-center rounded-lg text-sm transition-colors ${
-                      currentPage === page
-                        ? 'bg-[#2AB2C7] text-white'
-                        : 'bg-white text-gray-700 hover:bg-gray-50'
-                    }`}
+                    className={`flex h-[40px] w-[40px] items-center justify-center rounded-lg text-sm transition-colors ${currentPage === page
+                      ? 'bg-[#2AB2C7] text-white'
+                      : 'bg-white text-gray-700 hover:bg-gray-50'
+                      }`}
                   >
                     {page}
                   </button>

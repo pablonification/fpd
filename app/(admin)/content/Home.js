@@ -2,13 +2,13 @@ import '../../globals.css';
 
 export default function Home() {
   return (
-    <div className="inline-flex h-[944px] w-[1172px] flex-col items-start justify-start gap-4 p-10">
+    <div className="flex h-full min-h-screen w-full flex-col items-start justify-start gap-4 p-4 md:p-10">
       {/* Welcome Section */}
-      <div className="flex w-80 flex-col items-start justify-start gap-1">
-        <div className="justify-start self-stretch text-3xl leading-10 font-bold text-black">
+      <div className="flex w-full md:w-80 flex-col items-start justify-start gap-1">
+        <div className="justify-start self-stretch text-2xl md:text-3xl leading-10 font-bold text-black">
           Welcome, Admin!
         </div>
-        <div className="justify-start self-stretch text-center text-lg leading-6 font-medium text-neutral-500">
+        <div className="justify-start self-stretch text-base md:text-lg leading-6 font-medium text-neutral-500">
           Here’s an overview of today’s updates.
         </div>
       </div>
@@ -16,10 +16,10 @@ export default function Home() {
       {/* Overview Cards */}
       <div className="flex flex-col items-start justify-center gap-4 self-stretch">
         {/* Row 1 */}
-        <div className="inline-flex items-center justify-start gap-4 self-stretch">
+        <div className="flex w-full flex-col md:flex-row items-center justify-start gap-4 self-stretch">
           {/* Researchers Card */}
-          <div className="inline-flex flex-1 flex-col items-start justify-start gap-6 rounded-3xl px-6 pt-6 pb-5 outline outline-1 outline-offset-[-1px] outline-neutral-200">
-            <div className="inline-flex items-center justify-between self-stretch">
+          <div className="flex w-full md:flex-1 flex-col items-start justify-start gap-6 rounded-3xl px-6 pt-6 pb-5 outline outline-1 outline-offset-[-1px] outline-neutral-200">
+            <div className="flex w-full items-center justify-between self-stretch">
               <div className="justify-start text-center text-lg leading-6 font-medium text-black">
                 Researchers
               </div>
@@ -42,8 +42,8 @@ export default function Home() {
           </div>
 
           {/* Projects Card */}
-          <div className="inline-flex flex-1 flex-col items-start justify-start gap-6 self-stretch rounded-3xl px-6 pt-6 pb-5 outline outline-1 outline-offset-[-1px] outline-neutral-200">
-            <div className="inline-flex items-center justify-between self-stretch">
+          <div className="flex w-full md:flex-1 flex-col items-start justify-start gap-6 self-stretch rounded-3xl px-6 pt-6 pb-5 outline outline-1 outline-offset-[-1px] outline-neutral-200">
+            <div className="flex w-full items-center justify-between self-stretch">
               <div className="justify-start text-center text-lg leading-6 font-medium text-black">
                 Projects
               </div>
@@ -55,7 +55,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <div className="inline-flex items-center justify-between self-stretch">
+            <div className="flex w-full items-center justify-between self-stretch">
               <div className="flex items-center justify-start gap-2">
                 <div className="justify-start text-center text-2xl leading-8 font-semibold text-black">
                   25
@@ -77,8 +77,8 @@ export default function Home() {
           </div>
 
           {/* Users Card */}
-          <div className="inline-flex flex-1 flex-col items-start justify-start gap-6 self-stretch rounded-3xl px-6 pt-6 pb-5 outline outline-1 outline-offset-[-1px] outline-neutral-200">
-            <div className="inline-flex items-center justify-between self-stretch">
+          <div className="flex w-full md:flex-1 flex-col items-start justify-start gap-6 self-stretch rounded-3xl px-6 pt-6 pb-5 outline outline-1 outline-offset-[-1px] outline-neutral-200">
+            <div className="flex w-full items-center justify-between self-stretch">
               <div className="justify-start text-center text-lg leading-6 font-medium text-black">
                 Users
               </div>
@@ -102,10 +102,10 @@ export default function Home() {
         </div>
 
         {/* Row 2 */}
-        <div className="inline-flex items-center justify-start gap-4 self-stretch">
+        <div className="flex w-full flex-col md:flex-row items-center justify-start gap-4 self-stretch">
           {/* Gallery Items Card */}
-          <div className="inline-flex flex-1 flex-col items-start justify-start gap-6 rounded-3xl px-6 pt-6 pb-5 outline outline-1 outline-offset-[-1px] outline-neutral-200">
-            <div className="inline-flex items-center justify-between self-stretch">
+          <div className="flex w-full md:flex-1 flex-col items-start justify-start gap-6 rounded-3xl px-6 pt-6 pb-5 outline outline-1 outline-offset-[-1px] outline-neutral-200">
+            <div className="flex w-full items-center justify-between self-stretch">
               <div className="justify-start text-center text-lg leading-6 font-medium text-black">
                 Gallery Items
               </div>
@@ -128,8 +128,8 @@ export default function Home() {
           </div>
 
           {/* News Articles Card */}
-          <div className="inline-flex flex-1 flex-col items-start justify-start gap-6 self-stretch rounded-3xl px-6 pt-6 pb-5 outline outline-1 outline-offset-[-1px] outline-neutral-200">
-            <div className="inline-flex items-center justify-between self-stretch">
+          <div className="flex w-full md:flex-1 flex-col items-start justify-start gap-6 self-stretch rounded-3xl px-6 pt-6 pb-5 outline outline-1 outline-offset-[-1px] outline-neutral-200">
+            <div className="flex w-full items-center justify-between self-stretch">
               <div className="justify-start text-center text-lg leading-6 font-medium text-black">
                 News Articles
               </div>
@@ -152,8 +152,8 @@ export default function Home() {
           </div>
 
           {/* Website Traffic Summary Card */}
-          <div className="inline-flex flex-1 flex-col items-start justify-start gap-6 rounded-3xl px-6 pt-6 pb-5 outline outline-1 outline-offset-[-1px] outline-neutral-200">
-            <div className="inline-flex items-center justify-between self-stretch">
+          <div className="flex w-full md:flex-1 flex-col items-start justify-start gap-6 rounded-3xl px-6 pt-6 pb-5 outline outline-1 outline-offset-[-1px] outline-neutral-200">
+            <div className="flex w-full items-center justify-between self-stretch">
               <div className="justify-start text-center text-lg leading-6 font-medium text-black">
                 Website Traffic Summary
               </div>

@@ -49,7 +49,7 @@ export default function AboutForm() {
       {/* Card Container */}
       <form
         onSubmit={handleSubmit}
-        className="mt-6 flex w-[800px] flex-col gap-6 rounded-[16px] border border-gray-300 bg-white p-6"
+        className="mt-6 flex w-full max-w-[800px] flex-col gap-6 rounded-[16px] border border-gray-300 bg-white p-6"
       >
         {/* 4 Form Fields */}
         <FormField
@@ -84,7 +84,7 @@ export default function AboutForm() {
         {/* Submit Button */}
         <button
           type="submit"
-          className="mt-4 h-11 w-[752px] rounded-[16px] bg-[#2AB2C7] px-6 py-3 text-sm font-medium text-white transition hover:opacity-90"
+          className="mt-4 h-11 w-full rounded-[16px] bg-[#2AB2C7] px-6 py-3 text-sm font-medium text-white transition hover:opacity-90"
           onClick={() => {
             handleSubmit;
           }}

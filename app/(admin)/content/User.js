@@ -207,7 +207,7 @@ export default function UserForm() {
         const errData = await response.json();
         throw new Error(
           errData.message ||
-            `Failed to ${isCreating ? 'create' : 'update'} user`
+          `Failed to ${isCreating ? 'create' : 'update'} user`
         );
       }
 
@@ -254,7 +254,7 @@ export default function UserForm() {
     <div className="flex justify-center px-4 py-6">
       <div className="flex w-full max-w-full flex-col gap-6">
         {/* Header */}
-        <div className="flex w-full flex-col gap-4">
+        <div className="flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <h1 className="font-hanken text-2xl leading-8 font-semibold tracking-tight">
             All Users
           </h1>
@@ -271,11 +271,11 @@ export default function UserForm() {
         </div>
 
         {/* Filter & Add User */}
-        <div className="flex w-full max-w-screen items-center justify-between">
+        <div className="flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
-            className="h-[44px] w-[143px] rounded-md border border-gray-300 px-4 text-sm"
+            className="h-[44px] w-full rounded-md border border-gray-300 px-4 text-sm md:w-[143px]"
           >
             <option value="">All Roles</option>
             <option value="admin">Admin</option>
@@ -283,10 +283,10 @@ export default function UserForm() {
             <option value="viewer">Viewer</option>
           </select>
 
-          <div className="flex flex-1 justify-end">
+          <div className="flex w-full justify-end md:w-auto">
             <button
               onClick={() => openModal()}
-              className="h-[44px] w-[177px] rounded-[12px] bg-[#2AB2C7] px-6 font-medium text-white transition-opacity hover:opacity-90"
+              className="h-[44px] w-full rounded-[12px] bg-[#2AB2C7] px-6 font-medium text-white transition-opacity hover:opacity-90 md:w-[177px]"
               disabled={loading}
             >
               Add New User +
@@ -295,9 +295,9 @@ export default function UserForm() {
         </div>
 
         {/* --- Table --- */}
-        <div className="flex min-h-[596px] w-full flex-col overflow-hidden rounded-lg border border-gray-200">
+        <div className="flex min-h-[596px] w-full flex-col overflow-x-auto rounded-lg border border-gray-200">
           {/* Table Header */}
-          <div className="grid grid-cols-[3fr_1fr_1fr] items-center border-b border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-700">
+          <div className="grid min-w-[600px] grid-cols-[3fr_1fr_1fr] items-center border-b border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-700">
             <span>Users</span>
             <span>Role</span>
             <span className="justify-self-end">Action</span>
@@ -332,7 +332,7 @@ export default function UserForm() {
           {filteredUsers.map((user) => (
             <div
               key={user.id}
-              className="grid grid-cols-[3fr_1fr_1fr] items-center border-b border-gray-100 px-4 py-3 hover:bg-gray-50"
+              className="grid min-w-[600px] grid-cols-[3fr_1fr_1fr] items-center border-b border-gray-100 px-4 py-3 hover:bg-gray-50"
             >
               {/* User Info */}
               <div className="flex items-center gap-3">
@@ -376,7 +376,7 @@ export default function UserForm() {
                   width={20}
                   height={20}
                   className="cursor-pointer"
-                  // Logika untuk menampilkan detail pengguna bisa ditambahkan di sini
+                // Logika untuk menampilkan detail pengguna bisa ditambahkan di sini
                 />
               </div>
             </div>
@@ -412,12 +412,11 @@ export default function UserForm() {
           <form
             onSubmit={handleSubmit}
             // Ganti w-[1070px] agar lebih responsif, tapi tetap lebar
-            className={`max-w-8xl fixed top-0 right-0 h-full w-full bg-white shadow-2xl transition-transform duration-300 sm:w-[500px] md:w-[700px] lg:w-[1070px] ${
-              isModalOpen ? 'translate-x-0' : 'translate-x-full'
-            }`}
+            className={`max-w-8xl fixed top-0 right-0 h-full w-full bg-white shadow-2xl transition-transform duration-300 sm:w-[500px] md:w-[700px] lg:w-[1070px] ${isModalOpen ? 'translate-x-0' : 'translate-x-full'
+              }`}
           >
             {/* Header */}
-            <div className="flex h-[80px] items-center border-b border-gray-200 px-8">
+            <div className="flex h-[80px] items-center border-b border-gray-200 px-4 md:px-8">
               <button
                 type="button"
                 onClick={closeModal}
@@ -426,17 +425,17 @@ export default function UserForm() {
               >
                 ←
               </button>
-              <h2 className="font-hanken text-3xl leading-10 font-bold text-black">
+              <h2 className="font-hanken text-xl md:text-3xl leading-10 font-bold text-black">
                 {currentUser ? 'Edit User' : 'Create New User'}
               </h2>
             </div>
             {/* Content */}
             {/* Menggunakan padding lebih besar (px-8 py-10) dan wrapper untuk membatasi lebar konten (~855px) */}
-            <div className="h-[calc(100%-160px)] overflow-y-auto px-8 py-10">
+            <div className="h-[calc(100%-160px)] overflow-y-auto px-4 py-6 md:px-8 md:py-10">
               <div className="mx-auto flex w-full max-w-[855px] flex-col gap-9">
                 {/* 1. Profile Picture */}
-                <div className="flex items-center gap-5">
-                  <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-gray-200 text-xs text-gray-500">
+                <div className="flex flex-col md:flex-row items-start md:items-center gap-5">
+                  <div className="flex h-24 w-24 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-gray-200 text-xs text-gray-500">
                     <Image
                       src={avatarPreview || '/icon/db-user-1.png'}
                       alt="Profile"
@@ -496,7 +495,7 @@ export default function UserForm() {
                     onChange={(e) =>
                       setFormData({ ...formData, fullName: e.target.value })
                     }
-                    // Anda mungkin perlu menambahkan `inputClassName="rounded-2xl px-4 py-3 border border-zinc-300"` jika FormField mendukung
+                  // Anda mungkin perlu menambahkan `inputClassName="rounded-2xl px-4 py-3 border border-zinc-300"` jika FormField mendukung
                   />
 
                   <FormField
