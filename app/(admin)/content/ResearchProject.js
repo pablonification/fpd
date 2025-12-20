@@ -226,7 +226,6 @@ export default function ResearchProjectManagement() {
             All Research Projects
           </h1>
           <div className="flex h-[52px] w-full max-w-md items-center gap-2 rounded-[16px] border border-gray-300 px-4">
-            <span className="text-gray-400">🔍</span>
             <input
               type="text"
               placeholder="Search here..."
@@ -234,6 +233,7 @@ export default function ResearchProjectManagement() {
               onChange={(e) => setSearch(e.target.value)}
               className="flex-1 text-sm outline-none"
             />
+            <img src="/icon/search.png" alt="Search" className="w-5 h-5" />
           </div>
         </div>
 

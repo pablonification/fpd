@@ -237,13 +237,20 @@ export default function Researcher() {
 
       {/* SEARCH & FILTER */}
       <div className="flex flex-col md:flex-row items-center gap-4 border-b border-zinc-100 px-4 md:px-8 py-4">
-        <input
-          type="text"
-          placeholder="Search researchers..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full md:flex-1 rounded-lg border border-zinc-200 px-4 py-2 text-sm"
-        />
+        <div className="relative w-full md:flex-1">
+          <input
+            type="text"
+            placeholder="Search researchers..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full rounded-lg border border-zinc-200 pl-4 pr-10 py-2 text-sm"
+          />
+          <img
+            src="/icon/search.png"
+            alt="Search"
+            className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+          />
+        </div>
         <select
           value={roleFilter}
           onChange={(e) => setRoleFilter(e.target.value)}

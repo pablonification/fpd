@@ -227,11 +227,6 @@ export default function NewsAdmin() {
           All News
         </div>
         <div className="inline-flex w-full md:w-auto items-center justify-start gap-3 self-stretch rounded-2xl bg-white px-5 py-4 outline outline-1 outline-offset-[-1px] outline-zinc-300">
-          <div className="relative h-5 w-5">
-            <div className="absolute top-[1.67px] left-[1.67px] h-4 w-4 outline outline-[1.25px] outline-offset-[-0.63px] outline-neutral-400" />
-            <div className="absolute top-[16.67px] left-[16.67px] h-[1.67px] w-[1.67px] outline outline-[1.25px] outline-offset-[-0.63px] outline-neutral-400" />
-            <div className="absolute top-0 left-0 h-5 w-5 opacity-0" />
-          </div>
           <input
             type="text"
             placeholder="Search here.."
@@ -242,6 +237,7 @@ export default function NewsAdmin() {
             }}
             className="flex-1 text-base leading-5 font-normal text-black outline-none placeholder:text-neutral-400"
           />
+          <img src="/icon/search.png" alt="Search" className="w-5 h-5" />
         </div>
       </div>
 

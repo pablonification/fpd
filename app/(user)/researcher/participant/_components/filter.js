@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { HiChevronDown, HiCheck, HiSearch } from 'react-icons/hi';
+import { HiChevronDown, HiCheck } from 'react-icons/hi';
 
 export default function FilterRow({
   search = '',
@@ -43,7 +43,11 @@ export default function FilterRow({
             }}
             className="h-[56px] w-full rounded-[16px] border border-gray-300 bg-white/70 px-5 pr-12 text-lg text-gray-700 shadow-sm backdrop-blur-md focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder:text-gray-400"
           />
-          <HiSearch className="absolute top-1/2 right-4 h-6 w-6 -translate-y-1/2 text-gray-500" />
+          <img
+            src="/icon/search.png"
+            alt="Search"
+            className="absolute top-1/2 right-4 h-6 w-6 -translate-y-1/2 opacity-50"
+          />
         </div>
 
         <div className="flex w-full gap-4 md:w-auto">
@@ -61,8 +65,8 @@ export default function FilterRow({
                 setRoleOpen(false);
               }}
               className={`flex h-[56px] w-full items-center justify-between rounded-[16px] border ${displayedExpertise
-                  ? 'border-blue-400 bg-blue-50'
-                  : 'border-gray-300 bg-white/70'
+                ? 'border-blue-400 bg-blue-50'
+                : 'border-gray-300 bg-white/70'
                 } px-5 text-gray-800 shadow-sm backdrop-blur-md transition hover:opacity-90`}
             >
               <span className="truncate text-lg">
