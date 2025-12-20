@@ -1,74 +1,147 @@
+'use client';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
+import { CgSpinner } from 'react-icons/cg';
+import toast from 'react-hot-toast';
+
+function NewPasswordForm() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const token = searchParams.get('token');
+
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [verifying, setVerifying] = useState(true);
+  const [invalidToken, setInvalidToken] = useState(false);
+
+  useEffect(() => {
+    if (!token) {
+      setInvalidToken(true);
+      setVerifying(false);
+      return;
+    }
+    setVerifying(false);
+  }, [token]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (password !== confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, password }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to reset password');
+
+      toast.success('Password reset successful!');
+      router.push('/reset-success');
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (verifying) {
+    return (
+      <div className="flex flex-col items-center gap-4">
+        <CgSpinner className="h-10 w-10 animate-spin text-[#2AB2C7]" />
+        <p className="text-zinc-500 font-medium text-center">Verifying reset link...</p>
+      </div>
+    );
+  }
+
+  if (invalidToken) {
+    return (
+      <div className="flex flex-col items-center gap-6 text-center">
+        <div className="rounded-full bg-red-50 p-4 text-red-600">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <h2 className="text-2xl font-bold text-zinc-900">Invalid or Expired Link</h2>
+        <p className="text-zinc-500 max-w-[300px]">This password reset link is invalid or has already expired.</p>
+        <Link href="/forgot-password" text="Request New Link" className="w-full text-center rounded-xl bg-[#2AB2C7] px-6 py-3 font-bold text-white shadow-lg shadow-[#2AB2C7]/20 transition hover:opacity-90">
+          Request New Link
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="flex flex-col gap-6 self-stretch">
+      <div className="flex flex-col gap-1 self-stretch text-center md:text-left">
+        <h2 className="text-2xl font-bold tracking-tight text-zinc-900 md:text-3xl">Set New Password</h2>
+        <p className="text-sm font-normal text-zinc-500 md:text-base">Use a different password from your previous passwords.</p>
+      </div>
+
+      <div className="space-y-4 text-left">
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-semibold text-zinc-700">New Password</label>
+          <input
+            type="password"
+            required
+            minLength={8}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
+            className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-zinc-900 outline-none transition-all focus:border-[#2AB2C7] focus:ring-4 focus:ring-[#2AB2C7]/10"
+          />
+          <p className="text-xs text-zinc-400">Must be at least 8 characters.</p>
+        </div>
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-semibold text-zinc-700">Confirm Password</label>
+          <input
+            type="password"
+            required
+            minLength={8}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            placeholder="••••••••"
+            className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-zinc-900 outline-none transition-all focus:border-[#2AB2C7] focus:ring-4 focus:ring-[#2AB2C7]/10"
+          />
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        disabled={loading}
+        className="group relative flex w-full items-center justify-center rounded-2xl bg-[#2AB2C7] px-6 py-3.5 text-lg font-bold text-white transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-70"
+      >
+        {loading ? <CgSpinner className="h-6 w-6 animate-spin text-white" /> : 'Reset Password'}
+      </button>
+
+      <div className="text-center">
+        <Link href="/login" className="text-sm font-medium text-zinc-500 hover:text-[#2AB2C7] transition-colors">
+          Cancel and Back to Login
+        </Link>
+      </div>
+    </form>
+  );
+}
 
 export default function NewPassPage() {
   return (
-    <div className="relative flex h-screen w-full items-center justify-center bg-gradient-to-b from-[#DFF5F8] to-white">
-      <div className="flex w-[500px] flex-col items-center justify-start gap-6 rounded-[36px] bg-white/80 p-11 shadow-[0px_0px_32px_0px_rgba(0,0,0,0.07)] outline outline-1 outline-offset-[-1px] outline-zinc-300 backdrop-blur-lg">
-        {/* Header */}
-        <div className="flex flex-col items-center justify-start gap-4 self-stretch">
-          <Image
-            src="/icon/lock.png" // icon dari folder public
-            alt="Edit"
-            width={120}
-            height={120}
-            className="cursor-pointer"
-          />
-          <div className="flex flex-col items-center justify-start gap-1 self-stretch">
-            <div className="text-center text-xl leading-7 font-medium text-black">
-              Set A New Password
-            </div>
-            <div className="text-center text-sm leading-4 font-normal text-neutral-500">
-              Use a different password from your previous passwords
-            </div>
-          </div>
+    <div className="relative flex min-h-screen w-full items-center justify-center bg-zinc-50 px-4 md:bg-gradient-to-b md:from-[#DFF5F8] md:to-white">
+      <div className="flex w-full max-w-[480px] flex-col items-center justify-start gap-8 rounded-[36px] bg-white p-8 shadow-2xl md:p-12 outline outline-1 outline-offset-[-1px] outline-zinc-200">
+        <div className="flex flex-col items-center gap-4">
+          <Image src="/icon/lock.png" alt="Reset Password" width={100} height={100} />
         </div>
 
-        {/* Form */}
-        <div className="flex flex-col items-start justify-start gap-4 self-stretch">
-          {/* New Password */}
-          <div className="flex flex-col items-start justify-start gap-2 self-stretch">
-            <label className="text-base leading-5 font-medium text-black">
-              Password
-            </label>
-            <div className="mb-1 text-xs leading-4 font-normal text-neutral-400">
-              Must be at least 8 characters.
-            </div>
-            <input
-              type="password"
-              placeholder="Enter your new password"
-              className="focus:ring-Primary600 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-base leading-5 text-black outline-none focus:ring-2"
-            />
-          </div>
-
-          {/* Confirm Password */}
-          <div className="flex flex-col items-start justify-start gap-2 self-stretch">
-            <label className="text-base leading-5 font-medium text-black">
-              Confirm Password
-            </label>
-            <div className="mb-1 text-xs leading-4 font-normal text-neutral-400">
-              Retype your new password here
-            </div>
-            <input
-              type="password"
-              placeholder="Confirm your new password"
-              className="focus:ring-Primary600 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-base leading-5 text-black outline-none focus:ring-2"
-            />
-          </div>
-        </div>
-
-        {/* Button */}
-        <button className="w-full rounded-2xl bg-[#2AB2C7] px-6 py-3 text-base font-medium text-white">
-          Reset Password
-        </button>
-
-        {/* Back to login */}
-        <div className="mt-2 flex w-full justify-center">
-          <a href="/login">
-            <span className="cursor-pointer text-sm leading-4 font-normal text-stone-500 underline">
-              Back to Login
-            </span>
-          </a>
-        </div>
+        <Suspense fallback={<CgSpinner className="h-10 w-10 animate-spin text-[#2AB2C7]" />}>
+          <NewPasswordForm />
+        </Suspense>
       </div>
     </div>
   );
