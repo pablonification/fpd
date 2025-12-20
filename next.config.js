@@ -7,6 +7,11 @@ const nextConfig = {
         hostname: 'ybnyfebxqvtcmkjjhlws.supabase.co',
         pathname: '/storage/v1/object/public/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'api.dicebear.com',
+        pathname: '/**', // Allow all paths from dicebear
+      },
     ],
   },
 };
