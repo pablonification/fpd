@@ -1,4 +1,5 @@
 import Card from './_components/card';
+import SkeletonCard from './_components/SkeletonCard';
 
 import { Suspense } from 'react';
 
@@ -260,6 +261,8 @@ export default function Home() {
             </div>
           </div>
 
+
+
           {/* Latest Events */}
           <div className="flex w-full flex-col items-center gap-4 text-center sm:gap-8">
             <div>
@@ -271,7 +274,11 @@ export default function Home() {
               <div className="mx-auto grid w-full max-w-6xl grid-cols-1 justify-center gap-x-7 gap-y-7 sm:grid-cols-2 sm:gap-x-8 sm:gap-y-10 md:grid-cols-3 lg:grid-cols-3 lg:gap-x-10 lg:gap-y-12">
                 <Suspense
                   fallback={
-                    <div className="text-gray-500">Loading events...</div>
+                    <>
+                      <SkeletonCard />
+                      <SkeletonCard />
+                      <SkeletonCard />
+                    </>
                   }
                 >
                   <LatestEvents />
@@ -289,7 +296,11 @@ export default function Home() {
               <div className="mx-auto grid w-full max-w-6xl grid-cols-1 justify-center gap-x-7 gap-y-7 sm:grid-cols-2 sm:gap-x-8 sm:gap-y-10 md:grid-cols-3 lg:grid-cols-3 lg:gap-x-10 lg:gap-y-12">
                 <Suspense
                   fallback={
-                    <div className="text-gray-500">Loading news...</div>
+                    <>
+                      <SkeletonCard />
+                      <SkeletonCard />
+                      <SkeletonCard />
+                    </>
                   }
                 >
                   <LatestNews />

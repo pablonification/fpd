@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Card from './../_components/card';
+import SkeletonCard from './../_components/SkeletonCard';
 
 export default function NewsPage() {
   const [news, setNews] = useState([]);
@@ -68,7 +69,13 @@ export default function NewsPage() {
           </header>
 
           {loading && (
-            <div className="text-center text-gray-500">Loading news...</div>
+            <div className="flex flex-col gap-12">
+              <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6">
+                {[...Array(6)].map((_, i) => (
+                  <SkeletonCard key={i} />
+                ))}
+              </div>
+            </div>
           )}
           {error && <div className="text-center text-red-500">{error}</div>}
 

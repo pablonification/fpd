@@ -12,10 +12,16 @@ export default function AboutPage() {
     values: '',
   });
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     fetch('/api/about')
       .then((res) => res.json())
-      .then((data) => setAboutData(data));
+      .then((data) => {
+        setAboutData(data);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
   }, []);
 
   return (
@@ -26,9 +32,19 @@ export default function AboutPage() {
           <h1 className="text-[48px] leading-[60px] font-bold tracking-[-1%] text-black sm:text-[60px] sm:leading-[72px]">
             About Us
           </h1>
-          <p className="max-w-[900px] text-[18px] leading-[28px] tracking-[-1%] text-[#7C7C7C] sm:text-[24px] sm:leading-[32px]">
-            {aboutData.about_description || 'Loading description...'}
-          </p>
+          <div className="w-full max-w-[900px]">
+            {loading ? (
+              <div className="flex w-full flex-col items-center gap-2 animate-pulse">
+                <div className="h-4 w-full rounded bg-gray-200"></div>
+                <div className="h-4 w-full rounded bg-gray-200"></div>
+                <div className="h-4 w-3/4 rounded bg-gray-200"></div>
+              </div>
+            ) : (
+              <p className="max-w-[900px] text-[18px] leading-[28px] tracking-[-1%] text-[#7C7C7C] sm:text-[24px] sm:leading-[32px]">
+                {aboutData.about_description}
+              </p>
+            )}
+          </div>
         </header>
 
       </section>
@@ -43,9 +59,18 @@ export default function AboutPage() {
           <h3 className="mb-2 text-[16px] font-semibold md:text-[20px]">
             Vision
           </h3>
-          <p className="text-sm-[16px] leading-relaxed text-neutral-500">
-            {aboutData.vision || 'Loading vision...'}
-          </p>
+          <div className="w-full">
+            {loading ? (
+              <div className="flex flex-col gap-2 animate-pulse">
+                <div className="h-4 w-full rounded bg-gray-200"></div>
+                <div className="h-4 w-5/6 rounded bg-gray-200"></div>
+              </div>
+            ) : (
+              <p className="text-sm-[16px] leading-relaxed text-neutral-500">
+                {aboutData.vision}
+              </p>
+            )}
+          </div>
         </div>
 
         {/* Our Values */}
@@ -61,9 +86,18 @@ export default function AboutPage() {
           <h3 className="mb-2 text-[16px] font-semibold md:text-[20px]">
             Our Values
           </h3>
-          <p className="text-sm-[16px] leading-relaxed text-neutral-500">
-            {aboutData.values || 'Loading values...'}
-          </p>
+          <div className="w-full">
+            {loading ? (
+              <div className="flex flex-col gap-2 animate-pulse">
+                <div className="h-4 w-full rounded bg-gray-200"></div>
+                <div className="h-4 w-5/6 rounded bg-gray-200"></div>
+              </div>
+            ) : (
+              <p className="text-sm-[16px] leading-relaxed text-neutral-500">
+                {aboutData.values}
+              </p>
+            )}
+          </div>
         </div>
       </section>
 

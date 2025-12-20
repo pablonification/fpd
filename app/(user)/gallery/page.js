@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { GalleryCard, PhotoModal, VideoModal } from './_components/GalleryCard';
+import SkeletonGalleryCard from './_components/SkeletonGalleryCard';
 import { AnimatePresence } from 'framer-motion';
 import FilterDropdown from './_components/FilterDropdown';
 
@@ -101,8 +102,10 @@ export default function GalleryPage() {
         </header>
 
         {loading && (
-          <div className="mt-10 text-center text-gray-500">
-            Loading content...
+          <div className="mt-10 grid w-full grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-4">
+            {[...Array(8)].map((_, i) => (
+              <SkeletonGalleryCard key={i} />
+            ))}
           </div>
         )}
         {error && <div className="mt-10 text-center text-red-500">{error}</div>}
