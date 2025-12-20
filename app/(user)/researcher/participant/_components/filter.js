@@ -4,18 +4,26 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HiChevronDown, HiCheck, HiSearch } from 'react-icons/hi';
 
-export default function FilterRow({ search = '', onSearchChange }) {
+export default function FilterRow({
+  search = '',
+  onSearchChange,
+  expertiseOptions = [],
+  selectedExpertise = '',
+  onExpertiseChange,
+}) {
   const [roleOpen, setRoleOpen] = useState(false);
   const [expertiseOpen, setExpertiseOpen] = useState(false);
 
   const [selectedRole, setSelectedRole] = useState('');
-  const [selectedExpertise, setSelectedExpertise] = useState('');
 
-  // Local search state fallback when parent doesn't control it
+  // Local fallback if onExpertiseChange is not provided (though page passes it)
+  const [localExpertise, setLocalExpertise] = useState('');
+
+  // Local search state fallback
   const [localSearch, setLocalSearch] = useState('');
 
-  const roles = ['Admin', 'Researcher', 'Participant'];
-  const expertises = ['Frontend', 'Backend', 'AI', 'Data Science'];
+  const roles = ['Supervisor', 'Researcher', 'Participant']; // Updated to likely roles
+  const displayedExpertise = selectedExpertise || localExpertise;
 
   return (
     <div className="flex w-full justify-center">
@@ -33,84 +41,38 @@ export default function FilterRow({ search = '', onSearchChange }) {
                 setLocalSearch(val);
               }
             }}
-            className="h-[48px] w-full rounded-[16px] border border-gray-300 bg-white/70 px-5 pr-12 text-gray-700 shadow-sm backdrop-blur-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            className="h-[56px] w-full rounded-[16px] border border-gray-300 bg-white/70 px-5 pr-12 text-lg text-gray-700 shadow-sm backdrop-blur-md focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder:text-gray-400"
           />
-          <HiSearch className="absolute top-1/2 right-4 h-5 w-5 -translate-y-1/2 text-gray-500" />
+          <HiSearch className="absolute top-1/2 right-4 h-6 w-6 -translate-y-1/2 text-gray-500" />
         </div>
 
         <div className="flex w-full gap-4 md:w-auto">
-          {/* Role Dropdown */}
-          <div className="relative flex-1 md:w-[180px] md:flex-none">
-            <button
-              onClick={() => {
-                setRoleOpen(!roleOpen);
-                setExpertiseOpen(false);
-              }}
-              className={`flex h-[48px] w-full items-center justify-between rounded-[16px] border ${
-                selectedRole
-                  ? 'border-blue-400 bg-blue-50'
-                  : 'border-gray-300 bg-white/70'
-              } px-4 text-gray-800 shadow-sm backdrop-blur-md transition hover:opacity-90`}
-            >
-              <span className="truncate">{selectedRole || 'Role'}</span>
-              <motion.div
-                animate={{ rotate: roleOpen ? 180 : 0 }}
-                transition={{ duration: 0.25 }}
-              >
-                <HiChevronDown className="h-5 w-5 text-gray-600" />
-              </motion.div>
-            </button>
-
-            <AnimatePresence>
-              {roleOpen && (
-                <motion.ul
-                  initial={{ opacity: 0, y: -6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
-                  transition={{ duration: 0.25 }}
-                  className="absolute right-0 z-10 mt-2 w-full rounded-[12px] border border-gray-200 bg-white shadow-md"
-                >
-                  {roles.map((item) => (
-                    <li
-                      key={item}
-                      onClick={() => {
-                        setSelectedRole(selectedRole === item ? '' : item);
-                        setRoleOpen(false);
-                      }}
-                      className="flex cursor-pointer items-center justify-between rounded-md px-4 py-2 text-gray-700 hover:bg-gray-100"
-                    >
-                      {item}
-                      {selectedRole === item && (
-                        <HiCheck className="h-4 w-4 text-blue-500" />
-                      )}
-                    </li>
-                  ))}
-                </motion.ul>
-              )}
-            </AnimatePresence>
-          </div>
-
+          {/* Role Dropdown - Keeping logic but maybe not used by parent yet? 
+              The parent page does not seem to pass role or handle it, 
+              but we will keep it for UI consistency if needed. 
+              Alternatively, since user said 'filter bar', maybe just expertise?
+              I'll leave it but resize it.
+          */}
           {/* Expertise Dropdown */}
-          <div className="relative flex-1 md:w-[180px] md:flex-none">
+          <div className="relative flex-1 md:w-[220px] md:flex-none">
             <button
               onClick={() => {
                 setExpertiseOpen(!expertiseOpen);
                 setRoleOpen(false);
               }}
-              className={`flex h-[48px] w-full items-center justify-between rounded-[16px] border ${
-                selectedExpertise
+              className={`flex h-[56px] w-full items-center justify-between rounded-[16px] border ${displayedExpertise
                   ? 'border-blue-400 bg-blue-50'
                   : 'border-gray-300 bg-white/70'
-              } px-4 text-gray-800 shadow-sm backdrop-blur-md transition hover:opacity-90`}
+                } px-5 text-gray-800 shadow-sm backdrop-blur-md transition hover:opacity-90`}
             >
-              <span className="truncate">
-                {selectedExpertise || 'Expertise'}
+              <span className="truncate text-lg">
+                {displayedExpertise || 'All Expertise'}
               </span>
               <motion.div
                 animate={{ rotate: expertiseOpen ? 180 : 0 }}
                 transition={{ duration: 0.25 }}
               >
-                <HiChevronDown className="h-5 w-5 text-gray-600" />
+                <HiChevronDown className="h-6 w-6 text-gray-600" />
               </motion.div>
             </button>
 
@@ -121,25 +83,44 @@ export default function FilterRow({ search = '', onSearchChange }) {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -6 }}
                   transition={{ duration: 0.25 }}
-                  className="absolute right-0 z-10 mt-2 w-full rounded-[12px] border border-gray-200 bg-white shadow-md"
+                  className="absolute right-0 z-10 mt-2 max-h-[300px] w-full overflow-y-auto rounded-[12px] border border-gray-200 bg-white shadow-xl"
                 >
-                  {expertises.map((item) => (
-                    <li
-                      key={item}
-                      onClick={() => {
-                        setSelectedExpertise(
-                          selectedExpertise === item ? '' : item
-                        );
-                        setExpertiseOpen(false);
-                      }}
-                      className="flex cursor-pointer items-center justify-between rounded-md px-4 py-2 text-gray-700 hover:bg-gray-100"
-                    >
-                      {item}
-                      {selectedExpertise === item && (
-                        <HiCheck className="h-4 w-4 text-blue-500" />
-                      )}
+                  <li
+                    onClick={() => {
+                      if (onExpertiseChange) onExpertiseChange('');
+                      setLocalExpertise('');
+                      setExpertiseOpen(false);
+                    }}
+                    className="flex cursor-pointer items-center justify-between px-5 py-3 text-gray-700 hover:bg-gray-100"
+                  >
+                    All Expertise
+                    {displayedExpertise === '' && (
+                      <HiCheck className="h-5 w-5 text-blue-500" />
+                    )}
+                  </li>
+                  {expertiseOptions.length > 0 ? (
+                    expertiseOptions.map((item) => (
+                      <li
+                        key={item}
+                        onClick={() => {
+                          if (onExpertiseChange) onExpertiseChange(item);
+                          setLocalExpertise(item);
+                          setExpertiseOpen(false);
+                        }}
+                        className="flex cursor-pointer items-center justify-between px-5 py-3 text-gray-700 hover:bg-gray-100"
+                      >
+                        {item}
+                        {displayedExpertise === item && (
+                          <HiCheck className="h-5 w-5 text-blue-500" />
+                        )}
+                      </li>
+                    ))
+                  ) : (
+                    // Fallback if no options passed
+                    <li className="px-5 py-3 text-gray-400">
+                      No expertise found
                     </li>
-                  ))}
+                  )}
                 </motion.ul>
               )}
             </AnimatePresence>
