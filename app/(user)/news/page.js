@@ -69,11 +69,28 @@ export default function NewsPage() {
           </header>
 
           {loading && (
-            <div className="flex flex-col gap-12">
-              <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6">
-                {[...Array(6)].map((_, i) => (
-                  <SkeletonCard key={i} />
-                ))}
+            <div className="flex flex-col gap-12 w-full animate-pulse">
+              {/* Featured News Skeleton */}
+              <div className="grid w-full items-center gap-8 md:grid-cols-2">
+                <div className="order-first flex justify-center md:order-last">
+                  <div className="h-[300px] w-full max-w-[523px] rounded-xl bg-gray-200 shadow-lg"></div>
+                </div>
+                <div className="order-last flex flex-col gap-4 md:order-first">
+                  <div className="h-8 w-3/4 rounded bg-gray-200"></div>
+                  <div className="h-4 w-full rounded bg-gray-200"></div>
+                  <div className="h-4 w-full rounded bg-gray-200"></div>
+                  <div className="h-4 w-2/3 rounded bg-gray-200"></div>
+                  <div className="mt-2 h-4 w-32 rounded bg-gray-200"></div>
+                </div>
+              </div>
+
+              {/* Other News Grid Skeleton */}
+              <div className="flex flex-col gap-12">
+                <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6">
+                  {[...Array(3)].map((_, i) => (
+                    <SkeletonCard key={i} />
+                  ))}
+                </div>
               </div>
             </div>
           )}
