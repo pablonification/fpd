@@ -26,7 +26,9 @@ export default function CardProfile({
         <p className="text-grayDark text-lg font-bold sm:text-xl">{name}</p>
 
         {description && (
-          <p className="text-sm text-gray-600 sm:text-base">{description}</p>
+          <p className="line-clamp-2 text-sm text-gray-600 sm:text-base">
+            {description}
+          </p>
         )}
 
         {bidang && (
