@@ -88,8 +88,8 @@ export default function GalleryPage() {
   }, [processedItems, tab, filter]);
 
   return (
-    <main className="mt-24 flex min-h-screen w-full flex-col items-center px-4 py-10 sm:px-10">
-      <div className="flex w-full max-w-[1440px] flex-col">
+    <main className="mt-32 flex min-h-screen w-full flex-col items-center px-4 py-10 sm:px-6">
+      <div className="flex w-full max-w-7xl flex-col">
         <header className="flex w-full flex-col items-center gap-3 text-center">
           <h1 className="text-[48px] leading-[60px] font-bold tracking-[-1%] text-black sm:text-[60px] sm:leading-[72px]">
             Gallery & Field Activities

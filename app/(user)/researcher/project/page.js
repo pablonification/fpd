@@ -53,8 +53,8 @@ export default function ResearchProject() {
       : projects.filter((p) => p.researcherCategory === filter);
 
   return (
-    <main className="mt-24 min-h-screen w-full overflow-visible overflow-x-hidden sm:mt-16 md:mt-20 lg:mt-32">
-      <div className="mx-auto flex w-full max-w-[1296px] flex-col gap-4 px-4 py-6 sm:gap-6 sm:px-6 sm:py-10">
+    <main className="mt-32 min-h-screen w-full overflow-visible overflow-x-hidden">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-6 sm:gap-6 sm:px-6 sm:py-10">
         {/* HEADER */}
         <header className="flex w-full flex-col items-center gap-2 text-center sm:gap-3">
           <h1 className="text-2xl font-bold tracking-tight text-black sm:text-3xl md:text-4xl lg:text-5xl">
@@ -72,29 +72,26 @@ export default function ResearchProject() {
           <div className="flex flex-wrap gap-3 sm:gap-6">
             <button
               onClick={() => setTab('ongoing')}
-              className={`pb-1 text-sm font-medium sm:text-base ${
-                tab === 'ongoing' ? 'border-b-2 border-black' : 'text-gray-500'
-              }`}
+              className={`pb-1 text-sm font-medium sm:text-base ${tab === 'ongoing' ? 'border-b-2 border-black' : 'text-gray-500'
+                }`}
             >
               Ongoing
             </button>
             <button
               onClick={() => setTab('completed')}
-              className={`pb-1 text-sm font-medium sm:text-base ${
-                tab === 'completed'
+              className={`pb-1 text-sm font-medium sm:text-base ${tab === 'completed'
                   ? 'border-b-2 border-black'
                   : 'text-gray-500'
-              }`}
+                }`}
             >
               Completed
             </button>
             <button
               onClick={() => setTab('upcomming')}
-              className={`pb-1 text-sm font-medium sm:text-base ${
-                tab === 'upcomming'
+              className={`pb-1 text-sm font-medium sm:text-base ${tab === 'upcomming'
                   ? 'border-b-2 border-black'
                   : 'text-gray-500'
-              }`}
+                }`}
             >
               Upcomming
             </button>
