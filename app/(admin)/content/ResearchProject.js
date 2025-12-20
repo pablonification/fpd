@@ -1,7 +1,15 @@
 'use client';
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
+import dynamic from 'next/dynamic';
+
+// Dynamic import for ReactQuill to avoid SSR issues
+const ReactQuill = dynamic(() => import('react-quill-new'), {
+  ssr: false,
+  loading: () => <div className="h-[200px] w-full animate-pulse rounded-xl bg-gray-100" />
+});
+import 'react-quill-new/dist/quill.snow.css';
 
 // FormField Component
 function FormField({
@@ -19,7 +27,7 @@ function FormField({
       {description && (
         <span className="text-xs text-gray-400">{description}</span>
       )}
-      <div className="flex h-[44px] w-full items-center gap-[10px] rounded-[12px] border border-gray-300 px-4 py-3">
+      <div className="flex h-[44px] w-full items-center gap-[10px] rounded-[12px] border border-gray-300 px-4 py-3 bg-white">
         <input
           type={type}
           placeholder={placeholder}
@@ -32,41 +40,24 @@ function FormField({
   );
 }
 
-// TextArea Component
-function TextAreaField({
-  label,
-  description,
-  placeholder = '',
-  value,
-  onChange,
-  rows = 4,
-  className = '',
-}) {
-  return (
-    <div className={`flex w-full flex-col gap-2 ${className}`}>
-      <label className="text-sm font-bold text-gray-700">{label}</label>
-      {description && (
-        <span className="text-xs text-gray-400">{description}</span>
-      )}
-      <textarea
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-        rows={rows}
-        className="w-full resize-none rounded-[12px] border border-gray-300 px-4 py-3 text-sm outline-none"
-      />
-    </div>
-  );
-}
+const QUILL_MODULES = {
+  toolbar: [
+    [{ header: [1, 2, false] }],
+    ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+    [{ list: 'ordered' }, { list: 'bullet' }],
+    ['link', 'clean'],
+  ],
+};
 
 export default function ResearchProjectManagement() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState('');
-  const [yearFilter, setYearFilter] = useState('');
   const [specificYear, setSpecificYear] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentProject, setCurrentProject] = useState(null);
+
   const [formData, setFormData] = useState({
     projectTitle: '',
     principalInvestigator: '',
@@ -75,9 +66,11 @@ export default function ResearchProjectManagement() {
     status: '',
     description: '',
     outputs: '',
+    images: [], // Selected image URLs
   });
 
-  // Fetch projects from API
+  const fileInputRef = useRef(null);
+
   useEffect(() => {
     fetchProjects();
   }, []);
@@ -101,8 +94,53 @@ export default function ResearchProjectManagement() {
     }
   };
 
-  const handleSubmit = async () => {
+  const handleFileUpload = async (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+
+    const uploadPromises = files.map(async (file) => {
+      const uploadFormData = new FormData();
+      uploadFormData.append('file', file);
+
+      const res = await fetch('/api/upload-image', {
+        method: 'POST',
+        body: uploadFormData,
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Upload failed');
+      return data.publicUrl;
+    });
+
     try {
+      toast.loading('Uploading images...', { id: 'upload' });
+      const uploadedUrls = await Promise.all(uploadPromises);
+      setFormData(prev => ({
+        ...prev,
+        images: [...prev.images, ...uploadedUrls]
+      }));
+      toast.success('Images uploaded successfully', { id: 'upload' });
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast.error('Failed to upload one or more images', { id: 'upload' });
+    }
+  };
+
+  const removeImage = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleSubmit = async () => {
+    if (!formData.projectTitle) {
+      toast.error('Project title is required');
+      return;
+    }
+
+    try {
+      setSaving(true);
       const projectData = {
         title: formData.projectTitle,
         principalInvestigator: formData.principalInvestigator,
@@ -111,6 +149,7 @@ export default function ResearchProjectManagement() {
         status: formData.status,
         description: formData.description,
         results: formData.outputs,
+        images: formData.images,
       };
 
       const url = currentProject
@@ -136,13 +175,15 @@ export default function ResearchProjectManagement() {
             : 'Project created successfully'
         );
         setIsModalOpen(false);
-        fetchProjects(); // Refresh list
+        fetchProjects();
       } else {
         toast.error(data.error || 'Failed to save project');
       }
     } catch (error) {
       console.error('Error saving project:', error);
       toast.error('Error saving project');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -187,6 +228,7 @@ export default function ResearchProjectManagement() {
           : '',
         description: project.description || '',
         outputs: project.results || '',
+        images: project.media ? project.media.map(m => m.url) : [],
       });
     } else {
       setFormData({
@@ -197,6 +239,7 @@ export default function ResearchProjectManagement() {
         status: '',
         description: '',
         outputs: '',
+        images: [],
       });
     }
     setIsModalOpen(true);
@@ -208,7 +251,6 @@ export default function ResearchProjectManagement() {
       case 'completed':
         return 'bg-green-500';
       case 'ongoing':
-      case 'running':
         return 'bg-yellow-500';
       case 'upcoming':
         return 'bg-gray-400';
@@ -222,105 +264,86 @@ export default function ResearchProjectManagement() {
       <div className="flex w-full max-w-full flex-col gap-6">
         {/* Header */}
         <div className="flex w-full flex-col gap-4">
-          <h1 className="text-2xl leading-8 font-semibold tracking-tight">
-            All Research Projects
+          <h1 className="text-2xl font-hanken leading-8 font-semibold tracking-tight">
+            Research Projects
           </h1>
-          <div className="flex h-[52px] w-full max-w-md items-center gap-2 rounded-[16px] border border-gray-300 px-4">
+          <div className="flex h-[52px] w-full max-w-md items-center gap-2 rounded-[16px] border border-gray-300 px-4 bg-white">
             <input
               type="text"
-              placeholder="Search here..."
+              placeholder="Search projects..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="flex-1 text-sm outline-none"
             />
-            <img src="/icon/search.png" alt="Search" className="w-5 h-5" />
+            <Image src="/icon/search.png" alt="Search" width={20} height={20} />
           </div>
         </div>
 
         {/* Filter & Add Button */}
         <div className="flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div className="flex w-full gap-4 md:w-auto">
-            <select
-              value={yearFilter}
-              onChange={(e) => setYearFilter(e.target.value)}
-              className="h-[44px] flex-1 rounded-[12px] border border-gray-300 px-4 text-sm outline-none md:flex-none md:w-[120px]"
-            >
-              <option value="">Year</option>
-              <option value="2024">2024</option>
-              <option value="2023">2023</option>
-              <option value="2022">2022</option>
-            </select>
-
+          <div className="flex gap-4">
             <select
               value={specificYear}
               onChange={(e) => setSpecificYear(e.target.value)}
-              className="h-[44px] flex-1 rounded-[12px] border border-gray-300 px-4 text-sm outline-none md:flex-none md:w-[120px]"
+              className="h-[44px] w-[140px] rounded-[12px] border border-gray-300 px-4 text-sm outline-none bg-white font-medium"
             >
-              <option value="2024">2024</option>
-              <option value="2023">2023</option>
-              <option value="2022">2022</option>
+              <option value="">All Years</option>
+              {[2025, 2024, 2023, 2022, 2021].map(y => (
+                <option key={y} value={y.toString()}>{y}</option>
+              ))}
             </select>
           </div>
 
           <button
             onClick={() => openModal()}
-            className="h-[44px] w-full rounded-[12px] bg-[#2AB2C7] px-6 font-medium text-white hover:opacity-90 md:w-auto"
+            className="h-[44px] rounded-[12px] bg-[#2AB2C7] px-8 font-semibold text-white transition-all hover:opacity-90 active:scale-95 shadow-sm"
           >
             Add New Project +
           </button>
         </div>
 
         {/* Table */}
-        <div className="w-full overflow-x-auto rounded-lg border border-gray-200">
-          {/* Table Header */}
-          <div className="grid min-w-[900px] grid-cols-[2fr_0.8fr_1.5fr_1.2fr_0.8fr_0.8fr] gap-4 border-b border-gray-200 bg-gray-50 px-6 py-3 text-sm font-medium text-gray-700">
+        <div className="w-full overflow-hidden rounded-[20px] border border-gray-200 bg-white shadow-sm overflow-x-auto">
+          <div className="grid min-w-[900px] grid-cols-[2fr_1fr_1.5fr_1.5fr_1fr_1fr] border-b border-gray-200 bg-gray-50/50 px-6 py-4 text-sm font-bold text-gray-700">
             <span>Project Title</span>
             <span>Year</span>
-            <span>Principal Investigator</span>
-            <span>Researcher Category</span>
+            <span>PI</span>
+            <span>Category</span>
             <span>Status</span>
             <span className="text-right">Actions</span>
           </div>
 
-          {/* Table Rows */}
-          {loading ? (
-            <div className="flex items-center justify-center py-8">
-              <span className="text-gray-500">Loading...</span>
-            </div>
-          ) : filteredProjects.length === 0 ? (
-            <div className="flex items-center justify-center py-8">
-              <span className="text-gray-500">No projects found</span>
-            </div>
-          ) : (
-            filteredProjects.map((project) => (
-              <div
-                key={project.id}
-                className="grid min-w-[900px] grid-cols-[2fr_0.8fr_1.5fr_1.2fr_0.8fr_0.8fr] items-center gap-4 border-b border-gray-100 px-6 py-4 hover:bg-gray-50"
-              >
-                <span className="text-sm">{project.title}</span>
-                <span className="text-sm">{project.year || '-'}</span>
-                <span className="text-sm">
-                  {project.principalInvestigator || '-'}
-                </span>
-                <span className="text-sm">
-                  {project.researcherCategory || '-'}
-                </span>
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`h-2 w-2 rounded-full ${getStatusColor(project.status)}`}
-                  ></span>
-                  <span className="text-sm capitalize">
-                    {project.status || 'upcoming'}
-                  </span>
-                </div>
-                <div className="flex items-center justify-end gap-3">
-                  <div className="flex items-center justify-end gap-4">
+          <div className="flex flex-col">
+            {loading ? (
+              <div className="flex items-center justify-center py-20">
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#2AB2C7] border-t-transparent" />
+              </div>
+            ) : filteredProjects.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-20 text-gray-500">
+                <span className="text-4xl mb-4"></span>
+                <p>No projects found matching your criteria.</p>
+              </div>
+            ) : (
+              filteredProjects.map((project) => (
+                <div
+                  key={project.id}
+                  className="grid min-w-[900px] grid-cols-[2fr_1fr_1.5fr_1.5fr_1fr_1fr] items-center px-6 py-5 border-b border-gray-100 hover:bg-gray-50/80 transition-colors"
+                >
+                  <span className="text-sm font-bold text-gray-900 line-clamp-2 pr-4">{project.title}</span>
+                  <span className="text-sm text-gray-600">{project.year || '-'}</span>
+                  <span className="text-sm text-gray-600 truncate pr-4">{project.principalInvestigator || '-'}</span>
+                  <span className="text-sm text-gray-600">{project.researcherCategory || '-'}</span>
+                  <div className="flex items-center gap-2">
+                    <span className={`h-2.5 w-2.5 rounded-full ${getStatusColor(project.status)}`} />
+                    <span className="text-sm font-medium capitalize text-gray-700">{project.status || 'upcoming'}</span>
+                  </div>
+                  <div className="flex items-center justify-end gap-5">
                     <Image
                       src="/icon/db-u-edit.png"
                       alt="Edit"
                       width={20}
                       height={20}
-                      className="cursor-pointer"
+                      className="cursor-pointer hover:scale-110 transition-transform"
                       onClick={() => openModal(project)}
                     />
                     <Image
@@ -328,154 +351,72 @@ export default function ResearchProjectManagement() {
                       alt="Delete"
                       width={20}
                       height={20}
-                      className="cursor-pointer"
+                      className="cursor-pointer hover:scale-110 transition-transform"
                       onClick={() => handleDelete(project.id)}
-                    />
-                    <Image
-                      src="/icon/db-u-right.png"
-                      alt="Info"
-                      width={20}
-                      height={20}
-                      className="cursor-pointer"
                     />
                   </div>
                 </div>
-              </div>
-            ))
-          )}
-        </div>
-
-        {/* Footer Pagination */}
-        <div className="flex h-[40px] w-full items-center justify-between px-4">
-          <span className="text-sm text-gray-600">
-            Showing 1 to 15 of 1000 entries
-          </span>
-          <div className="flex gap-2">
-            <button className="flex h-[40px] w-[120px] items-center justify-center rounded-[16px] border border-gray-300 bg-white text-sm hover:bg-gray-50">
-              ← Previous
-            </button>
-            <button className="flex h-[40px] w-[120px] items-center justify-center rounded-[16px] border border-gray-300 bg-white text-sm hover:bg-gray-50">
-              Next →
-            </button>
+              ))
+            )}
           </div>
         </div>
       </div>
 
-      {/* Modal Overlay */}
+      {/* Slide-over Modal */}
       {isModalOpen && (
-        <div className="bg-opacity-50 fixed inset-0 z-50 backdrop-blur-sm">
-          <div
-            className={`fixed top-0 right-0 h-full bg-white shadow-2xl transition-transform duration-300 
-              w-full sm:w-[500px] md:w-[700px] lg:w-[1070px]
-              ${isModalOpen ? 'translate-x-0' : 'translate-x-full'}`}
-          >
+        <div className="fixed inset-0 z-50 flex justify-end">
+          <div className="absolute inset-0 bg-black/20 backdrop-blur-sm transition-opacity" onClick={() => setIsModalOpen(false)} />
+
+          <div className="relative h-full w-full max-w-[1100px] bg-white shadow-2xl transition-transform duration-300 overflow-hidden flex flex-col">
             {/* Header */}
-            <div className="flex h-[80px] items-center border-b border-gray-200 px-4 md:px-8">
+            <div className="flex h-[80px] items-center border-b border-gray-200 px-8 flex-shrink-0">
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="mr-4 flex h-10 w-10 items-center justify-center rounded-full hover:bg-gray-100"
+                className="mr-4 flex h-8 w-8 items-center justify-center rounded-full bg-zinc-100 text-xl hover:bg-zinc-200 transition-colors"
               >
                 ←
               </button>
-              <h2 className="text-xl md:text-2xl font-semibold">
-                {currentProject
-                  ? 'Edit Research Project'
-                  : 'Create New Research Project'}
+              <h2 className="text-2xl font-bold font-hanken">
+                {currentProject ? 'Edit Research Project' : 'Add New Research Project'}
               </h2>
             </div>
 
             {/* Content */}
-            <div className="h-[calc(100%-160px)] overflow-y-auto px-4 py-6 md:px-8">
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div className="flex-1 overflow-y-auto px-8 py-10">
+              <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
                 {/* Left Column */}
-                <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-8">
                   <FormField
                     label="Project Title"
-                    description="Provide the full title of the research project."
+                    description="The full official title of the research project."
                     placeholder="Enter project title"
                     value={formData.projectTitle}
-                    onChange={(e) =>
-                      setFormData({ ...formData, projectTitle: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, projectTitle: e.target.value })}
                   />
 
-                  <FormField
-                    label="Principal Investigator"
-                    description="Enter the name of the lead researcher responsible for this project."
-                    placeholder="Enter name"
-                    value={formData.principalInvestigator}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        principalInvestigator: e.target.value,
-                      })
-                    }
-                  />
-
-                  <div className="flex w-full flex-col gap-2">
-                    <label className="text-sm font-bold text-gray-700">
-                      Researcher Category
-                    </label>
-                    <span className="text-xs text-gray-400">
-                      Select the researcher category that matches the role or
-                      level of the researcher.
-                    </span>
-                    <select
-                      value={formData.category}
-                      onChange={(e) =>
-                        setFormData({ ...formData, category: e.target.value })
-                      }
-                      className="h-[44px] w-full rounded-[12px] border border-gray-300 px-4 text-sm outline-none"
-                    >
-                      <option value="">Researcher category</option>
-                      <option value="Supervisor">Supervisor</option>
-                      <option value="Master's Student">Masters Student</option>
-                      <option value="Undergraduate Student">
-                        Undergraduate Student
-                      </option>
-                      <option value="Alumni Researchers">
-                        Alumni Researchers
-                      </option>
-                    </select>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="flex w-full flex-col gap-2">
-                      <label className="text-sm font-bold text-gray-700">
-                        Year
-                      </label>
-                      <span className="text-xs text-gray-400">
-                        Choose the year this research was conducted.
-                      </span>
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="flex flex-col gap-2">
+                      <label className="text-sm font-bold text-gray-700">Project Year</label>
                       <select
                         value={formData.year}
-                        onChange={(e) =>
-                          setFormData({ ...formData, year: e.target.value })
-                        }
-                        className="h-[44px] w-full rounded-[12px] border border-gray-300 px-4 text-sm outline-none"
+                        onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+                        className="h-[44px] w-full rounded-[12px] border border-gray-300 px-4 text-sm outline-none bg-white"
                       >
-                        <option value="">Year</option>
-                        <option value="2024">2024</option>
-                        <option value="2023">2023</option>
-                        <option value="2022">2022</option>
+                        <option value="">Select Year</option>
+                        {[2025, 2024, 2023, 2022, 2021].map(y => (
+                          <option key={y} value={y.toString()}>{y}</option>
+                        ))}
                       </select>
                     </div>
 
-                    <div className="flex w-full flex-col gap-2">
-                      <label className="text-sm font-bold text-gray-700">
-                        Status
-                      </label>
-                      <span className="text-xs text-gray-400">
-                        Select the current status of the research.
-                      </span>
+                    <div className="flex flex-col gap-2">
+                      <label className="text-sm font-bold text-gray-700">Status</label>
                       <select
                         value={formData.status}
-                        onChange={(e) =>
-                          setFormData({ ...formData, status: e.target.value })
-                        }
-                        className="h-[44px] w-full rounded-[12px] border border-gray-300 px-4 text-sm outline-none"
+                        onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                        className="h-[44px] w-full rounded-[12px] border border-gray-300 px-4 text-sm outline-none bg-white"
                       >
-                        <option value="">Status</option>
+                        <option value="">Select Status</option>
                         <option value="Ongoing">Ongoing</option>
                         <option value="Completed">Completed</option>
                         <option value="Upcoming">Upcoming</option>
@@ -483,75 +424,144 @@ export default function ResearchProjectManagement() {
                     </div>
                   </div>
 
-                  <TextAreaField
-                    label="Description"
-                    description="Write a brief overview of the research scope, objectives, or focus."
-                    placeholder="Enter description"
-                    value={formData.description}
-                    onChange={(e) =>
-                      setFormData({ ...formData, description: e.target.value })
-                    }
-                    rows={6}
+                  <FormField
+                    label="Principal Investigator"
+                    description="Lead researcher responsible for the project."
+                    placeholder="Enter name"
+                    value={formData.principalInvestigator}
+                    onChange={(e) => setFormData({ ...formData, principalInvestigator: e.target.value })}
                   />
+
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-bold text-gray-700">Researcher Category</label>
+                    <select
+                      value={formData.category}
+                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                      className="h-[44px] w-full rounded-[12px] border border-gray-300 px-4 text-sm outline-none bg-white"
+                    >
+                      <option value="">Category</option>
+                      <option value="Supervisor">Supervisor</option>
+                      <option value="Master's Student">Masters Student</option>
+                      <option value="Undergraduate Student">Undergraduate Student</option>
+                      <option value="Alumni Researchers">Alumni Researchers</option>
+                    </select>
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-bold text-gray-700">Description</label>
+                    <span className="text-xs text-gray-400">Detailed overview of goals and methods.</span>
+                    <div className="min-h-[250px] overflow-hidden rounded-xl border border-gray-300 bg-white">
+                      <ReactQuill
+                        theme="snow"
+                        value={formData.description}
+                        onChange={(val) => setFormData({ ...formData, description: val })}
+                        modules={QUILL_MODULES}
+                        className="h-full"
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 {/* Right Column */}
-                <div className="flex flex-col gap-6">
-                  <TextAreaField
-                    label="Research Outputs"
-                    description="Summarize the key findings or results produced from the research."
-                    placeholder="Enter research outputs"
-                    value={formData.outputs}
-                    onChange={(e) =>
-                      setFormData({ ...formData, outputs: e.target.value })
-                    }
-                    rows={10}
-                  />
+                <div className="flex flex-col gap-8">
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-bold text-gray-700">Research Outputs</label>
+                    <span className="text-xs text-gray-400">Summarize key findings and results.</span>
+                    <div className="min-h-[250px] overflow-hidden rounded-xl border border-gray-300 bg-white">
+                      <ReactQuill
+                        theme="snow"
+                        value={formData.outputs}
+                        onChange={(val) => setFormData({ ...formData, outputs: val })}
+                        modules={QUILL_MODULES}
+                        className="h-full"
+                      />
+                    </div>
+                  </div>
 
-                  {/* File Upload Area */}
-                  <div className="flex w-full flex-col gap-2">
-                    <label className="text-sm font-bold text-gray-700">
-                      Supporting Documents
-                    </label>
-                    <span className="text-xs text-gray-400">
-                      Upload supporting documents or images such as reports,
-                      publications, or research data.
-                    </span>
-                    <div className="flex h-[200px] w-full flex-col items-center justify-center gap-3 rounded-[12px] border-2 border-dashed border-gray-300 bg-gray-50">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-200">
-                        ⏱️
-                      </div>
-                      <p className="max-w-[300px] text-center text-xs text-gray-500">
-                        Upload supporting documents or images such as reports,
-                        publications, or research data.
-                      </p>
-                      <button className="rounded-[12px] border border-gray-300 bg-white px-6 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-                        Browse File
+                  {/* Supporting Documents / Image Upload */}
+                  <div className="flex flex-col gap-3">
+                    <label className="text-sm font-bold text-gray-700">Supporting Documents (Images)</label>
+                    <div
+                      onClick={() => fileInputRef.current?.click()}
+                      className="flex h-[180px] cursor-pointer flex-col items-center justify-center gap-3 rounded-[20px] border-2 border-dashed border-gray-300 bg-gray-50 transition-colors hover:bg-gray-100"
+                    >
+                      <span className="text-3xl"></span>
+                      <p className="text-xs text-gray-500 font-medium">Click to upload project images (JPG, PNG)</p>
+                      <button className="rounded-lg bg-white border border-gray-300 px-4 py-1.5 text-xs font-bold text-gray-700 shadow-sm">
+                        Select Files
                       </button>
+                    </div>
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleFileUpload}
+                      multiple
+                      accept="image/*"
+                      className="hidden"
+                    />
+
+                    {/* Image Preview Grid */}
+                    <div className="grid grid-cols-3 gap-4 mt-2">
+                      {formData.images.map((url, idx) => (
+                        <div key={idx} className="group relative aspect-video rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm">
+                          <Image src={url} alt={`Media ${idx}`} fill className="object-cover" />
+                          <button
+                            onClick={(e) => { e.stopPropagation(); removeImage(idx); }}
+                            className="absolute right-2 top-2 h-6 w-6 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Footer Buttons */}
-            <div className="absolute right-0 bottom-0 left-0 flex h-[80px] items-center justify-end gap-4 border-t border-gray-200 px-8">
+            {/* Footer */}
+            <div className="flex h-[100px] items-center justify-end gap-4 border-t border-gray-200 px-8 flex-shrink-0 bg-gray-50">
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="h-[44px] w-[120px] rounded-[12px] border border-gray-300 bg-white font-medium text-gray-700 hover:bg-gray-50"
+                className="h-[52px] min-w-[140px] rounded-xl border border-gray-300 bg-white font-bold text-gray-600 hover:bg-gray-100 transition-colors"
+                disabled={saving}
               >
                 Cancel
               </button>
               <button
                 onClick={handleSubmit}
-                className="h-[44px] w-[120px] rounded-[12px] bg-[#2AB2C7] font-medium text-white hover:opacity-90"
+                className="flex h-[52px] min-w-[160px] items-center justify-center rounded-xl bg-[#2AB2C7] font-bold text-white shadow-lg shadow-[#2AB2C7]/20 transition-all hover:opacity-90 active:scale-95 disabled:opacity-50"
+                disabled={saving}
               >
-                {currentProject ? 'Update' : 'Save'}
+                {saving ? (
+                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                ) : (
+                  currentProject ? 'Update Project' : 'Save Project'
+                )}
               </button>
             </div>
           </div>
         </div>
       )}
+
+      {/* Styles for Quill */}
+      <style jsx global>{`
+        .ql-container {
+          border-bottom-left-radius: 12px;
+          border-bottom-right-radius: 12px;
+          border: none !important;
+          font-family: inherit;
+        }
+        .ql-toolbar {
+          border-top-left-radius: 12px;
+          border-top-right-radius: 12px;
+          border: none !important;
+          border-bottom: 1px solid #e5e7eb !important;
+        }
+        .ql-editor {
+          min-h-[200px];
+        }
+      `}</style>
     </div>
   );
 }

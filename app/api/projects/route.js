@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/db/db';
-import { projects } from '@/db/schema';
+import { projects, projectMedia } from '@/db/schema';
 import { eq, desc } from 'drizzle-orm';
 
 // GET all projects
@@ -11,23 +11,30 @@ export async function GET(request) {
     const status = searchParams.get('status');
     const category = searchParams.get('category');
 
-    let query = db.select().from(projects);
+    // Using relational query to include media
+    const allProjects = await db.query.projects.findMany({
+      with: {
+        media: true,
+      },
+      orderBy: [desc(projects.createdAt)],
+    });
 
-    // Apply filters if provided
-    let conditions = [];
+    // Filter by year if provided
+    let filteredProjects = allProjects;
     if (year) {
-      conditions.push(eq(projects.year, year));
-    }
-    if (status) {
-      conditions.push(eq(projects.status, status.toLowerCase()));
+      filteredProjects = filteredProjects.filter((p) => p.year === year);
     }
 
-    const allProjects = await query.orderBy(desc(projects.createdAt));
+    // Filter by status if provided
+    if (status) {
+      filteredProjects = filteredProjects.filter(
+        (p) => p.status === status.toLowerCase()
+      );
+    }
 
     // Filter by category (researcher type) if provided
-    let filteredProjects = allProjects;
     if (category && category !== 'All') {
-      filteredProjects = allProjects.filter(
+      filteredProjects = filteredProjects.filter(
         (p) => p.researcherCategory === category
       );
     }
@@ -57,6 +64,7 @@ export async function POST(request) {
       results,
       principalInvestigator,
       researcherCategory,
+      images, // Array of image URLs
     } = body;
 
     // Validate required fields
@@ -67,22 +75,39 @@ export async function POST(request) {
       );
     }
 
-    const newProject = await db
-      .insert(projects)
-      .values({
-        title,
-        year: year || null,
-        status: status?.toLowerCase() || 'upcoming',
-        description: description || null,
-        results: results || null,
-        principalInvestigator: principalInvestigator || null,
-        researcherCategory: researcherCategory || null,
-      })
-      .returning();
+    // Use a transaction for consistency
+    const result = await db.transaction(async (tx) => {
+      const newProject = await tx
+        .insert(projects)
+        .values({
+          title,
+          year: year || null,
+          status: status?.toLowerCase() || 'upcoming',
+          description: description || null,
+          results: results || null,
+          principalInvestigator: principalInvestigator || null,
+          researcherCategory: researcherCategory || null,
+        })
+        .returning();
+
+      const projectId = newProject[0].id;
+
+      // Insert media if provided
+      if (images && Array.isArray(images) && images.length > 0) {
+        await tx.insert(projectMedia).values(
+          images.map((url) => ({
+            projectId,
+            url,
+          }))
+        );
+      }
+
+      return newProject[0];
+    });
 
     return NextResponse.json({
       success: true,
-      data: newProject[0],
+      data: result,
     });
   } catch (error) {
     console.error('Error creating project:', error);
