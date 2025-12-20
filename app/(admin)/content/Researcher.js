@@ -1,9 +1,11 @@
 'use client';
-
 import { useState, useEffect, useCallback, useRef } from 'react';
+import Image from 'next/image';
 import FormField from '../_components/FormField';
+import { CgSpinner } from 'react-icons/cg';
+import toast from 'react-hot-toast';
 
-export default function Researcher() {
+export default function ResearcherForm() {
   const [researchers, setResearchers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -36,19 +38,20 @@ export default function Researcher() {
 
   // Fetch researchers
   const fetchResearchers = useCallback(async () => {
+    setLoading(true);
+    setError(null);
     try {
-      setLoading(true);
       const response = await fetch('/api/researchers', { cache: 'no-store' });
       const data = await response.json();
 
       if (data.success) {
         setResearchers(data.data);
       } else {
-        setError(data.error || 'Failed to fetch researchers');
+        throw new Error(data.error || 'Failed to fetch researchers');
       }
     } catch (err) {
-      console.error('Error fetching researchers:', err);
       setError(err.message);
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -67,8 +70,8 @@ export default function Researcher() {
 
   // Modal handlers
   const openModal = (researcher = null) => {
+    setCurrentResearcher(researcher);
     if (researcher) {
-      setCurrentResearcher(researcher);
       setFormData({
         name: researcher.name,
         email: researcher.email,
@@ -77,17 +80,8 @@ export default function Researcher() {
         affiliation: researcher.affiliation || '',
         description: researcher.description || '',
       });
-      // Check both avatarUrl (camelCase from schema) and avatar_url (from DB)
-      const avatarUrl = researcher.avatarUrl || researcher.avatar_url;
-      console.log(
-        'Opening modal - Avatar URL:',
-        avatarUrl,
-        'Researcher:',
-        researcher
-      );
-      setAvatarPreview(avatarUrl || null);
+      setAvatarPreview(researcher.avatarUrl || researcher.avatar_url || null);
     } else {
-      setCurrentResearcher(null);
       setFormData({
         name: '',
         email: '',
@@ -105,14 +99,6 @@ export default function Researcher() {
   const closeModal = () => {
     setIsModalOpen(false);
     setCurrentResearcher(null);
-    setFormData({
-      name: '',
-      email: '',
-      role: 'Principal Investigator',
-      expertise: '',
-      affiliation: '',
-      description: '',
-    });
     setAvatarFile(null);
     setAvatarPreview(null);
   };
@@ -121,11 +107,10 @@ export default function Researcher() {
     const file = e.target.files?.[0];
     if (file) {
       setAvatarFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setAvatarPreview(reader.result);
-      };
-      reader.readAsDataURL(file);
+      setAvatarPreview(URL.createObjectURL(file));
+    } else {
+      setAvatarFile(null);
+      setAvatarPreview(currentResearcher?.avatarUrl || currentResearcher?.avatar_url || null);
     }
   };
 
@@ -133,41 +118,37 @@ export default function Researcher() {
     fileInputRef.current?.click();
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError(null);
 
-    try {
-      // Get existing avatar URL - check both field names
-      let avatarUrl =
-        currentResearcher?.avatarUrl || currentResearcher?.avatar_url || null;
-      console.log('Form submit - Current avatar URL:', avatarUrl);
+    let avatarUrl = currentResearcher?.avatarUrl || currentResearcher?.avatar_url || null;
 
-      // Upload avatar if new file selected
-      if (avatarFile) {
+    if (avatarFile) {
+      try {
         const uploadFormData = new FormData();
         uploadFormData.append('file', avatarFile);
 
-        const uploadResponse = await fetch('/api/upload-image', {
+        const uploadRes = await fetch('/api/upload-image', {
           method: 'POST',
           body: uploadFormData,
         });
 
-        const uploadData = await uploadResponse.json();
-        if (uploadResponse.ok && uploadData.publicUrl) {
-          avatarUrl = uploadData.publicUrl;
-          console.log('Image uploaded successfully:', avatarUrl);
-        } else {
-          console.error('Upload failed:', uploadData);
-          setError(uploadData.message || 'Failed to upload image');
-          return;
-        }
+        const uploadData = await uploadRes.json();
+        if (!uploadRes.ok) throw new Error(uploadData.message);
+        avatarUrl = uploadData.publicUrl;
+      } catch (err) {
+        setError(`Upload failed: ${err.message}`);
+        setLoading(false);
+        return;
       }
+    }
 
+    try {
       const url = currentResearcher
         ? `/api/researchers/${currentResearcher.id}`
         : '/api/researchers';
-
       const method = currentResearcher ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
@@ -180,311 +161,301 @@ export default function Researcher() {
       });
 
       const data = await response.json();
+      if (!data.success) throw new Error(data.error || 'Failed to save');
 
-      if (data.success) {
-        await fetchResearchers();
-        closeModal();
-      } else {
-        setError(data.error || 'Failed to save researcher');
-      }
+      toast.success(currentResearcher ? 'Researcher updated!' : 'Researcher created!');
+      closeModal();
+      fetchResearchers();
     } catch (err) {
-      console.error('Error:', err);
       setError(err.message);
+      toast.error(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Handle delete
-  const handleDelete = async (researcherId, researcherName) => {
-    if (confirm(`Delete ${researcherName}?`)) {
-      try {
-        const response = await fetch(`/api/researchers/${researcherId}`, {
-          method: 'DELETE',
-        });
+  const handleDelete = async (id, name) => {
+    if (!window.confirm(`Are you sure you want to delete ${name}?`)) return;
 
-        const data = await response.json();
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/researchers/${id}`, { method: 'DELETE' });
+      const data = await response.json();
+      if (!data.success) throw new Error(data.error || 'Failed to delete');
 
-        if (data.success) {
-          await fetchResearchers();
-        } else {
-          setError(data.error || 'Failed to delete researcher');
-        }
-      } catch (err) {
-        console.error('Error deleting researcher:', err);
-        setError(err.message);
-      }
+      toast.success('Researcher deleted');
+      fetchResearchers();
+    } catch (err) {
+      setError(err.message);
+      toast.error(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <main className="flex h-screen flex-col bg-white">
-      {/* HEADER */}
-      <div className="flex h-16 w-full items-center justify-between border-b border-zinc-200 px-4 md:px-8 py-4">
-        <h1 className="text-xl md:text-2xl font-bold text-black">Manage Researchers</h1>
-        <button
-          onClick={() => openModal()}
-          className="rounded-lg bg-black px-4 md:px-6 py-2 text-sm md:text-base text-white hover:bg-gray-800"
-        >
-          + Add Researcher
-        </button>
-      </div>
-
-      {/* ERROR MESSAGE */}
-      {error && (
-        <div className="mx-4 md:mx-8 mt-4 rounded-lg bg-red-50 p-4 text-red-700">
-          {error}
+    <div className="flex justify-center px-4 py-6">
+      <div className="flex w-full max-w-full flex-col gap-6">
+        {/* Header */}
+        <div className="flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <h1 className="font-hanken text-2xl leading-8 font-semibold tracking-tight">
+            All Researchers
+          </h1>
+          <div className="flex h-[52px] w-full max-w-md items-center gap-2 rounded-[16px] border border-gray-300 px-4 bg-white">
+            <input
+              type="text"
+              placeholder="Search researchers..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="flex-1 text-sm outline-none"
+            />
+            <Image src="/icon/search.png" alt="Search" width={20} height={20} />
+          </div>
         </div>
-      )}
 
-      {/* SEARCH & FILTER */}
-      <div className="flex flex-col md:flex-row items-center gap-4 border-b border-zinc-100 px-4 md:px-8 py-4">
-        <div className="relative w-full md:flex-1">
-          <input
-            type="text"
-            placeholder="Search researchers..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-lg border border-zinc-200 pl-4 pr-10 py-2 text-sm"
-          />
-          <img
-            src="/icon/search.png"
-            alt="Search"
-            className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
-          />
+        {/* Filter & Add */}
+        <div className="flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <select
+            value={roleFilter}
+            onChange={(e) => setRoleFilter(e.target.value)}
+            className="h-[44px] w-full rounded-md border border-gray-300 px-4 text-sm md:w-[220px] bg-white"
+          >
+            <option value="">All Roles</option>
+            {RESEARCHER_ROLES.map((role) => (
+              <option key={role} value={role}>{role}</option>
+            ))}
+          </select>
+
+          <button
+            onClick={() => openModal()}
+            className="h-[44px] w-full rounded-[12px] bg-[#2AB2C7] px-6 font-medium text-white transition-opacity hover:opacity-90 md:w-auto"
+            disabled={loading}
+          >
+            Add New Researcher +
+          </button>
         </div>
-        <select
-          value={roleFilter}
-          onChange={(e) => setRoleFilter(e.target.value)}
-          className="w-full md:w-auto rounded-lg border border-zinc-200 px-4 py-2 text-sm"
-        >
-          <option value="">All Roles</option>
-          {RESEARCHER_ROLES.map((role) => (
-            <option key={role} value={role}>
-              {role}
-            </option>
+
+        {/* Table */}
+        <div className="flex min-h-[500px] w-full flex-col overflow-x-auto rounded-lg border border-gray-200 bg-white">
+          <div className="grid min-w-[1000px] grid-cols-[2fr_1.5fr_1.5fr_1.5fr_1fr] items-center border-b border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-700">
+            <span>Researcher</span>
+            <span>Role</span>
+            <span>Expertise</span>
+            <span>Affiliation</span>
+            <span className="justify-self-end">Action</span>
+          </div>
+
+          {loading && researchers.length === 0 && (
+            <div className="flex items-center justify-center py-20">
+              <CgSpinner className="animate-spin text-4xl text-[#2AB2C7]" />
+            </div>
+          )}
+
+          {error && (
+            <div className="m-4 rounded-lg bg-red-50 p-4 text-sm text-red-600 border border-red-200">
+              {error}
+            </div>
+          )}
+
+          {!loading && filteredResearchers.length === 0 && (
+            <div className="flex items-center justify-center py-20 text-gray-500">
+              No researchers found.
+            </div>
+          )}
+
+          {filteredResearchers.map((item) => (
+            <div
+              key={item.id}
+              className="grid min-w-[1000px] grid-cols-[2fr_1.5fr_1.5fr_1.5fr_1fr] items-center border-b border-gray-100 px-4 py-4 hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 relative flex-shrink-0">
+                  <Image
+                    src={item.avatarUrl || item.avatar_url || '/icon/db-user-1.png'}
+                    alt={item.name}
+                    fill
+                    className="rounded-full object-cover"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-semibold text-gray-900">{item.name}</span>
+                  <span className="text-xs text-gray-500">{item.email}</span>
+                </div>
+              </div>
+
+              <span className="text-sm text-gray-600">{item.role}</span>
+              <span className="text-sm text-gray-600 truncate pr-4">{item.expertise || '-'}</span>
+              <span className="text-sm text-gray-600 truncate pr-4">{item.affiliation || '-'}</span>
+
+              <div className="flex items-center justify-end gap-5">
+                <Image
+                  src="/icon/db-u-edit.png"
+                  alt="Edit"
+                  width={20}
+                  height={20}
+                  className="cursor-pointer hover:opacity-70 transition-opacity"
+                  onClick={() => openModal(item)}
+                />
+                <Image
+                  src="/icon/db-u-trash.png"
+                  alt="Delete"
+                  width={20}
+                  height={20}
+                  className="cursor-pointer hover:opacity-70 transition-opacity"
+                  onClick={() => handleDelete(item.id, item.name)}
+                />
+              </div>
+            </div>
           ))}
-        </select>
+        </div>
       </div>
 
-      {/* TABLE CONTAINER (Enable Horizontal Scroll) */}
-      <div className="flex-1 overflow-auto px-4 md:px-8">
-        <div className="min-w-[1000px]">
-          {/* TABLE HEADER */}
-          <div className="border-b border-zinc-100 py-4">
-            <div className="flex items-center justify-between">
-              <div className="w-52 text-base leading-5 font-medium text-neutral-400">
-                Researchers
-              </div>
-              <div className="w-40 text-base leading-5 font-medium text-neutral-400">
-                Role
-              </div>
-              <div className="w-40 text-base leading-5 font-medium text-neutral-400">
-                Expertise
-              </div>
-              <div className="w-40 text-base leading-5 font-medium text-neutral-400">
-                Affiliation
-              </div>
-              <div className="w-40 text-base leading-5 font-medium text-neutral-400">
-                Contact / Email
-              </div>
-              <div className="flex items-center justify-end gap-8">
-                <div className="w-28 text-base leading-5 font-medium text-neutral-400">
-                  Actions
+      {/* Slide-over Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex justify-end">
+          <div className="absolute inset-0 bg-black/20 backdrop-blur-sm transition-opacity" onClick={closeModal} />
+
+          <form
+            onSubmit={handleSubmit}
+            className="relative h-full w-full max-w-[800px] bg-white shadow-2xl transition-transform duration-300 overflow-hidden flex flex-col"
+          >
+            {/* Modal Header */}
+            <div className="flex h-[80px] items-center border-b border-gray-200 px-8 flex-shrink-0">
+              <button
+                type="button"
+                onClick={closeModal}
+                className="mr-4 flex h-8 w-8 items-center justify-center rounded-full bg-zinc-100 text-xl text-black hover:bg-zinc-200 transition-colors"
+              >
+                ←
+              </button>
+              <h2 className="font-hanken text-2xl font-bold text-black">
+                {currentResearcher ? 'Edit Researcher' : 'Create New Researcher'}
+              </h2>
+            </div>
+
+            {/* Modal Content */}
+            <div className="flex-1 overflow-y-auto px-8 py-10">
+              <div className="mx-auto flex w-full max-w-[650px] flex-col gap-9">
+                {/* Profile Picture Upload */}
+                <div className="flex items-center gap-6">
+                  <div className="h-24 w-24 flex-shrink-0 rounded-full bg-gray-100 overflow-hidden relative border border-gray-200">
+                    <Image
+                      src={avatarPreview || '/icon/db-user-1.png'}
+                      alt="Profile"
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <div>
+                      <h4 className="text-base font-semibold text-gray-900">Profile Picture</h4>
+                      <p className="text-xs text-gray-500">Upload a professional photo for the researcher profile.</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={triggerFileInput}
+                      className="inline-flex h-9 items-center justify-center rounded-lg border border-gray-300 bg-white px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      Upload New Photo
+                    </button>
+                  </div>
+                </div>
+
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  accept="image/*"
+                  className="hidden"
+                />
+
+                <div className="flex flex-col gap-6">
+                  <FormField
+                    label="Full Name"
+                    description="The official name of the researcher."
+                    placeholder="Enter full name"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    required
+                  />
+
+                  <FormField
+                    label="Email Address"
+                    description="Contact email for collaborations."
+                    type="email"
+                    placeholder="Enter email address"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    required
+                  />
+
+                  <div className="flex flex-col gap-2">
+                    <label className="text-base font-medium text-gray-900">Role</label>
+                    <span className="text-xs text-gray-500 italic">Select the appropriate academic or research role.</span>
+                    <select
+                      value={formData.role}
+                      onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                      className="h-[44px] w-full rounded-xl border border-zinc-300 bg-white px-4 text-base outline-none focus:border-[#2AB2C7]"
+                      required
+                    >
+                      {RESEARCHER_ROLES.map((role) => (
+                        <option key={role} value={role}>{role}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <FormField
+                    label="Expertise"
+                    description="Main area of research focus (e.g., AI, Biotechnology)."
+                    placeholder="Enter area of expertise"
+                    value={formData.expertise}
+                    onChange={(e) => setFormData({ ...formData, expertise: e.target.value })}
+                  />
+
+                  <FormField
+                    label="Affiliation"
+                    description="Current institution or university."
+                    placeholder="Enter institution name"
+                    value={formData.affiliation}
+                    onChange={(e) => setFormData({ ...formData, affiliation: e.target.value })}
+                  />
+
+                  <div className="flex flex-col gap-2">
+                    <label className="text-base font-medium text-gray-900">Description</label>
+                    <span className="text-xs text-gray-500 italic">A brief biography or research summary.</span>
+                    <textarea
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      placeholder="Enter a brief description..."
+                      rows={4}
+                      className="w-full rounded-xl border border-zinc-300 p-4 text-base outline-none focus:border-[#2AB2C7] min-h-[120px]"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* TABLE BODY */}
-          <div>
-            {loading ? (
-              <div className="flex items-center justify-center py-8">
-                <span className="text-gray-500">Loading...</span>
-              </div>
-            ) : filteredResearchers.length === 0 ? (
-              <div className="flex items-center justify-center py-8">
-                <span className="text-gray-500">No researchers found</span>
-              </div>
-            ) : (
-              filteredResearchers.map((researcher) => (
-                <div
-                  key={researcher.id}
-                  className="flex items-center justify-between border-b border-zinc-100 py-4 hover:bg-gray-50"
-                >
-                  <div className="flex w-52 items-center gap-3">
-                    <img
-                      src={researcher.avatarUrl || '/placeholder-avatar.png'}
-                      alt={researcher.name}
-                      className="h-8 w-8 rounded-full object-cover"
-                    />
-                    <span className="text-sm font-medium text-black">
-                      {researcher.name}
-                    </span>
-                  </div>
-                  <div className="w-40 text-sm text-gray-600">
-                    {researcher.role}
-                  </div>
-                  <div className="w-40 truncate text-sm text-gray-600">
-                    {researcher.expertise || '-'}
-                  </div>
-                  <div className="w-40 truncate text-sm text-gray-600">
-                    {researcher.affiliation || '-'}
-                  </div>
-                  <div className="w-40 text-sm text-gray-600">
-                    {researcher.email}
-                  </div>
-                  <div className="flex items-center justify-end gap-3">
-                    <button
-                      onClick={() => openModal(researcher)}
-                      className="text-sm font-medium text-blue-600 hover:text-blue-800"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(researcher.id, researcher.name)}
-                      className="text-sm font-medium text-red-600 hover:text-red-800"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* MODAL */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-2xl rounded-lg bg-white p-6 md:p-8 shadow-lg max-h-[90vh] overflow-y-auto">
-            <h2 className="mb-6 text-xl font-bold text-black">
-              {currentResearcher ? 'Edit Researcher' : 'Add New Researcher'}
-            </h2>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Avatar Section */}
-              <div className="mb-6 flex flex-col items-center gap-4">
-                <div
-                  onClick={triggerFileInput}
-                  className="flex h-24 w-24 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-zinc-300 bg-gray-100 transition hover:border-blue-500"
-                >
-                  {avatarPreview ? (
-                    <img
-                      src={avatarPreview}
-                      alt="Avatar preview"
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <span className="text-xs text-gray-500">
-                      Click to upload
-                    </span>
-                  )}
-                </div>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
-              </div>
-
-              <FormField
-                label="Name"
-                type="text"
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-                placeholder="Full name"
-                required
-              />
-
-              <FormField
-                label="Email"
-                type="email"
-                value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
-                placeholder="Email address"
-                required
-              />
-
-              <div>
-                <label className="mb-2 block text-sm font-medium text-black">
-                  Role
-                </label>
-                <select
-                  value={formData.role}
-                  onChange={(e) =>
-                    setFormData({ ...formData, role: e.target.value })
-                  }
-                  className="w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm"
-                  required
-                >
-                  {RESEARCHER_ROLES.map((role) => (
-                    <option key={role} value={role}>
-                      {role}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <FormField
-                label="Expertise"
-                type="text"
-                value={formData.expertise}
-                onChange={(e) =>
-                  setFormData({ ...formData, expertise: e.target.value })
-                }
-                placeholder="Main areas of expertise"
-              />
-
-              <FormField
-                label="Affiliation"
-                type="text"
-                value={formData.affiliation}
-                onChange={(e) =>
-                  setFormData({ ...formData, affiliation: e.target.value })
-                }
-                placeholder="University or institution"
-              />
-
-              <div>
-                <label className="mb-2 block text-sm font-medium text-black">
-                  Description
-                </label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
-                  placeholder="Researcher description"
-                  rows="4"
-                  className="w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm"
-                />
-              </div>
-
-              <div className="flex justify-end gap-3 pt-6">
-                <button
-                  type="button"
-                  onClick={closeModal}
-                  className="rounded-lg border border-zinc-200 px-6 py-2 text-black hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="rounded-lg bg-black px-6 py-2 text-white hover:bg-gray-800"
-                >
-                  {currentResearcher ? 'Update' : 'Create'}
-                </button>
-              </div>
-            </form>
-          </div>
+            {/* Modal Footer */}
+            <div className="flex h-[100px] items-center justify-end gap-4 border-t border-gray-200 px-8 flex-shrink-0 bg-gray-50">
+              <button
+                type="button"
+                onClick={closeModal}
+                className="h-[52px] min-w-[160px] rounded-xl border border-gray-300 bg-white px-6 text-lg font-semibold text-gray-600 hover:bg-gray-50 transition-colors"
+                disabled={loading}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="h-[52px] min-w-[160px] rounded-xl bg-[#2AB2C7] px-6 text-lg font-semibold text-white hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+                disabled={loading}
+              >
+                {loading ? <CgSpinner className="animate-spin text-2xl" /> : (currentResearcher ? 'Update' : 'Save')}
+              </button>
+            </div>
+          </form>
         </div>
       )}
-    </main>
+    </div>
   );
 }

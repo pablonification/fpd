@@ -6,6 +6,7 @@ import {
   timestamp,
   boolean,
   pgEnum,
+  integer,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
@@ -63,7 +64,7 @@ export const publications = pgTable('publications', {
   isHighlighted: boolean('is_highlighted').default(false),
 
   // Mengubah ke `integer` karena `serial` hanya boleh digunakan sebagai PK
-  projectId: serial('project_id').references(() => projects.id),
+  projectId: integer('project_id').references(() => projects.id),
 
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
@@ -77,9 +78,9 @@ export const publicationsRelations = relations(publications, ({ one }) => ({
 
 export const projectCollaborators = pgTable('project_collaborators', {
   // Mengubah ke `integer` karena `serial` hanya boleh digunakan sebagai PK
-  projectId: serial('project_id').references(() => projects.id),
+  projectId: integer('project_id').references(() => projects.id),
   // Mengubah ke `integer` karena `serial` hanya boleh digunakan sebagai PK
-  userId: serial('user_id').references(() => users.id),
+  userId: integer('user_id').references(() => users.id),
 });
 
 export const projectCollaboratorsRelations = relations(
@@ -155,4 +156,12 @@ export const researchers = pgTable('researchers', {
   isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+// New Table for Timeline
+export const organizationTimeline = pgTable('organization_timeline', {
+  id: serial('id').primaryKey(),
+  year: varchar('year', { length: 50 }).notNull(), // text like '17 Agustus 1945' or '2020'
+  description: text('description').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
