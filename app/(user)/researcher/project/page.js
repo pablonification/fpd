@@ -27,9 +27,9 @@ export default function ResearchProject() {
     try {
       setLoading(true);
       const statusMap = {
-        ongoing: 'running',
+        ongoing: 'ongoing',
         completed: 'completed',
-        upcomming: 'upcoming',
+        upcoming: 'upcoming',
       };
 
       const url = `/api/projects?status=${statusMap[tab]}`;
@@ -47,10 +47,16 @@ export default function ResearchProject() {
   };
 
   // Filter berdasarkan filter dropdown
-  const filteredList =
-    filter === 'All'
-      ? projects
-      : projects.filter((p) => p.researcherCategory === filter);
+  const filteredList = projects
+    .filter((p) => p.status === tab) // Strict filter by tab status (client-side)
+    .filter((p) => {
+      // Filter by category
+      if (filter === 'All') return true;
+      return (
+        p.researcherCategory &&
+        filter.toLowerCase().includes(p.researcherCategory.toLowerCase())
+      );
+    });
 
   return (
     <main className="mt-32 min-h-screen w-full overflow-visible overflow-x-hidden">
@@ -80,20 +86,20 @@ export default function ResearchProject() {
             <button
               onClick={() => setTab('completed')}
               className={`pb-1 text-sm font-medium sm:text-base ${tab === 'completed'
-                  ? 'border-b-2 border-black'
-                  : 'text-gray-500'
+                ? 'border-b-2 border-black'
+                : 'text-gray-500'
                 }`}
             >
               Completed
             </button>
             <button
-              onClick={() => setTab('upcomming')}
-              className={`pb-1 text-sm font-medium sm:text-base ${tab === 'upcomming'
-                  ? 'border-b-2 border-black'
-                  : 'text-gray-500'
+              onClick={() => setTab('upcoming')}
+              className={`pb-1 text-sm font-medium sm:text-base ${tab === 'upcoming'
+                ? 'border-b-2 border-black'
+                : 'text-gray-500'
                 }`}
             >
-              Upcomming
+              Upcoming
             </button>
           </div>
 

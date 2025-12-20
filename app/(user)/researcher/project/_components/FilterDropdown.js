@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export default function FilterDropdown() {
+export default function FilterDropdown({ filter = 'All', setFilter }) {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const [filter, setFilter] = useState('All'); // default 'All'
+
+  // Local options (could be passed as prop too, but keeping it here for now as they match)
   const options = [
     'Supervisors',
     "Master's Students",
@@ -13,7 +14,9 @@ export default function FilterDropdown() {
   ];
 
   const handleSelect = (option) => {
-    setFilter(filter === option ? 'All' : option);
+    if (setFilter) {
+      setFilter(filter === option ? 'All' : option);
+    }
     setOpen(false);
   };
 
@@ -68,9 +71,8 @@ export default function FilterDropdown() {
                     onClick={() => handleSelect(opt)}
                     role="option"
                     aria-selected={active}
-                    className={`cursor-pointer rounded-md px-4 py-2 transition hover:bg-gray-100 ${
-                      active ? 'bg-gray-100 font-medium text-black' : ''
-                    }`}
+                    className={`cursor-pointer rounded-md px-4 py-2 transition hover:bg-gray-100 ${active ? 'bg-gray-100 font-medium text-black' : ''
+                      }`}
                   >
                     {opt}
                   </li>
