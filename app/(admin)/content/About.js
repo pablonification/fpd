@@ -5,22 +5,18 @@ import toast from 'react-hot-toast';
 import Image from 'next/image';
 
 export default function AboutForm() {
-  // Static Content State
   const [title, setTitle] = useState('');
   const [vision, setVision] = useState('');
   const [mission, setMission] = useState('');
   const [values, setValues] = useState('');
-
-  // Timeline State
   const [timelineItems, setTimelineItems] = useState([]);
   const [newYear, setNewYear] = useState('');
   const [newDesc, setNewDesc] = useState('');
+  const [loading, setLoading] = useState(true);
 
-  // Fetch Data
   useEffect(() => {
     async function fetchData() {
       try {
-        // Fetch Static Content
         const resStatic = await fetch('/api/about');
         const dataStatic = await resStatic.json();
         if (dataStatic) {
@@ -30,7 +26,6 @@ export default function AboutForm() {
           setValues(dataStatic.values || '');
         }
 
-        // Fetch Timeline
         const resTimeline = await fetch('/api/about/timeline');
         const dataTimeline = await resTimeline.json();
         if (Array.isArray(dataTimeline)) {
@@ -38,6 +33,8 @@ export default function AboutForm() {
         }
       } catch (err) {
         console.error('Failed to fetch data', err);
+      } finally {
+        setLoading(false);
       }
     }
     fetchData();
@@ -125,6 +122,46 @@ export default function AboutForm() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="mt-6 flex flex-col items-center">
+        <h1 className="w-max-screen text-center text-[24px] leading-8 font-semibold tracking-[-0.01em]">
+          Edit About Page
+        </h1>
+        <div className="mt-6 flex w-full max-w-[800px] animate-pulse flex-col gap-8">
+          <div className="flex flex-col gap-6 rounded-[16px] border border-gray-300 bg-white p-6">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="flex flex-col gap-2">
+                <div className="h-4 w-24 rounded bg-gray-200" />
+                <div className="h-3 w-48 rounded bg-gray-200" />
+                <div className="h-[44px] w-full rounded-[12px] bg-gray-200" />
+              </div>
+            ))}
+            <div className="mt-4 h-11 w-full rounded-[16px] bg-gray-200" />
+          </div>
+          <div className="flex flex-col gap-6 rounded-[16px] border border-gray-300 bg-white p-6">
+            <div className="h-6 w-40 rounded bg-gray-200" />
+            <div className="h-4 w-64 rounded bg-gray-200" />
+            <div className="flex flex-col gap-2">
+              {[...Array(3)].map((_, i) => (
+                <div
+                  key={i}
+                  className="flex items-center justify-between rounded-lg border border-gray-200 p-4"
+                >
+                  <div className="flex flex-col gap-1">
+                    <div className="h-4 w-16 rounded bg-gray-200" />
+                    <div className="h-3 w-48 rounded bg-gray-200" />
+                  </div>
+                  <div className="h-8 w-8 rounded-full bg-gray-200" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mt-6 flex flex-col items-center">
       {/* Header */}
@@ -190,13 +227,13 @@ export default function AboutForm() {
             {/* Add New Item */}
             <div className="flex flex-col gap-3 rounded-xl border border-dashed border-gray-300 bg-gray-50 p-4">
               <label className="text-sm font-semibold">New Milestone</label>
-              <div className="flex flex-col md:flex-row gap-2">
+              <div className="flex flex-col gap-2 md:flex-row">
                 <input
                   type="text"
                   placeholder="Year / Date (e.g. 2023)"
                   value={newYear}
                   onChange={(e) => setNewYear(e.target.value)}
-                  className="h-10 w-full md:w-1/3 rounded-lg border border-gray-300 px-3 text-sm outline-none"
+                  className="h-10 w-full rounded-lg border border-gray-300 px-3 text-sm outline-none md:w-1/3"
                 />
                 <input
                   type="text"
@@ -208,7 +245,7 @@ export default function AboutForm() {
                 <button
                   type="button"
                   onClick={handleAddTimeline}
-                  className="h-10 rounded-lg bg-[#2AB2C7] px-4 text-sm font-medium text-white hover:opacity-90 whitespace-nowrap"
+                  className="h-10 rounded-lg bg-[#2AB2C7] px-4 text-sm font-medium whitespace-nowrap text-white hover:opacity-90"
                 >
                   Add
                 </button>
@@ -218,7 +255,7 @@ export default function AboutForm() {
             {/* List Items */}
             <div className="flex flex-col gap-2">
               {timelineItems.length === 0 && (
-                <p className="text-center text-sm text-gray-400 py-4">
+                <p className="py-4 text-center text-sm text-gray-400">
                   No timeline items yet.
                 </p>
               )}
@@ -235,7 +272,7 @@ export default function AboutForm() {
                   </div>
                   <button
                     onClick={() => handleDeleteTimeline(item.id)}
-                    className="text-red-500 hover:bg-red-50 p-2 rounded-full"
+                    className="rounded-full p-2 text-red-500 hover:bg-red-50"
                   >
                     <Image
                       src="/icon/db-u-trash.png"

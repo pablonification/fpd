@@ -61,14 +61,14 @@ export default function TeamSection() {
     const matchesSearch = !q
       ? true
       : [t.name, t.affiliation, t.bidang, t.expertise, t.description]
-        .filter(Boolean)
-        .some((field) => field.toLowerCase().includes(q));
+          .filter(Boolean)
+          .some((field) => field.toLowerCase().includes(q));
 
     const matchesExpertise = !selectedExpertise
       ? true
       : (t.expertise || '')
-        .toLowerCase()
-        .includes(selectedExpertise.toLowerCase());
+          .toLowerCase()
+          .includes(selectedExpertise.toLowerCase());
 
     return matchesSearch && matchesExpertise;
   });
@@ -99,16 +99,16 @@ export default function TeamSection() {
   if (loading) {
     return (
       <section className="bg-bgMain mt-32 flex justify-center px-4 py-12 sm:px-6">
-        <div className="w-full max-w-7xl">
+        <div className="w-full max-w-6xl">
           {/* Header Skeleton */}
           <div className="flex w-full flex-col items-center gap-2 text-center sm:gap-3">
-            <div className="h-10 w-48 rounded bg-gray-200 animate-pulse"></div>
-            <div className="h-6 w-full max-w-2xl rounded bg-gray-200 animate-pulse"></div>
+            <div className="h-10 w-48 animate-pulse rounded bg-gray-200"></div>
+            <div className="h-6 w-full max-w-2xl animate-pulse rounded bg-gray-200"></div>
           </div>
 
           {/* Filter Skeleton */}
-          <div className="mb-10 w-full mt-10">
-            <div className="h-[56px] w-full rounded-[16px] bg-gray-200 animate-pulse"></div>
+          <div className="mt-10 mb-10 w-full">
+            <div className="h-[56px] w-full animate-pulse rounded-[16px] bg-gray-200"></div>
           </div>
 
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
@@ -134,18 +134,18 @@ export default function TeamSection() {
 
   return (
     <section className="bg-bgMain mt-32 flex justify-center px-4 py-12 sm:px-6">
-
-      <div className="w-full max-w-7xl">
+      <div className="w-full max-w-6xl">
         <header className="flex w-full flex-col items-center gap-2 text-center sm:gap-3">
           <h1 className="text-2xl font-bold tracking-tight text-black sm:text-3xl md:text-4xl lg:text-5xl">
             Researchers
           </h1>
           <p className="max-w-[900px] text-sm text-gray-600 sm:text-base md:text-lg lg:text-xl">
-            Meet our dedicated researchers who are passionate about pushing the boundaries of knowledge and making a positive impact on society.
+            Meet our dedicated researchers who are passionate about pushing the
+            boundaries of knowledge and making a positive impact on society.
           </p>
         </header>
         {/* Filter */}
-        <div className="mb-10 w-full mt-10">
+        <div className="mt-10 mb-10 w-full">
           <FilterRow
             search={search}
             onSearchChange={setSearch}

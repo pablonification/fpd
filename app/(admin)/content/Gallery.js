@@ -163,6 +163,7 @@ export default function GalleryAdmin() {
             : formData.youtubeUrl.trim(),
         title: formData.title.trim(),
         description: formData.description.trim(),
+        category: formData.activityType,
         activityDate: formData.activityDate,
       };
 
@@ -251,7 +252,7 @@ export default function GalleryAdmin() {
         <div className="text-2xl leading-8 font-semibold text-black">
           All Gallery
         </div>
-        <div className="inline-flex w-full md:w-auto items-center justify-start gap-3 self-stretch rounded-2xl bg-white px-5 py-4 outline outline-1 outline-offset-[-1px] outline-zinc-300">
+        <div className="inline-flex w-full items-center justify-start gap-3 self-stretch rounded-2xl bg-white px-5 py-4 outline outline-1 outline-offset-[-1px] outline-zinc-300 md:w-auto">
           <input
             type="text"
             placeholder="Search here.."
@@ -262,7 +263,7 @@ export default function GalleryAdmin() {
             }}
             className="flex-1 text-base leading-5 font-normal text-black outline-none placeholder:text-neutral-400"
           />
-          <img src="/icon/search.png" alt="Search" className="w-5 h-5" />
+          <img src="/icon/search.png" alt="Search" className="h-5 w-5" />
         </div>
       </div>
 
@@ -273,15 +274,15 @@ export default function GalleryAdmin() {
       )}
 
       {/* Filter Section & Add Button */}
-      <div className="flex flex-col w-full gap-4 md:flex-row md:items-center md:justify-between">
-        <div className="flex w-full flex-col md:flex-row md:items-center gap-4">
+      <div className="flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex w-full flex-col gap-4 md:flex-row md:items-center">
           <select
             value={filterType}
             onChange={(e) => {
               setFilterType(e.target.value);
               setCurrentPage(1);
             }}
-            className="h-[44px] w-full md:w-[180px] rounded-xl border border-zinc-300 px-4 text-sm transition-colors outline-none focus:border-[#2AB2C7]"
+            className="h-[44px] w-full rounded-xl border border-zinc-300 px-4 text-sm transition-colors outline-none focus:border-[#2AB2C7] md:w-[180px]"
           >
             <option value="">All Types</option>
             <option value="photo">Photos</option>
@@ -293,7 +294,7 @@ export default function GalleryAdmin() {
         </div>
         <button
           onClick={() => openModal('add')}
-          className="flex w-full md:w-auto items-center justify-center gap-2.5 rounded-2xl bg-[#2AB2C7] px-6 py-3 text-white transition-opacity hover:opacity-90"
+          className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-[#2AB2C7] px-6 py-3 text-white transition-opacity hover:opacity-90 md:w-auto"
         >
           <div className="text-base leading-5 font-medium">Add New Content</div>
         </button>
@@ -309,26 +310,28 @@ export default function GalleryAdmin() {
               </div>
 
               {/* Content Type Selector */}
-              <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+              <div className="mb-6 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
                 <div className="text-base text-neutral-600">Content Type:</div>
                 <div className="flex gap-2">
                   <button
                     type="button"
                     onClick={() => setContentType('image')}
-                    className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${contentType === 'image'
-                      ? 'bg-primary-700 text-white'
-                      : 'bg-zinc-100 text-neutral-600 hover:bg-zinc-200'
-                      }`}
+                    className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
+                      contentType === 'image'
+                        ? 'bg-primary-700 text-white'
+                        : 'bg-zinc-100 text-neutral-600 hover:bg-zinc-200'
+                    }`}
                   >
                     Image
                   </button>
                   <button
                     type="button"
                     onClick={() => setContentType('video')}
-                    className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${contentType === 'video'
-                      ? 'bg-primary-700 text-white'
-                      : 'bg-zinc-100 text-neutral-600 hover:bg-zinc-200'
-                      }`}
+                    className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
+                      contentType === 'video'
+                        ? 'bg-primary-700 text-white'
+                        : 'bg-zinc-100 text-neutral-600 hover:bg-zinc-200'
+                    }`}
                   >
                     Video (YouTube)
                   </button>
@@ -523,7 +526,7 @@ export default function GalleryAdmin() {
           return (
             <div
               key={item.id}
-              className="min-w-[900px] flex items-center justify-between rounded-[56px] py-3"
+              className="flex min-w-[900px] items-center justify-between rounded-[56px] py-3"
             >
               <div className="flex items-center gap-6">
                 <div className="relative h-6 w-6">
@@ -563,10 +566,10 @@ export default function GalleryAdmin() {
               <div className="w-20 text-base leading-5 font-normal text-zinc-800">
                 {activityDate
                   ? new Date(activityDate).toLocaleDateString('id-ID', {
-                    day: '2-digit',
-                    month: 'short',
-                    year: 'numeric',
-                  })
+                      day: '2-digit',
+                      month: 'short',
+                      year: 'numeric',
+                    })
                   : '-'}
               </div>
               <div className="flex w-28 items-center gap-4">
@@ -620,13 +623,37 @@ export default function GalleryAdmin() {
         )}
 
         {loading && (
-          <div className="py-12 text-center text-neutral-400">Loading...</div>
+          <div className="animate-pulse">
+            {[...Array(5)].map((_, i) => (
+              <div
+                key={i}
+                className="flex min-w-[900px] items-center justify-between rounded-[56px] py-3"
+              >
+                <div className="flex items-center gap-6">
+                  <div className="h-6 w-6 rounded bg-gray-200" />
+                  <div className="flex items-center gap-2">
+                    <div className="h-24 w-32 rounded-3xl bg-gray-200" />
+                    <div className="flex flex-col gap-2 px-2">
+                      <div className="h-5 w-48 rounded bg-gray-200" />
+                      <div className="h-4 w-64 rounded bg-gray-200" />
+                    </div>
+                  </div>
+                </div>
+                <div className="h-5 w-16 rounded bg-gray-200" />
+                <div className="h-5 w-20 rounded bg-gray-200" />
+                <div className="flex w-28 items-center gap-4">
+                  <div className="h-5 w-5 rounded bg-gray-200" />
+                  <div className="h-5 w-5 rounded bg-gray-200" />
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </div>
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex flex-col items-center gap-4 md:flex-row md:justify-between px-4">
+        <div className="flex flex-col items-center gap-4 px-4 md:flex-row md:justify-between">
           <span className="text-sm text-gray-600">
             Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
             {Math.min(currentPage * itemsPerPage, filteredItems.length)} of{' '}
@@ -646,10 +673,11 @@ export default function GalleryAdmin() {
                   <button
                     key={page}
                     onClick={() => setCurrentPage(page)}
-                    className={`flex h-[40px] w-[40px] items-center justify-center rounded-lg text-sm transition-colors ${currentPage === page
-                      ? 'bg-[#2AB2C7] text-white'
-                      : 'bg-white text-gray-700 hover:bg-gray-50'
-                      }`}
+                    className={`flex h-[40px] w-[40px] items-center justify-center rounded-lg text-sm transition-colors ${
+                      currentPage === page
+                        ? 'bg-[#2AB2C7] text-white'
+                        : 'bg-white text-gray-700 hover:bg-gray-50'
+                    }`}
                   >
                     {page}
                   </button>

@@ -7,19 +7,29 @@ import { HiMenu, HiX } from 'react-icons/hi';
 
 export default function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobileResearchersOpen, setMobileResearchersOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // Close dropdown if clicked outside
+  // Close dropdown if clicked outside or Escape key pressed
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setDropdownOpen(false);
       }
     }
+
+    function handleKeyDown(event) {
+      if (event.key === 'Escape') {
+        setDropdownOpen(false);
+      }
+    }
+
     document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
 
@@ -118,7 +128,10 @@ export default function Navbar() {
 
         {/* Hamburger Mobile */}
         <div className="md:hidden">
-          <button onClick={() => setMobileOpen(!mobileOpen)}>
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="cursor-pointer"
+          >
             {mobileOpen ? <HiX size={24} /> : <HiMenu size={24} />}
           </button>
         </div>
@@ -131,71 +144,95 @@ export default function Navbar() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25, ease: 'easeOut' }}
-            className="mt-3 flex flex-col gap-2 px-2 font-bold md:hidden"
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            className="overflow-hidden md:hidden"
           >
-            <Link
-              href="/"
-              className="text-grayDark hover:text-primaryGradientEnd transition"
-            >
-              Home
-            </Link>
-
-            {/* Dropdown bisa jadi collapsible di mobile */}
-            <div>
-              <div
-                onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="text-grayDark flex cursor-pointer items-center gap-2 py-1 select-none hover:opacity-90 md:px-2"
+            <div className="flex flex-col gap-1 px-2 pt-2 pb-4 font-bold">
+              <Link
+                href="/"
+                className="text-grayDark hover:text-primaryGradientEnd py-2 transition"
+                onClick={() => setMobileOpen(false)}
               >
-                Researchers
-                <img
-                  src="/icon/arrow-down.png"
-                  alt="arrow down"
-                  className={`h-4 w-4 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}
-                />
-              </div>
-              <AnimatePresence>
-                {dropdownOpen && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="flex flex-col gap-1 pl-4"
-                  >
-                    <Link
-                      href="/researcher/participant"
-                      className="block w-full"
+                Home
+              </Link>
+
+              {/* Dropdown bisa jadi collapsible di mobile */}
+              <div>
+                <div
+                  onClick={() =>
+                    setMobileResearchersOpen(!mobileResearchersOpen)
+                  }
+                  className="text-grayDark flex cursor-pointer items-center justify-between py-2 select-none hover:opacity-90"
+                >
+                  <span>Researchers</span>
+                  <img
+                    src="/icon/arrow-down.png"
+                    alt="arrow down"
+                    className={`h-4 w-4 transition-transform duration-300 ${
+                      mobileResearchersOpen ? 'rotate-180' : ''
+                    }`}
+                  />
+                </div>
+                <AnimatePresence>
+                  {mobileResearchersOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.25, ease: 'easeInOut' }}
+                      className="overflow-hidden"
                     >
-                      Participant
-                    </Link>
+                      <div className="flex flex-col gap-2 pb-2 pl-4 text-sm text-gray-600">
+                        <Link
+                          href="/researcher/participant"
+                          className="hover:text-primaryGradientEnd block w-full py-2 transition"
+                          onClick={() => setMobileOpen(false)}
+                        >
+                          Participant
+                        </Link>
 
-                    <Link href="/researcher/project" className="block w-full">
-                      Project
-                    </Link>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                        <Link
+                          href="/researcher/project"
+                          className="hover:text-primaryGradientEnd block w-full py-2 transition"
+                          onClick={() => setMobileOpen(false)}
+                        >
+                          Project
+                        </Link>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              <Link
+                href="/news"
+                className="text-grayDark hover:text-primaryGradientEnd py-2 transition"
+                onClick={() => setMobileOpen(false)}
+              >
+                News
+              </Link>
+              <Link
+                href="/gallery"
+                className="text-grayDark hover:text-primaryGradientEnd py-2 transition"
+                onClick={() => setMobileOpen(false)}
+              >
+                Gallery
+              </Link>
+              <Link
+                href="/about"
+                className="text-grayDark hover:text-primaryGradientEnd py-2 transition"
+                onClick={() => setMobileOpen(false)}
+              >
+                About
+              </Link>
+              <Link
+                href="/login"
+                className="bg-grayDark mt-2 flex items-center justify-center rounded-3xl px-4 py-3 text-white transition hover:opacity-90"
+                onClick={() => setMobileOpen(false)}
+              >
+                Sign Up
+              </Link>
             </div>
-
-            <Link
-              href="/news"
-              className="text-grayDark hover:text-primaryGradientEnd transition"
-            >
-              News
-            </Link>
-            <Link
-              href="/gallery"
-              className="text-grayDark hover:text-primaryGradientEnd transition"
-            >
-              Gallery
-            </Link>
-            <Link
-              href="/login"
-              className="bg-grayDark flex items-center justify-center rounded-3xl px-4 py-2 text-white transition hover:opacity-90"
-            >
-              Sign Up
-            </Link>
           </motion.div>
         )}
       </AnimatePresence>

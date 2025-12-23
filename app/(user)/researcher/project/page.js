@@ -41,8 +41,10 @@ export default function ResearchProject() {
     if (!matchesStatus) return false;
 
     // 2. Filter by Category
-    const matchesCategory = filter === 'All' ||
-      (p.researcherCategory && filter.toLowerCase().includes(p.researcherCategory.toLowerCase()));
+    const matchesCategory =
+      filter === 'All' ||
+      (p.researcherCategory &&
+        filter.toLowerCase().includes(p.researcherCategory.toLowerCase()));
 
     // 3. Filter by Year
     const matchesYear = year === 'All' || p.year === year;
@@ -52,7 +54,7 @@ export default function ResearchProject() {
 
   return (
     <main className="mt-32 min-h-screen w-full overflow-visible overflow-x-hidden">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-6 sm:gap-6 sm:px-6 sm:py-10">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-6 sm:gap-6 sm:px-6 sm:py-10">
         {/* HEADER */}
         <header className="flex w-full flex-col items-center gap-3 text-center">
           <h1 className="text-[48px] leading-[60px] font-bold tracking-[-1%] text-black sm:text-[60px] sm:leading-[72px]">
@@ -64,28 +66,32 @@ export default function ResearchProject() {
           </p>
         </header>
 
-
         {/* NAVBAR KECIL */}
         <div className="mt-2 flex w-full flex-col gap-4 sm:mt-4">
           <div className="flex flex-wrap gap-3 sm:gap-6">
             <button
               onClick={() => setTab('ongoing')}
-              className={`pb-1 text-sm font-medium sm:text-base ${tab === 'ongoing' ? 'border-b-2 border-black' : 'text-gray-500'
-                }`}
+              className={`cursor-pointer pb-1 text-sm font-medium sm:text-base ${
+                tab === 'ongoing' ? 'border-b-2 border-black' : 'text-gray-500'
+              }`}
             >
               Ongoing
             </button>
             <button
               onClick={() => setTab('completed')}
-              className={`pb-1 text-sm font-medium sm:text-base ${tab === 'completed' ? 'border-b-2 border-black' : 'text-gray-500'
-                }`}
+              className={`cursor-pointer pb-1 text-sm font-medium sm:text-base ${
+                tab === 'completed'
+                  ? 'border-b-2 border-black'
+                  : 'text-gray-500'
+              }`}
             >
               Completed
             </button>
             <button
               onClick={() => setTab('upcoming')}
-              className={`pb-1 text-sm font-medium sm:text-base ${tab === 'upcoming' ? 'border-b-2 border-black' : 'text-gray-500'
-                }`}
+              className={`cursor-pointer pb-1 text-sm font-medium sm:text-base ${
+                tab === 'upcoming' ? 'border-b-2 border-black' : 'text-gray-500'
+              }`}
             >
               Upcoming
             </button>

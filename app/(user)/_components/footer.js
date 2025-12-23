@@ -1,3 +1,8 @@
+'use client';
+
+import Link from 'next/link';
+import { FaLinkedin } from 'react-icons/fa';
+
 export default function Footer() {
   return (
     <div className="mt-16 inline-flex w-full flex-col items-center justify-end">
@@ -25,13 +30,21 @@ export default function Footer() {
               Get in Touch & Visit Us
             </div>
             <div className="flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-3">
-              <button className="flex items-center justify-center gap-2.5 rounded-2xl bg-white px-4 py-2 text-xs font-medium text-stone-500 outline outline-1 outline-zinc-300 transition hover:bg-zinc-50 sm:px-6 sm:py-2 sm:text-sm">
+              <Link
+                href="/contact"
+                className="flex cursor-pointer items-center justify-center gap-2.5 rounded-2xl border border-[#DCDCDC] bg-white px-4 py-2 text-xs font-medium text-stone-500 transition hover:border-gray-400 hover:bg-gray-50 sm:px-6 sm:py-2 sm:text-sm"
+              >
                 Visit Our Facility
-              </button>
-              <button className="flex items-center justify-center gap-2.5 rounded-2xl bg-white px-4 py-2 text-xs font-medium text-stone-500 outline outline-1 outline-zinc-300 transition hover:bg-zinc-50 sm:px-6 sm:py-2 sm:text-sm">
-                <div className="h-4 w-4 border-2 border-stone-500" />
+              </Link>
+              <a
+                href="https://linkedin.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex cursor-pointer items-center justify-center gap-2.5 rounded-2xl border border-[#DCDCDC] bg-white px-4 py-2 text-xs font-medium text-stone-500 transition hover:border-gray-400 hover:bg-gray-50 sm:px-6 sm:py-2 sm:text-sm"
+              >
+                <FaLinkedin className="h-4 w-4 text-stone-500" />
                 Connect on LinkedIn
-              </button>
+              </a>
             </div>
           </div>
 

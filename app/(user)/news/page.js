@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import Card from './../_components/card';
 import SkeletonCard from './../_components/SkeletonCard';
 
@@ -55,10 +56,8 @@ export default function NewsPage() {
 
   return (
     <main className="bg-bgMain mt-42 min-h-screen snap-y snap-mandatory overflow-y-scroll">
-      {/* SECTION 1 - Header */}
-      <section className="flex min-h-screen w-full snap-start justify-center px-4 sm:px-6 text-black">
-        <div className="flex w-full max-w-7xl flex-col gap-12 md:gap-16">
-          {/* Title */}
+      <section className="flex min-h-screen w-full snap-start justify-center px-4 text-black sm:px-6">
+        <div className="flex w-full max-w-6xl flex-col gap-12 md:gap-16">
           <header className="flex w-full flex-col items-center gap-3 text-center">
             <h1 className="text-[48px] leading-[60px] font-bold tracking-[-1%] text-black sm:text-[60px] sm:leading-[72px]">
               News
@@ -69,11 +68,10 @@ export default function NewsPage() {
           </header>
 
           {loading && (
-            <div className="flex flex-col gap-12 w-full animate-pulse">
-              {/* Featured News Skeleton */}
+            <div className="flex w-full animate-pulse flex-col gap-12">
               <div className="grid w-full items-center gap-8 md:grid-cols-2">
                 <div className="order-first flex justify-center md:order-last">
-                  <div className="h-[300px] w-full max-w-[523px] rounded-xl bg-gray-200 shadow-lg"></div>
+                  <div className="aspect-video w-full max-w-[523px] rounded-xl bg-gray-200 shadow-lg"></div>
                 </div>
                 <div className="order-last flex flex-col gap-4 md:order-first">
                   <div className="h-8 w-3/4 rounded bg-gray-200"></div>
@@ -84,9 +82,8 @@ export default function NewsPage() {
                 </div>
               </div>
 
-              {/* Other News Grid Skeleton */}
               <div className="flex flex-col gap-12">
-                <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6">
+                <div className="grid w-full grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {[...Array(3)].map((_, i) => (
                     <SkeletonCard key={i} />
                   ))}
@@ -98,51 +95,57 @@ export default function NewsPage() {
 
           {!loading && !error && news.length > 0 && (
             <>
-              {/* Featured News - First Item */}
               {news[0] && (
-                <div className="grid w-full items-center gap-8 md:grid-cols-2">
-                  {/* Kolom Kanan - Image (di mobile tampil dulu) */}
-                  <div className="order-first flex justify-center md:order-last">
-                    <img
-                      src={
-                        news[0].imageUrl ||
-                        news[0].image_url ||
-                        'https://picsum.photos/500/300'
-                      }
-                      alt={news[0].title}
-                      className="w-full max-w-[523px] rounded-xl object-cover shadow-lg"
-                    />
-                  </div>
+                <Link
+                  href={`/news/${news[0].slug}`}
+                  className="group block w-full"
+                >
+                  <div className="grid w-full cursor-pointer items-center gap-8 md:grid-cols-2">
+                    <div className="order-first flex justify-center md:order-last">
+                      <img
+                        src={
+                          news[0].imageUrl ||
+                          news[0].image_url ||
+                          'https://picsum.photos/500/300'
+                        }
+                        alt={news[0].title}
+                        className="aspect-video w-full max-w-[523px] rounded-xl object-cover shadow-lg transition-all duration-300 ease-out group-hover:brightness-[0.8]"
+                      />
+                    </div>
 
-                  {/* Kolom Kiri - Teks */}
-                  <div className="order-last flex flex-col gap-4 md:order-first">
-                    <h2 className="text-xl font-bold sm:text-2xl md:text-3xl lg:text-4xl">
-                      {news[0].title}
-                    </h2>
-                    <p className="text-sm text-black/60 sm:text-base md:text-lg">
-                      {news[0].content.substring(0, 200)}
-                      {news[0].content.length > 200 ? '...' : ''}
-                    </p>
-                    <p className="mt-2 text-sm sm:text-base md:text-base">
-                      {news[0].isFeatured || news[0].is_featured
-                        ? 'Featured News'
-                        : 'News'}
-                    </p>
+                    <div className="order-last flex flex-col gap-4 md:order-first">
+                      <h2 className="group-hover:text-primaryGradientEnd text-xl font-bold transition-colors duration-300 ease-out sm:text-2xl md:text-3xl lg:text-4xl">
+                        {news[0].title}
+                      </h2>
+                      <p className="text-sm text-black/60 sm:text-base md:text-lg">
+                        {news[0].content.substring(0, 200)}
+                        {news[0].content.length > 200 ? '...' : ''}
+                      </p>
+                      <p className="mt-2 text-sm sm:text-base md:text-base">
+                        {news[0].isFeatured || news[0].is_featured
+                          ? 'Featured News'
+                          : 'News'}
+                      </p>
+                    </div>
                   </div>
-                </div>
+                </Link>
               )}
 
-              {/* Other News - Cards */}
               {cards.length > 1 && (
                 <div className="flex flex-col gap-12">
-                  <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6">
+                  <div className="grid w-full grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {cards.slice(1).map((c, i) => (
-                      <Card
+                      <Link
                         key={i}
-                        imageSrc={c.imageSrc}
-                        texts={c.texts}
-                        className="h-full"
-                      />
+                        href={`/news/${news[i + 1].slug}`}
+                        className="group block h-full"
+                      >
+                        <Card
+                          imageSrc={c.imageSrc}
+                          texts={c.texts}
+                          className="[&_p:first-of-type]:group-hover:text-primaryGradientEnd h-full cursor-pointer [&_img]:transition-all [&_img]:duration-300 [&_img]:ease-out [&_img]:group-hover:brightness-[0.8] [&_p:first-of-type]:transition-colors [&_p:first-of-type]:duration-300 [&_p:first-of-type]:ease-out"
+                        />
+                      </Link>
                     ))}
                   </div>
                 </div>

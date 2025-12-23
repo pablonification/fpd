@@ -27,7 +27,7 @@ export default function FilterRow({
 
   return (
     <div className="flex w-full justify-center">
-      <div className="flex w-full max-w-7xl flex-col gap-4 md:flex-row md:items-center md:gap-6">
+      <div className="flex w-full max-w-6xl flex-col gap-4 md:flex-row md:items-center md:gap-6">
         <div className="relative w-full flex-grow">
           <input
             type="text"
@@ -41,7 +41,7 @@ export default function FilterRow({
                 setLocalSearch(val);
               }
             }}
-            className="h-[56px] w-full rounded-[16px] border border-gray-300 bg-white/70 px-5 pr-12 text-lg text-gray-700 shadow-sm backdrop-blur-md focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder:text-gray-400"
+            className="h-[56px] w-full rounded-[16px] border border-gray-300 bg-white/70 px-5 pr-12 text-lg text-gray-700 shadow-sm backdrop-blur-md placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 focus:outline-none"
           />
           <img
             src="/icon/search.png"
@@ -64,10 +64,11 @@ export default function FilterRow({
                 setExpertiseOpen(!expertiseOpen);
                 setRoleOpen(false);
               }}
-              className={`flex h-[56px] w-full items-center justify-between rounded-[16px] border ${displayedExpertise
-                ? 'border-blue-400 bg-blue-50'
-                : 'border-gray-300 bg-white/70'
-                } px-5 text-gray-800 shadow-sm backdrop-blur-md transition hover:opacity-90`}
+              className={`flex h-[56px] w-full cursor-pointer items-center justify-between rounded-[16px] border ${
+                displayedExpertise
+                  ? 'border-blue-400 bg-blue-50'
+                  : 'border-gray-300 bg-white/70'
+              } px-5 text-gray-800 shadow-sm backdrop-blur-md transition hover:opacity-90`}
             >
               <span className="truncate text-lg">
                 {displayedExpertise || 'All Expertise'}

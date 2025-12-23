@@ -47,15 +47,7 @@ export async function POST(request) {
     const body = await request.json();
     console.log('📥 Received body:', body);
 
-    const { title, description, type, mediaUrl, activityDate } = body;
-
-    console.log('🔍 Extracted values:', {
-      title,
-      description,
-      type,
-      mediaUrl,
-      activityDate,
-    });
+    const { title, description, type, mediaUrl, activityDate, category } = body;
 
     // Basic validation
     const normalizedType = (type || '').toLowerCase();
@@ -75,8 +67,9 @@ export async function POST(request) {
     const valuesToInsert = {
       title: title?.trim() || null,
       description: description?.trim() || null,
-      type: normalizedType, // Use 'type' as defined in schema, not 'media_type_column'
-      mediaUrl: mediaUrl.trim(), // Use 'mediaUrl' as defined in schema, not 'media_url'
+      type: normalizedType,
+      mediaUrl: mediaUrl.trim(),
+      category: category?.trim() || null,
       activityDate: activityDate ? new Date(activityDate) : null,
       createdAt: new Date(),
     };

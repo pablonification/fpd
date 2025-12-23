@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -12,13 +13,29 @@ export default function ProfileModal({
   hasNext,
   hasPrev,
 }) {
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onClose]);
+
   return (
     <AnimatePresence>
       {isOpen && (
         <>
           {/* Overlay */}
           <motion.div
-            className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
+            className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm"
             onClick={onClose}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -27,7 +44,7 @@ export default function ProfileModal({
 
           {/* Modal box */}
           <motion.div
-            className="fixed top-1/2 left-1/2 z-50 w-[90%] max-w-3xl -translate-x-1/2 -translate-y-1/2 rounded-[30px] bg-white px-10 py-10 shadow-xl"
+            className="fixed top-1/2 left-1/2 z-[70] max-h-[90vh] w-[90%] max-w-3xl -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-[30px] bg-white px-6 py-8 shadow-xl sm:px-10 sm:py-10"
             initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.85 }}
@@ -35,7 +52,7 @@ export default function ProfileModal({
             {/* Close Button */}
             <button
               onClick={onClose}
-              className="absolute top-6 right-6 text-gray-500 hover:text-gray-700"
+              className="absolute top-4 right-4 cursor-pointer text-gray-500 hover:text-gray-700 sm:top-6 sm:right-6"
             >
               <X size={26} />
             </button>
@@ -45,22 +62,22 @@ export default function ProfileModal({
               <img
                 src={data?.imageSrc}
                 alt={data?.name}
-                className="h-32 w-32 rounded-2xl object-cover shadow-md"
+                className="h-24 w-24 rounded-2xl object-cover shadow-md sm:h-32 sm:w-32"
               />
 
-              <h2 className="mt-4 text-2xl font-semibold text-gray-900">
+              <h2 className="mt-4 text-xl font-semibold text-gray-900 sm:text-2xl">
                 {data?.name}
               </h2>
             </div>
 
             {/* Content with arrows */}
-            <div className="mt-8 flex w-full items-start justify-center gap-8">
-              {/* Left Arrow */}
-              <div className="flex items-center">
+            <div className="mt-6 flex w-full flex-col items-center gap-4 sm:mt-8 sm:flex-row sm:items-start sm:justify-center sm:gap-8">
+              {/* Left Arrow - hidden on mobile, shown on sm+ */}
+              <div className="hidden items-center sm:flex">
                 {hasPrev && (
                   <button
                     onClick={onPrev}
-                    className="rounded-full border border-gray-300 p-3 hover:bg-gray-100"
+                    className="cursor-pointer rounded-full border border-[#DCDCDC] p-3 hover:bg-gray-100"
                   >
                     <ChevronLeft size={24} />
                   </button>
@@ -68,7 +85,7 @@ export default function ProfileModal({
               </div>
 
               {/* Middle Content */}
-              <div className="w-full max-w-xl space-y-6 text-gray-700">
+              <div className="w-full max-w-xl space-y-4 text-gray-700 sm:space-y-6">
                 {/* Biography */}
                 {data?.description && (
                   <div>
@@ -112,17 +129,37 @@ export default function ProfileModal({
                 )}
               </div>
 
-              {/* Right Arrow */}
-              <div className="flex items-center">
+              {/* Right Arrow - hidden on mobile */}
+              <div className="hidden items-center sm:flex">
                 {hasNext && (
                   <button
                     onClick={onNext}
-                    className="rounded-full border border-gray-300 p-3 hover:bg-gray-100"
+                    className="cursor-pointer rounded-full border border-[#DCDCDC] p-3 hover:bg-gray-100"
                   >
                     <ChevronRight size={24} />
                   </button>
                 )}
               </div>
+            </div>
+
+            {/* Mobile Navigation Arrows */}
+            <div className="mt-6 flex justify-center gap-4 sm:hidden">
+              {hasPrev && (
+                <button
+                  onClick={onPrev}
+                  className="cursor-pointer rounded-full border border-[#DCDCDC] p-3 hover:bg-gray-100"
+                >
+                  <ChevronLeft size={24} />
+                </button>
+              )}
+              {hasNext && (
+                <button
+                  onClick={onNext}
+                  className="cursor-pointer rounded-full border border-[#DCDCDC] p-3 hover:bg-gray-100"
+                >
+                  <ChevronRight size={24} />
+                </button>
+              )}
             </div>
           </motion.div>
         </>

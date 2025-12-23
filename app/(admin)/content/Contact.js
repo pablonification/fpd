@@ -132,7 +132,46 @@ export default function ContactForm() {
     }
   };
 
-  if (loading) return <div className="p-4 text-center">Loading...</div>;
+  if (loading) {
+    return (
+      <div className="mt-6 flex flex-col items-center">
+        <h1 className="w-max-screen text-center text-[24px] leading-8 font-semibold tracking-[-0.01em]">
+          Edit Contact Page
+        </h1>
+        <div className="mt-6 flex w-full max-w-[600px] animate-pulse flex-col gap-6 rounded-[16px] border border-gray-300 bg-white p-6">
+          <div className="flex w-full flex-col gap-2">
+            <div className="h-4 w-12 rounded bg-gray-200" />
+            <div className="h-[44px] w-full rounded-[12px] bg-gray-200" />
+          </div>
+          <div className="flex w-full flex-col gap-2">
+            <div className="h-4 w-24 rounded bg-gray-200" />
+            <div className="h-[44px] w-full rounded-[12px] bg-gray-200" />
+          </div>
+          <div className="flex w-full flex-col gap-2">
+            <div className="h-4 w-12 rounded bg-gray-200" />
+            <div className="flex gap-2">
+              <div className="h-[44px] flex-1 rounded-[12px] bg-gray-200" />
+              <div className="h-[44px] w-28 rounded-[12px] bg-gray-200" />
+            </div>
+            <div className="mt-2 flex flex-col gap-2">
+              <div className="h-4 w-24 rounded bg-gray-200" />
+              {[...Array(3)].map((_, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-3 rounded-[8px] border border-gray-200 bg-gray-50 px-4 py-3"
+                >
+                  <div className="h-6 w-6 rounded bg-gray-200" />
+                  <div className="h-4 flex-1 rounded bg-gray-200" />
+                  <div className="h-5 w-5 rounded bg-gray-200" />
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="mt-4 h-11 w-full rounded-[16px] bg-gray-200" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mt-6 flex flex-col items-center">

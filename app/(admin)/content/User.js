@@ -1,36 +1,34 @@
 'use client';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import Image from 'next/image';
-import FormField from '../_components/FormField'; // Asumsi path benar
-import { CgSpinner } from 'react-icons/cg'; // Menggunakan icon spinner untuk loading
-
-// Menggantikan data mock
-// const users = [...]
+import FormField from '../_components/FormField';
+import { CgSpinner } from 'react-icons/cg';
 
 export default function UserForm() {
-  const [users, setUsers] = useState([]); // State untuk menyimpan data pengguna dari API
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null); // <-- user yang sedang diedit
+  const [currentUser, setCurrentUser] = useState(null);
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     password: '',
     role: '',
-    status: 'Active', // Active/Inactive
+    status: 'Active',
   });
 
-  // --- STATE BARU UNTUK FILE AVATAR ---
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(null);
 
-  // --- REF BARU UNTUK INPUT FILE ---
   const fileInputRef = useRef(null);
-  // --- Fungsi Pengambilan Data (Fetching) ---
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
   const fetchUsers = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -59,12 +57,24 @@ export default function UserForm() {
     fetchUsers();
   }, [fetchUsers]);
 
-  // --- Filter Lokal ---
-  const filteredUsers = users.filter(
-    (user) =>
-      user.name.toLowerCase().includes(search.toLowerCase()) &&
-      (roleFilter ? user.role === roleFilter : true)
-  );
+  const filteredUsers = useMemo(() => {
+    return users.filter(
+      (user) =>
+        user.name.toLowerCase().includes(search.toLowerCase()) &&
+        (roleFilter ? user.role === roleFilter : true)
+    );
+  }, [users, search, roleFilter]);
+
+  const paginatedUsers = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredUsers.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredUsers, currentPage]);
+
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, roleFilter]);
 
   // --- Modal Logic ---
   const openModal = (user = null) => {
@@ -207,7 +217,7 @@ export default function UserForm() {
         const errData = await response.json();
         throw new Error(
           errData.message ||
-          `Failed to ${isCreating ? 'create' : 'update'} user`
+            `Failed to ${isCreating ? 'create' : 'update'} user`
         );
       }
 
@@ -266,7 +276,7 @@ export default function UserForm() {
               onChange={(e) => setSearch(e.target.value)}
               className="flex-1 text-sm outline-none"
             />
-            <img src="/icon/search.png" alt="Search" className="w-5 h-5" />
+            <img src="/icon/search.png" alt="Search" className="h-5 w-5" />
           </div>
         </div>
 
@@ -305,9 +315,27 @@ export default function UserForm() {
 
           {/* Loading State */}
           {loading && users.length === 0 && (
-            <div className="flex items-center justify-center py-10">
-              <CgSpinner className="animate-spin text-4xl text-[#2AB2C7]" />
-              <span className="ml-2 text-gray-500">Loading users...</span>
+            <div className="animate-pulse">
+              {[...Array(5)].map((_, i) => (
+                <div
+                  key={i}
+                  className="grid min-w-[600px] grid-cols-[3fr_1fr_1fr] items-center border-b border-gray-100 px-4 py-3"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full bg-gray-200" />
+                    <div className="flex flex-col gap-1">
+                      <div className="h-4 w-32 rounded bg-gray-200" />
+                      <div className="h-3 w-40 rounded bg-gray-200" />
+                    </div>
+                  </div>
+                  <div className="h-4 w-16 rounded bg-gray-200" />
+                  <div className="flex items-center justify-end gap-4">
+                    <div className="h-5 w-5 rounded bg-gray-200" />
+                    <div className="h-5 w-5 rounded bg-gray-200" />
+                    <div className="h-5 w-5 rounded bg-gray-200" />
+                  </div>
+                </div>
+              ))}
             </div>
           )}
 
@@ -329,15 +357,14 @@ export default function UserForm() {
             </div>
           )}
 
-          {filteredUsers.map((user) => (
+          {paginatedUsers.map((user) => (
             <div
               key={user.id}
               className="grid min-w-[600px] grid-cols-[3fr_1fr_1fr] items-center border-b border-gray-100 px-4 py-3 hover:bg-gray-50"
             >
-              {/* User Info */}
               <div className="flex items-center gap-3">
                 <Image
-                  src={user.avatar} // Menggunakan avatar dari data yang sudah diolah
+                  src={user.avatar}
                   alt={user.name}
                   width={40}
                   height={40}
@@ -349,10 +376,8 @@ export default function UserForm() {
                 </div>
               </div>
 
-              {/* Role */}
               <span>{user.role}</span>
 
-              {/* Actions */}
               <div className="flex items-center justify-end gap-4">
                 <Image
                   src="/icon/db-u-edit.png"
@@ -376,34 +401,64 @@ export default function UserForm() {
                   width={20}
                   height={20}
                   className="cursor-pointer"
-                // Logika untuk menampilkan detail pengguna bisa ditambahkan di sini
                 />
               </div>
             </div>
           ))}
         </div>
 
-        {/* Footer */}
-        <div className="w-max-screen flex h-[40px] w-full items-center justify-between px-4">
-          <span className="text-sm text-gray-600">
-            Showing {filteredUsers.length} from {users.length} users
-          </span>
-          <div className="flex gap-2">
-            {/* Paginasi yang sebenarnya membutuhkan state dan logika tambahan. Sementara, tombol hanya placeholder. */}
-            <button
-              className="flex h-[40px] w-[142px] items-center justify-center gap-[10px] rounded-[16px] border border-[#DCDCDC] bg-white px-[20px] py-[8px] text-sm hover:bg-gray-200"
-              disabled
-            >
-              Previous
-            </button>
-            <button
-              className="flex h-[40px] w-[142px] items-center justify-center gap-[10px] rounded-[16px] border border-[#DCDCDC] bg-white px-[24px] py-[8px] text-sm hover:bg-gray-200"
-              disabled
-            >
-              Next
-            </button>
+        {totalPages > 1 && (
+          <div className="flex flex-col items-center gap-4 px-4 md:flex-row md:justify-between">
+            <span className="text-sm text-gray-600">
+              Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
+              {Math.min(currentPage * itemsPerPage, filteredUsers.length)} of{' '}
+              {filteredUsers.length} users
+            </span>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="flex h-[40px] w-[142px] items-center justify-center gap-[10px] rounded-[16px] border border-zinc-300 bg-white px-[20px] py-[8px] text-sm transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Previous
+              </button>
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (page) => (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`flex h-[40px] w-[40px] items-center justify-center rounded-lg text-sm transition-colors ${
+                        currentPage === page
+                          ? 'bg-[#2AB2C7] text-white'
+                          : 'bg-white text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  )
+                )}
+              </div>
+              <button
+                onClick={() =>
+                  setCurrentPage((p) => Math.min(totalPages, p + 1))
+                }
+                disabled={currentPage === totalPages}
+                className="flex h-[40px] w-[142px] items-center justify-center gap-[10px] rounded-[16px] border border-zinc-300 bg-white px-[24px] py-[8px] text-sm transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
           </div>
-        </div>
+        )}
+
+        {totalPages <= 1 && filteredUsers.length > 0 && (
+          <div className="px-4">
+            <span className="text-sm text-gray-600">
+              Showing {filteredUsers.length} of {users.length} users
+            </span>
+          </div>
+        )}
       </div>
 
       {/* --- Modal Overlay --- */}
@@ -412,8 +467,9 @@ export default function UserForm() {
           <form
             onSubmit={handleSubmit}
             // Ganti w-[1070px] agar lebih responsif, tapi tetap lebar
-            className={`max-w-8xl fixed top-0 right-0 h-full w-full bg-white shadow-2xl transition-transform duration-300 sm:w-[500px] md:w-[700px] lg:w-[1070px] ${isModalOpen ? 'translate-x-0' : 'translate-x-full'
-              }`}
+            className={`max-w-8xl fixed top-0 right-0 h-full w-full bg-white shadow-2xl transition-transform duration-300 sm:w-[500px] md:w-[700px] lg:w-[1070px] ${
+              isModalOpen ? 'translate-x-0' : 'translate-x-full'
+            }`}
           >
             {/* Header */}
             <div className="flex h-[80px] items-center border-b border-gray-200 px-4 md:px-8">
@@ -425,7 +481,7 @@ export default function UserForm() {
               >
                 ←
               </button>
-              <h2 className="font-hanken text-xl md:text-3xl leading-10 font-bold text-black">
+              <h2 className="font-hanken text-xl leading-10 font-bold text-black md:text-3xl">
                 {currentUser ? 'Edit User' : 'Create New User'}
               </h2>
             </div>
@@ -434,7 +490,7 @@ export default function UserForm() {
             <div className="h-[calc(100%-160px)] overflow-y-auto px-4 py-6 md:px-8 md:py-10">
               <div className="mx-auto flex w-full max-w-[855px] flex-col gap-9">
                 {/* 1. Profile Picture */}
-                <div className="flex flex-col md:flex-row items-start md:items-center gap-5">
+                <div className="flex flex-col items-start gap-5 md:flex-row md:items-center">
                   <div className="flex h-24 w-24 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-gray-200 text-xs text-gray-500">
                     <Image
                       src={avatarPreview || '/icon/db-user-1.png'}
@@ -495,7 +551,7 @@ export default function UserForm() {
                     onChange={(e) =>
                       setFormData({ ...formData, fullName: e.target.value })
                     }
-                  // Anda mungkin perlu menambahkan `inputClassName="rounded-2xl px-4 py-3 border border-zinc-300"` jika FormField mendukung
+                    // Anda mungkin perlu menambahkan `inputClassName="rounded-2xl px-4 py-3 border border-zinc-300"` jika FormField mendukung
                   />
 
                   <FormField

@@ -34,7 +34,7 @@ export default function FilterDropdown({ filter = 'All', setFilter }) {
       {/* Trigger button */}
       <button
         onClick={() => setOpen((prev) => !prev)}
-        className="flex w-max min-w-[200px] items-center justify-between gap-3 rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-all hover:border-[#2AB2C7] hover:bg-gray-50 active:scale-95"
+        className="cursor-pointer flex w-max min-w-[200px] items-center justify-between gap-3 rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-all hover:border-[#2AB2C7] hover:bg-gray-50 active:scale-95"
         aria-haspopup="listbox"
         aria-expanded={open}
       >

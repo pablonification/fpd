@@ -33,13 +33,14 @@ export async function PUT(request, { params }) {
   try {
     const { id } = await params;
     const body = await request.json();
-    const { title, description, type, mediaUrl, activityDate } = body;
+    const { title, description, type, mediaUrl, activityDate, category } = body;
 
     const updateValues = {
       title: title ?? null,
       description: description ?? null,
       type: type ? type.toLowerCase() : undefined,
       mediaUrl: mediaUrl ?? undefined,
+      category: category ?? undefined,
       activityDate: activityDate ? new Date(activityDate) : undefined,
     };
 

@@ -3,15 +3,23 @@ import { db } from '@/db/db';
 import { news } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 
-// GET /api/news/[id]
+// GET /api/news/[id] - supports both numeric id and slug
 export async function GET(request, { params }) {
   try {
     const { id } = await params;
-    const rows = await db
-      .select()
-      .from(news)
-      .where(eq(news.id, parseInt(id)))
-      .limit(1);
+    const isNumeric = /^\d+$/.test(id);
+
+    let rows;
+    if (isNumeric) {
+      rows = await db
+        .select()
+        .from(news)
+        .where(eq(news.id, parseInt(id)))
+        .limit(1);
+    } else {
+      rows = await db.select().from(news).where(eq(news.slug, id)).limit(1);
+    }
+
     if (!rows || rows.length === 0) {
       return NextResponse.json(
         { success: false, error: 'News not found' },

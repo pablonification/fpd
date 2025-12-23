@@ -16,7 +16,7 @@ export default function ErrorPage({
 
       {/* Tombol Kembali */}
       <Link href="/">
-        <button className="text-primaryGradientStart mt-8 rounded-full bg-white px-6 py-3 font-semibold shadow-lg transition hover:scale-105 hover:shadow-xl">
+        <button className="cursor-pointer text-primaryGradientStart mt-8 rounded-full bg-white px-6 py-3 font-semibold shadow-lg transition hover:scale-105 hover:shadow-xl">
           Kembali ke Home
         </button>
       </Link>
