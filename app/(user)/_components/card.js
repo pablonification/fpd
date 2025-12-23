@@ -32,8 +32,10 @@ export default function Card({
           <p
             key={index}
             className={`break-words ${
-              t.bold ? 'text-grayDark font-bold' : 'text-gray-600'
-            } ${t.size === 'large' ? 'text-lg sm:text-lg' : 'text-sm sm:text-sm'}`}
+              t.bold
+                ? 'text-grayDark leading-tight font-bold'
+                : 'leading-normal text-gray-600'
+            } ${t.size === 'large' ? 'text-lg sm:text-xl' : 'text-sm sm:text-base'}`}
           >
             {t.text}
           </p>

@@ -59,10 +59,10 @@ export default function NewsPage() {
       <section className="flex min-h-screen w-full snap-start justify-center px-4 text-black sm:px-6">
         <div className="flex w-full max-w-6xl flex-col gap-12 md:gap-16">
           <header className="flex w-full flex-col items-center gap-3 text-center">
-            <h1 className="text-[48px] leading-[60px] font-bold tracking-[-1%] text-black sm:text-[60px] sm:leading-[72px]">
+            <h1 className="text-3xl leading-tight font-bold tracking-tight text-black sm:text-4xl md:text-5xl lg:text-6xl">
               News
             </h1>
-            <p className="max-w-[900px] text-[18px] leading-[28px] tracking-[-1%] text-[#7C7C7C] sm:text-[24px] sm:leading-[32px]">
+            <p className="max-w-[900px] text-sm leading-relaxed tracking-normal text-[#7C7C7C] sm:text-base">
               Collection of news and updates from our team.
             </p>
           </header>
@@ -114,14 +114,14 @@ export default function NewsPage() {
                     </div>
 
                     <div className="order-last flex flex-col gap-4 md:order-first">
-                      <h2 className="group-hover:text-primaryGradientEnd text-xl font-bold transition-colors duration-300 ease-out sm:text-2xl md:text-3xl lg:text-4xl">
+                      <h2 className="group-hover:text-primaryGradientEnd text-2xl leading-tight font-bold transition-colors duration-300 ease-out sm:text-3xl md:text-4xl">
                         {news[0].title}
                       </h2>
-                      <p className="text-sm text-black/60 sm:text-base md:text-lg">
+                      <p className="text-sm leading-relaxed text-black/60 sm:text-base">
                         {news[0].content.substring(0, 200)}
                         {news[0].content.length > 200 ? '...' : ''}
                       </p>
-                      <p className="mt-2 text-sm sm:text-base md:text-base">
+                      <p className="mt-2 text-xs text-gray-500 sm:text-sm">
                         {news[0].isFeatured || news[0].is_featured
                           ? 'Featured News'
                           : 'News'}

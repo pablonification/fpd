@@ -12,10 +12,10 @@ export default function Footer() {
         <div className="flex flex-col items-start justify-start gap-4">
           <div className="h-20 w-20 bg-zinc-300 sm:h-28 sm:w-28" />
           <div className="flex flex-col items-start justify-start gap-2">
-            <div className="text-lg font-semibold text-black sm:text-xl lg:text-2xl">
+            <div className="text-lg font-semibold text-black sm:text-xl">
               Fluid & Process Dynamics Research Group
             </div>
-            <div className="text-xs font-medium text-neutral-400 sm:text-sm lg:text-base">
+            <div className="text-xs font-medium text-neutral-400 sm:text-sm">
               Advancing innovation through science, engineering, and real-world
               experimentation.
             </div>
@@ -26,13 +26,13 @@ export default function Footer() {
         <div className="flex w-full flex-col items-start justify-start gap-6 sm:items-center lg:w-auto">
           {/* Get in Touch & Visit Us */}
           <div className="flex w-full flex-col items-start justify-start gap-4">
-            <div className="text-sm font-medium text-black sm:text-base lg:text-lg">
+            <div className="text-lg font-medium text-black sm:text-xl">
               Get in Touch & Visit Us
             </div>
             <div className="flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-3">
               <Link
                 href="/contact"
-                className="flex cursor-pointer items-center justify-center gap-2.5 rounded-2xl border border-[#DCDCDC] bg-white px-4 py-2 text-xs font-medium text-stone-500 transition hover:border-gray-400 hover:bg-gray-50 sm:px-6 sm:py-2 sm:text-sm"
+                className="flex cursor-pointer items-center justify-center gap-2.5 rounded-2xl border border-[#DCDCDC] bg-white px-4 py-2 text-sm font-medium text-stone-500 transition hover:border-gray-400 hover:bg-gray-50 sm:px-6 sm:py-2 sm:text-base"
               >
                 Visit Our Facility
               </Link>
@@ -40,7 +40,7 @@ export default function Footer() {
                 href="https://linkedin.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex cursor-pointer items-center justify-center gap-2.5 rounded-2xl border border-[#DCDCDC] bg-white px-4 py-2 text-xs font-medium text-stone-500 transition hover:border-gray-400 hover:bg-gray-50 sm:px-6 sm:py-2 sm:text-sm"
+                className="flex cursor-pointer items-center justify-center gap-2.5 rounded-2xl border border-[#DCDCDC] bg-white px-4 py-2 text-sm font-medium text-stone-500 transition hover:border-gray-400 hover:bg-gray-50 sm:px-6 sm:py-2 sm:text-base"
               >
                 <FaLinkedin className="h-4 w-4 text-stone-500" />
                 Connect on LinkedIn
@@ -50,31 +50,31 @@ export default function Footer() {
 
           {/* Contact */}
           <div className="flex w-full flex-col items-start justify-start gap-4">
-            <div className="text-sm font-medium text-black sm:text-base lg:text-lg">
+            <div className="text-lg font-medium text-black sm:text-xl">
               Contact
             </div>
             <div className="flex w-full flex-col items-start justify-start gap-3 sm:flex-row sm:gap-6 lg:gap-8">
               {/* Contact 1 */}
               <div className="flex flex-col items-start justify-start gap-1">
-                <div className="text-xs font-medium text-black sm:text-sm lg:text-base">
+                <div className="text-sm font-medium text-black sm:text-base">
                   Prof. M. Akbar Rhamdhani
                 </div>
-                <div className="text-xs font-medium text-neutral-400 sm:text-sm lg:text-base">
+                <div className="text-xs font-medium text-neutral-400 sm:text-sm">
                   arhamdani@swin.edu.au
                 </div>
-                <div className="text-xs font-medium text-neutral-400 sm:text-sm lg:text-base">
+                <div className="text-xs font-medium text-neutral-400 sm:text-sm">
                   +61 3921 48528
                 </div>
               </div>
               {/* Contact 2 */}
               <div className="flex flex-col items-start justify-start gap-1">
-                <div className="text-xs font-medium text-black sm:text-sm lg:text-base">
+                <div className="text-sm font-medium text-black sm:text-base">
                   Dr Bintang A. Nuraeni
                 </div>
-                <div className="text-xs font-medium text-neutral-400 sm:text-sm lg:text-base">
+                <div className="text-xs font-medium text-neutral-400 sm:text-sm">
                   bnuraeni@swin.edu.au
                 </div>
-                <div className="text-xs font-medium text-neutral-400 sm:text-sm lg:text-base">
+                <div className="text-xs font-medium text-neutral-400 sm:text-sm">
                   +61 4812 49922
                 </div>
               </div>

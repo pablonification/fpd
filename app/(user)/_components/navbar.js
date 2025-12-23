@@ -37,12 +37,12 @@ export default function Navbar() {
     <nav className="bg-grayLight fixed top-6 left-1/2 z-50 w-[90%] max-w-[727px] -translate-x-1/2 rounded-[33px] px-6 py-3 shadow-md backdrop-blur-md">
       <div className="flex items-center justify-between">
         {/* Logo */}
-        <div className="bg-grayMid text-grayDark flex h-9 w-9 items-center justify-center rounded-lg text-xl font-semibold">
+        <div className="bg-grayMid text-grayDark flex h-9 w-9 items-center justify-center rounded-lg text-xl font-semibold sm:text-2xl">
           F
         </div>
 
         {/* Desktop Menu */}
-        <div className="hidden items-center gap-6 font-bold md:flex">
+        <div className="hidden items-center gap-6 text-sm font-bold sm:text-base md:flex">
           <Link
             href="/"
             className="text-grayDark hover:text-primaryGradientEnd transition"

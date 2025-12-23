@@ -96,14 +96,14 @@ export default function NewsDetailPage() {
       <div className="mx-auto max-w-4xl">
         <Link
           href="/news"
-          className="group mb-8 inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition-colors hover:text-[#2497A9]"
+          className="group mb-8 inline-flex items-center gap-2 text-xs font-medium text-gray-500 transition-colors hover:text-[#2497A9] sm:text-sm"
         >
           <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
           Back to News
         </Link>
 
         <header className="mb-10 flex flex-col gap-6">
-          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+          <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500 sm:text-sm">
             <span className="flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1">
               <Calendar className="h-3.5 w-3.5" />
               {date}
@@ -115,7 +115,7 @@ export default function NewsDetailPage() {
             )}
           </div>
 
-          <h1 className="text-3xl leading-tight font-extrabold tracking-tight text-gray-900 sm:text-4xl md:text-5xl lg:text-[3.5rem]">
+          <h1 className="text-3xl leading-tight font-bold tracking-tight text-gray-900 sm:text-4xl md:text-5xl lg:text-6xl">
             {news.title}
           </h1>
         </header>
@@ -133,7 +133,7 @@ export default function NewsDetailPage() {
           </div>
         )}
 
-        <article className="prose prose-lg prose-gray prose-headings:font-bold prose-headings:text-gray-900 prose-p:text-gray-600 prose-a:text-[#2497A9] prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl max-w-none">
+        <article className="prose prose-sm sm:prose-base prose-gray prose-headings:font-bold prose-headings:text-gray-900 prose-p:leading-relaxed prose-p:text-gray-600 prose-a:text-[#2497A9] prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl max-w-none">
           <div dangerouslySetInnerHTML={{ __html: news.content }} />
         </article>
       </div>

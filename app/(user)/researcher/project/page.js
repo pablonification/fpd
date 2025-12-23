@@ -57,10 +57,10 @@ export default function ResearchProject() {
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-6 sm:gap-6 sm:px-6 sm:py-10">
         {/* HEADER */}
         <header className="flex w-full flex-col items-center gap-3 text-center">
-          <h1 className="text-[48px] leading-[60px] font-bold tracking-[-1%] text-black sm:text-[60px] sm:leading-[72px]">
+          <h1 className="text-3xl leading-tight font-bold tracking-tight text-black sm:text-4xl md:text-5xl lg:text-6xl">
             Research & Projects
           </h1>
-          <p className="max-w-[900px] text-[18px] leading-[28px] tracking-[-1%] text-[#7C7C7C] sm:text-[24px] sm:leading-[32px]">
+          <p className="max-w-[900px] text-sm leading-relaxed tracking-normal text-[#7C7C7C] sm:text-base">
             Explore our ongoing studies, completed works, upcoming initiatives,
             and scientific publications.
           </p>

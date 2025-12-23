@@ -51,11 +51,11 @@ export default function AboutPage() {
   }, []);
 
   return (
-    <main className="mx-auto mt-42 flex w-full max-w-6xl flex-col items-center gap-12 px-4 pb-20 text-[14px] sm:px-6 md:text-[14px]">
+    <main className="mx-auto mt-42 flex w-full max-w-6xl flex-col items-center gap-12 px-4 pb-20 text-sm sm:px-6 sm:text-base">
       {/* About Us */}
       <section className="w-full text-left md:text-center">
         <header className="flex w-full flex-col items-center gap-3 text-center">
-          <h1 className="text-[48px] leading-[60px] font-bold tracking-[-1%] text-black sm:text-[60px] sm:leading-[72px]">
+          <h1 className="text-3xl leading-tight font-bold tracking-tight text-black sm:text-4xl md:text-5xl lg:text-6xl">
             About Us
           </h1>
           <div className="w-full max-w-[900px]">
@@ -66,7 +66,7 @@ export default function AboutPage() {
                 <div className="h-4 w-3/4 rounded bg-gray-200"></div>
               </div>
             ) : (
-              <p className="max-w-[900px] text-[16px] leading-[28px] tracking-[-1%] text-[#7C7C7C] sm:text-[24px] sm:leading-[32px]">
+              <p className="max-w-[900px] text-sm leading-relaxed tracking-normal text-[#7C7C7C] sm:text-base">
                 {aboutData.about_description}
               </p>
             )}
@@ -81,7 +81,7 @@ export default function AboutPage() {
           <div className="mb-4 flex justify-start text-3xl text-blue-400">
             <Image src={VisionImage} alt="Vision Icon" width={32} height={32} />
           </div>
-          <h3 className="mb-2 text-[16px] font-semibold md:text-[20px]">
+          <h3 className="mb-2 text-xl leading-snug font-semibold sm:text-2xl">
             Vision
           </h3>
           <div className="w-full">
@@ -91,7 +91,7 @@ export default function AboutPage() {
                 <div className="h-4 w-5/6 rounded bg-gray-200"></div>
               </div>
             ) : (
-              <p className="text-sm-[16px] leading-relaxed text-neutral-500">
+              <p className="text-sm leading-relaxed text-neutral-500 sm:text-base">
                 {aboutData.vision}
               </p>
             )}
@@ -108,7 +108,7 @@ export default function AboutPage() {
               height={32}
             />
           </div>
-          <h3 className="mb-2 text-[16px] font-semibold md:text-[20px]">
+          <h3 className="mb-2 text-xl leading-snug font-semibold sm:text-2xl">
             Our Values
           </h3>
           <div className="w-full">
@@ -118,7 +118,7 @@ export default function AboutPage() {
                 <div className="h-4 w-5/6 rounded bg-gray-200"></div>
               </div>
             ) : (
-              <p className="text-sm-[16px] leading-relaxed text-neutral-500">
+              <p className="text-sm leading-relaxed text-neutral-500 sm:text-base">
                 {aboutData.values}
               </p>
             )}
@@ -128,7 +128,7 @@ export default function AboutPage() {
 
       {/* Company Timeline */}
       <section className="w-full px-6 py-1 text-center">
-        <h2 className="mb-12 text-left text-[24px] font-bold md:text-center md:text-[44px]">
+        <h2 className="mb-12 text-left text-2xl leading-tight font-bold sm:text-3xl md:text-center md:text-4xl">
           Company Timeline
         </h2>
 
@@ -155,10 +155,10 @@ export default function AboutPage() {
                 </div>
 
                 <div>
-                  <h4 className="text-left text-lg font-semibold italic">
+                  <h4 className="text-left text-lg font-semibold italic sm:text-xl">
                     {item.year}
                   </h4>
-                  <p className="text-sm leading-relaxed text-neutral-500">
+                  <p className="text-sm leading-relaxed text-neutral-500 sm:text-base">
                     {item.description}
                   </p>
                 </div>
@@ -172,7 +172,7 @@ export default function AboutPage() {
 
       {/* Contact Us */}
       <section className="w-full py-16 text-center">
-        <h2 className="mb-4 text-[24px] font-bold md:text-[44px]">
+        <h2 className="mb-4 text-2xl leading-tight font-bold sm:text-3xl md:text-4xl">
           Contact Us
         </h2>
         {/* Address and Email Display if needed, or simple social links */}

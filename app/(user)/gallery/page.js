@@ -92,10 +92,10 @@ export default function GalleryPage() {
     <main className="mt-32 flex min-h-screen w-full flex-col items-center px-4 py-10 sm:px-6">
       <div className="flex w-full max-w-6xl flex-col">
         <header className="flex w-full flex-col items-center gap-3 text-center">
-          <h1 className="text-[48px] leading-[60px] font-bold tracking-[-1%] text-black sm:text-[60px] sm:leading-[72px]">
+          <h1 className="text-3xl leading-tight font-bold tracking-tight text-black sm:text-4xl md:text-5xl lg:text-6xl">
             Gallery & Field Activities
           </h1>
-          <p className="max-w-[900px] text-[18px] leading-[28px] tracking-[-1%] text-[#7C7C7C] sm:text-[24px] sm:leading-[32px]">
+          <p className="max-w-[900px] text-sm leading-relaxed tracking-normal text-[#7C7C7C] sm:text-base">
             Collection of photos and videos showcasing laboratory activities,
             field research, seminars, and workshops organized by our team.
           </p>
@@ -128,13 +128,13 @@ export default function GalleryPage() {
               <div className="flex gap-6">
                 <button
                   onClick={() => setTab('photos')}
-                  className={`cursor-pointer pb-1 text-lg ${tab === 'photos' ? 'border-b-2 border-black font-semibold' : 'text-gray-500'}`}
+                  className={`cursor-pointer pb-1 text-base sm:text-lg ${tab === 'photos' ? 'border-b-2 border-black font-semibold' : 'text-gray-500'}`}
                 >
                   Photos
                 </button>
                 <button
                   onClick={() => setTab('videos')}
-                  className={`cursor-pointer pb-1 text-lg ${tab === 'videos' ? 'border-b-2 border-black font-semibold' : 'text-gray-500'}`}
+                  className={`cursor-pointer pb-1 text-base sm:text-lg ${tab === 'videos' ? 'border-b-2 border-black font-semibold' : 'text-gray-500'}`}
                 >
                   Videos
                 </button>

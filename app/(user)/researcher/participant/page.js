@@ -136,10 +136,10 @@ export default function TeamSection() {
     <section className="bg-bgMain mt-32 flex justify-center px-4 py-12 sm:px-6">
       <div className="w-full max-w-6xl">
         <header className="flex w-full flex-col items-center gap-2 text-center sm:gap-3">
-          <h1 className="text-2xl font-bold tracking-tight text-black sm:text-3xl md:text-4xl lg:text-5xl">
+          <h1 className="text-3xl leading-tight font-bold tracking-tight text-black sm:text-4xl md:text-5xl lg:text-6xl">
             Researchers
           </h1>
-          <p className="max-w-[900px] text-sm text-gray-600 sm:text-base md:text-lg lg:text-xl">
+          <p className="max-w-[900px] text-sm leading-relaxed text-gray-600 sm:text-base">
             Meet our dedicated researchers who are passionate about pushing the
             boundaries of knowledge and making a positive impact on society.
           </p>

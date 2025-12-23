@@ -128,11 +128,11 @@ export default function DetailProject() {
               <div
                 className={`h-2 w-2 rounded-full ${getStatusColor(project.status)}`}
               />
-              <div className="text-xs font-normal text-zinc-800 sm:text-sm lg:text-base">
+              <div className="text-xs font-normal text-zinc-800 sm:text-sm">
                 {getStatusText(project.status)}
               </div>
             </div>
-            <div className="text-xs font-normal text-zinc-800 sm:text-sm lg:text-base">
+            <div className="text-xs font-normal text-zinc-800 sm:text-sm">
               {project.year || 'N/A'}
             </div>
           </div>
@@ -140,13 +140,13 @@ export default function DetailProject() {
 
         {/* Title and Info */}
         <div className="flex w-full max-w-full flex-col items-start justify-center gap-1 break-words sm:gap-2 md:gap-3">
-          <div className="text-xl leading-tight font-bold text-black sm:text-2xl md:text-3xl">
+          <div className="text-3xl leading-tight font-bold text-black sm:text-4xl md:text-5xl">
             {project.title}
           </div>
-          <div className="text-sm font-medium text-black sm:text-base md:text-lg">
+          <div className="text-sm font-medium text-black sm:text-base">
             {project.principalInvestigator || 'N/A'}
           </div>
-          <div className="text-sm font-medium text-[#2497a9] sm:text-base md:text-lg">
+          <div className="text-sm font-medium text-[#2497a9] sm:text-base">
             {project.researcherCategory || 'N/A'}
           </div>
         </div>
@@ -167,7 +167,7 @@ export default function DetailProject() {
             <h3 className="mb-3 text-lg font-bold text-black sm:text-xl">
               Research Results / Outcomes
             </h3>
-            <div className="prose prose-sm md:prose-base w-full max-w-none overflow-hidden break-words text-zinc-700">
+            <div className="prose prose-sm sm:prose-base w-full max-w-none overflow-hidden break-words text-zinc-700">
               <div dangerouslySetInnerHTML={{ __html: project.results }} />
             </div>
           </div>
@@ -176,7 +176,7 @@ export default function DetailProject() {
         {/* Images Grid */}
         {project.media && project.media.length > 0 && (
           <div className="relative mt-8 w-full">
-            <h3 className="mb-4 text-lg font-bold text-black">
+            <h3 className="mb-4 text-lg font-bold text-black sm:text-xl">
               Supporting Documents
             </h3>
             <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">

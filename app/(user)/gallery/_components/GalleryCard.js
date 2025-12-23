@@ -35,7 +35,7 @@ export function GalleryCard({
         {texts.map((t, index) => (
           <p
             key={index}
-            className={`${t.bold ? 'font-bold text-black' : 'text-gray-600'} ${t.size === 'large' ? 'text-lg' : 'text-sm'} ${index === 0 ? 'group-hover:text-primaryGradientEnd transition-colors duration-300 ease-out' : ''}`}
+            className={`${t.bold ? 'leading-tight font-bold text-black' : 'leading-normal text-gray-600'} ${t.size === 'large' ? 'text-lg sm:text-xl' : 'text-sm sm:text-base'} ${index === 0 ? 'group-hover:text-primaryGradientEnd transition-colors duration-300 ease-out' : ''}`}
           >
             {t.text}
           </p>
@@ -125,20 +125,20 @@ export function PhotoModal({ cards = [], index = 0, onClose, setIndex }) {
             </div>
 
             <div className="mt-6 flex flex-col gap-3 text-left">
-              <h2 className="text-2xl leading-tight font-bold text-gray-900 sm:text-3xl">
+              <h2 className="text-2xl leading-tight font-bold text-gray-900 sm:text-3xl md:text-4xl">
                 {card?.title || 'Untitled Photo'}
               </h2>
 
               <div className="flex flex-wrap items-center gap-3">
-                <span className="rounded-full bg-[#2497A9]/10 px-3 py-1 text-sm font-semibold text-[#2497A9]">
+                <span className="rounded-full bg-[#2497A9]/10 px-3 py-1 text-xs font-semibold text-[#2497A9] sm:text-sm">
                   {card?.typeLabel || 'Activity'}
                 </span>
-                <span className="text-sm text-gray-500">
+                <span className="text-xs text-gray-500 sm:text-sm">
                   {card?.date || ''}
                 </span>
               </div>
 
-              <p className="text-base leading-relaxed text-gray-600 sm:text-lg">
+              <p className="text-sm leading-relaxed text-gray-600 sm:text-base">
                 {card?.description || ''}
               </p>
             </div>
@@ -212,20 +212,20 @@ export function VideoModal({ index, data, onClose }) {
             </div>
 
             <div className="mt-6 flex flex-col gap-3 text-left">
-              <h2 className="text-2xl leading-tight font-bold text-gray-900 sm:text-3xl">
+              <h2 className="text-2xl leading-tight font-bold text-gray-900 sm:text-3xl md:text-4xl">
                 {data.title || 'Untitled Video'}
               </h2>
 
               <div className="flex flex-wrap items-center gap-3">
-                <span className="rounded-full bg-[#2497A9]/10 px-3 py-1 text-sm font-semibold text-[#2497A9]">
+                <span className="rounded-full bg-[#2497A9]/10 px-3 py-1 text-xs font-semibold text-[#2497A9] sm:text-sm">
                   {data.activityType || 'Video'}
                 </span>
-                <span className="text-sm text-gray-500">
+                <span className="text-xs text-gray-500 sm:text-sm">
                   {data.date ? new Date(data.date).toLocaleDateString() : ''}
                 </span>
               </div>
 
-              <p className="text-base leading-relaxed text-gray-600 sm:text-lg">
+              <p className="text-sm leading-relaxed text-gray-600 sm:text-base">
                 {data.description || ''}
               </p>
             </div>

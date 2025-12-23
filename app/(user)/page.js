@@ -168,10 +168,10 @@ export default function Home() {
 
           {/* Title + Description */}
           <div className="flex flex-col gap-2 [text-shadow:_0_2px_10px_rgb(255_255_255_/_30%)] sm:gap-4">
-            <h1 className="text-2xl leading-tight font-bold sm:text-3xl md:text-4xl lg:text-6xl">
+            <h1 className="text-3xl leading-tight font-bold sm:text-4xl md:text-5xl lg:text-6xl">
               Silicon Zero-Emission Recycling, Refining and Production
             </h1>
-            <p className="mx-auto max-w-2xl text-xs font-medium text-[#656565] sm:text-sm md:text-base lg:text-lg">
+            <p className="mx-auto max-w-2xl text-sm leading-relaxed font-normal text-[#656565] sm:text-base">
               Brief paragraph summarizing what this platform is, who the users
               are, and the main reasons why this platform matters to them.
             </p>
@@ -200,10 +200,10 @@ export default function Home() {
           {/* Who Are We */}
           <div className="flex max-w-6xl flex-col items-center gap-4 text-center sm:gap-8">
             <div className="flex flex-col gap-2 sm:gap-4">
-              <h1 className="text-2xl leading-tight font-bold sm:text-3xl md:text-4xl lg:text-6xl">
+              <h2 className="text-2xl leading-tight font-bold sm:text-3xl md:text-4xl">
                 Who We Are
-              </h1>
-              <p className="max-w-3xl text-xs text-black/50 sm:text-sm md:text-base lg:text-xl">
+              </h2>
+              <p className="max-w-3xl text-sm leading-relaxed text-black/50 sm:text-base">
                 Si-ZERO is a global sustainability initiative led by Swinburne
                 University of Technology, bringing together partners across
                 Australia, India, Indonesia, and the United States to advance a
@@ -222,9 +222,9 @@ export default function Home() {
           {/* What We Do */}
           <div className="mt-14 flex w-full flex-col items-center gap-4 text-center sm:gap-8">
             <div>
-              <h1 className="text-grayDark text-xl font-bold sm:text-2xl md:text-3xl lg:text-5xl">
+              <h2 className="text-grayDark text-2xl leading-tight font-bold sm:text-3xl md:text-4xl">
                 What We Do
-              </h1>
+              </h2>
             </div>
             <div className="w-full space-y-6 sm:space-y-8">
               <div className="mx-auto grid w-full max-w-6xl grid-cols-1 justify-center gap-x-8 gap-y-7 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-10 lg:grid-cols-2 lg:gap-x-8 lg:gap-y-12">
@@ -295,9 +295,9 @@ export default function Home() {
           {/* Latest Events */}
           <div className="flex w-full flex-col items-center gap-4 text-center sm:gap-8">
             <div>
-              <h1 className="text-grayDark text-xl font-bold sm:text-2xl md:text-3xl lg:text-5xl">
+              <h2 className="text-grayDark text-2xl leading-tight font-bold sm:text-3xl md:text-4xl">
                 Latest Gallery
-              </h1>
+              </h2>
             </div>
             <div className="w-full space-y-6 sm:space-y-8">
               <div className="mx-auto grid w-full max-w-6xl grid-cols-1 justify-center gap-x-7 gap-y-7 sm:grid-cols-2 sm:gap-x-8 sm:gap-y-10 md:grid-cols-3 lg:grid-cols-3 lg:gap-x-10 lg:gap-y-12">
@@ -317,9 +317,9 @@ export default function Home() {
           </div>
           <div className="flex w-full flex-col items-center gap-4 py-8 text-center sm:gap-8">
             <div>
-              <h1 className="text-grayDark text-xl font-bold sm:text-2xl md:text-3xl lg:text-5xl">
+              <h2 className="text-grayDark text-2xl leading-tight font-bold sm:text-3xl md:text-4xl">
                 Latest News
-              </h1>
+              </h2>
             </div>
             <div className="w-full space-y-6 sm:space-y-8">
               <div className="mx-auto grid w-full max-w-6xl grid-cols-1 justify-center gap-x-7 gap-y-7 sm:grid-cols-2 sm:gap-x-8 sm:gap-y-10 md:grid-cols-3 lg:grid-cols-3 lg:gap-x-10 lg:gap-y-12">
