@@ -7,7 +7,9 @@ import dynamic from 'next/dynamic';
 // Dynamic import for ReactQuill to avoid SSR issues
 const ReactQuill = dynamic(() => import('react-quill-new'), {
   ssr: false,
-  loading: () => <div className="h-[200px] w-full animate-pulse rounded-xl bg-gray-100" />
+  loading: () => (
+    <div className="h-[200px] w-full animate-pulse rounded-xl bg-gray-100" />
+  ),
 });
 import 'react-quill-new/dist/quill.snow.css';
 
@@ -27,7 +29,7 @@ function FormField({
       {description && (
         <span className="text-xs text-gray-400">{description}</span>
       )}
-      <div className="flex h-[44px] w-full items-center gap-[10px] rounded-[12px] border border-gray-300 px-4 py-3 bg-white">
+      <div className="flex h-[44px] w-full items-center gap-[10px] rounded-[12px] border border-gray-300 bg-white px-4 py-3">
         <input
           type={type}
           placeholder={placeholder}
@@ -115,9 +117,9 @@ export default function ResearchProjectManagement() {
     try {
       toast.loading('Uploading images...', { id: 'upload' });
       const uploadedUrls = await Promise.all(uploadPromises);
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        images: [...prev.images, ...uploadedUrls]
+        images: [...prev.images, ...uploadedUrls],
       }));
       toast.success('Images uploaded successfully', { id: 'upload' });
     } catch (error) {
@@ -127,9 +129,9 @@ export default function ResearchProjectManagement() {
   };
 
   const removeImage = (index) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      images: prev.images.filter((_, i) => i !== index)
+      images: prev.images.filter((_, i) => i !== index),
     }));
   };
 
@@ -228,7 +230,7 @@ export default function ResearchProjectManagement() {
           : '',
         description: project.description || '',
         outputs: project.results || '',
-        images: project.media ? project.media.map(m => m.url) : [],
+        images: project.media ? project.media.map((m) => m.url) : [],
       });
     } else {
       setFormData({
@@ -264,10 +266,10 @@ export default function ResearchProjectManagement() {
       <div className="flex w-full max-w-full flex-col gap-6">
         {/* Header */}
         <div className="flex w-full flex-col gap-4">
-          <h1 className="text-2xl font-hanken leading-8 font-semibold tracking-tight">
+          <h1 className="font-hanken text-2xl leading-8 font-semibold tracking-tight">
             Research Projects
           </h1>
-          <div className="flex h-[52px] w-full max-w-md items-center gap-2 rounded-[16px] border border-gray-300 px-4 bg-white">
+          <div className="flex h-[52px] w-full max-w-md items-center gap-2 rounded-[16px] border border-gray-300 bg-white px-4">
             <input
               type="text"
               placeholder="Search projects..."
@@ -285,25 +287,27 @@ export default function ResearchProjectManagement() {
             <select
               value={specificYear}
               onChange={(e) => setSpecificYear(e.target.value)}
-              className="h-[44px] w-[140px] rounded-[12px] border border-gray-300 px-4 text-sm outline-none bg-white font-medium"
+              className="h-[44px] w-[140px] rounded-[12px] border border-gray-300 bg-white px-4 text-sm font-medium outline-none"
             >
               <option value="">All Years</option>
-              {[2025, 2024, 2023, 2022, 2021].map(y => (
-                <option key={y} value={y.toString()}>{y}</option>
+              {[2025, 2024, 2023, 2022, 2021].map((y) => (
+                <option key={y} value={y.toString()}>
+                  {y}
+                </option>
               ))}
             </select>
           </div>
 
           <button
             onClick={() => openModal()}
-            className="h-[44px] rounded-[12px] bg-[#2AB2C7] px-8 font-semibold text-white transition-all hover:opacity-90 active:scale-95 shadow-sm"
+            className="h-[44px] rounded-[12px] bg-[#2AB2C7] px-8 font-semibold text-white shadow-sm transition-all hover:opacity-90 active:scale-95"
           >
             Add New Project +
           </button>
         </div>
 
         {/* Table */}
-        <div className="w-full overflow-hidden rounded-[20px] border border-gray-200 bg-white shadow-sm overflow-x-auto">
+        <div className="w-full overflow-hidden overflow-x-auto rounded-[20px] border border-gray-200 bg-white shadow-sm">
           <div className="grid min-w-[900px] grid-cols-[2fr_1fr_1.5fr_1.5fr_1fr_1fr] border-b border-gray-200 bg-gray-50/50 px-6 py-4 text-sm font-bold text-gray-700">
             <span>Project Title</span>
             <span>Year</span>
@@ -315,27 +319,57 @@ export default function ResearchProjectManagement() {
 
           <div className="flex flex-col">
             {loading ? (
-              <div className="flex items-center justify-center py-20">
-                <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#2AB2C7] border-t-transparent" />
+              <div className="animate-pulse">
+                {[...Array(5)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="grid min-w-[900px] grid-cols-[2fr_1fr_1.5fr_1.5fr_1fr_1fr] items-center border-b border-gray-100 px-6 py-5"
+                  >
+                    <div className="h-5 w-48 rounded bg-gray-200" />
+                    <div className="h-4 w-12 rounded bg-gray-200" />
+                    <div className="h-4 w-24 rounded bg-gray-200" />
+                    <div className="h-4 w-28 rounded bg-gray-200" />
+                    <div className="flex items-center gap-2">
+                      <div className="h-2.5 w-2.5 rounded-full bg-gray-200" />
+                      <div className="h-4 w-16 rounded bg-gray-200" />
+                    </div>
+                    <div className="flex items-center justify-end gap-5">
+                      <div className="h-5 w-5 rounded bg-gray-200" />
+                      <div className="h-5 w-5 rounded bg-gray-200" />
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : filteredProjects.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 text-gray-500">
-                <span className="text-4xl mb-4"></span>
+                <span className="mb-4 text-4xl"></span>
                 <p>No projects found matching your criteria.</p>
               </div>
             ) : (
               filteredProjects.map((project) => (
                 <div
                   key={project.id}
-                  className="grid min-w-[900px] grid-cols-[2fr_1fr_1.5fr_1.5fr_1fr_1fr] items-center px-6 py-5 border-b border-gray-100 hover:bg-gray-50/80 transition-colors"
+                  className="grid min-w-[900px] grid-cols-[2fr_1fr_1.5fr_1.5fr_1fr_1fr] items-center border-b border-gray-100 px-6 py-5 transition-colors hover:bg-gray-50/80"
                 >
-                  <span className="text-sm font-bold text-gray-900 line-clamp-2 pr-4">{project.title}</span>
-                  <span className="text-sm text-gray-600">{project.year || '-'}</span>
-                  <span className="text-sm text-gray-600 truncate pr-4">{project.principalInvestigator || '-'}</span>
-                  <span className="text-sm text-gray-600">{project.researcherCategory || '-'}</span>
+                  <span className="line-clamp-2 pr-4 text-sm font-bold text-gray-900">
+                    {project.title}
+                  </span>
+                  <span className="text-sm text-gray-600">
+                    {project.year || '-'}
+                  </span>
+                  <span className="truncate pr-4 text-sm text-gray-600">
+                    {project.principalInvestigator || '-'}
+                  </span>
+                  <span className="text-sm text-gray-600">
+                    {project.researcherCategory || '-'}
+                  </span>
                   <div className="flex items-center gap-2">
-                    <span className={`h-2.5 w-2.5 rounded-full ${getStatusColor(project.status)}`} />
-                    <span className="text-sm font-medium capitalize text-gray-700">{project.status || 'upcoming'}</span>
+                    <span
+                      className={`h-2.5 w-2.5 rounded-full ${getStatusColor(project.status)}`}
+                    />
+                    <span className="text-sm font-medium text-gray-700 capitalize">
+                      {project.status || 'upcoming'}
+                    </span>
                   </div>
                   <div className="flex items-center justify-end gap-5">
                     <Image
@@ -343,7 +377,7 @@ export default function ResearchProjectManagement() {
                       alt="Edit"
                       width={20}
                       height={20}
-                      className="cursor-pointer hover:scale-110 transition-transform"
+                      className="cursor-pointer transition-transform hover:scale-110"
                       onClick={() => openModal(project)}
                     />
                     <Image
@@ -351,7 +385,7 @@ export default function ResearchProjectManagement() {
                       alt="Delete"
                       width={20}
                       height={20}
-                      className="cursor-pointer hover:scale-110 transition-transform"
+                      className="cursor-pointer transition-transform hover:scale-110"
                       onClick={() => handleDelete(project.id)}
                     />
                   </div>
@@ -365,19 +399,24 @@ export default function ResearchProjectManagement() {
       {/* Slide-over Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex justify-end">
-          <div className="absolute inset-0 bg-black/20 backdrop-blur-sm transition-opacity" onClick={() => setIsModalOpen(false)} />
+          <div
+            className="absolute inset-0 bg-black/20 backdrop-blur-sm transition-opacity"
+            onClick={() => setIsModalOpen(false)}
+          />
 
-          <div className="relative h-full w-full max-w-[1100px] bg-white shadow-2xl transition-transform duration-300 overflow-hidden flex flex-col">
+          <div className="relative flex h-full w-full max-w-[1100px] flex-col overflow-hidden bg-white shadow-2xl transition-transform duration-300">
             {/* Header */}
-            <div className="flex h-[80px] items-center border-b border-gray-200 px-8 flex-shrink-0">
+            <div className="flex h-[80px] flex-shrink-0 items-center border-b border-gray-200 px-8">
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="mr-4 flex h-8 w-8 items-center justify-center rounded-full bg-zinc-100 text-xl hover:bg-zinc-200 transition-colors"
+                className="mr-4 flex h-8 w-8 items-center justify-center rounded-full bg-zinc-100 text-xl transition-colors hover:bg-zinc-200"
               >
                 ←
               </button>
-              <h2 className="text-2xl font-bold font-hanken">
-                {currentProject ? 'Edit Research Project' : 'Add New Research Project'}
+              <h2 className="font-hanken text-2xl font-bold">
+                {currentProject
+                  ? 'Edit Research Project'
+                  : 'Add New Research Project'}
               </h2>
             </div>
 
@@ -391,30 +430,42 @@ export default function ResearchProjectManagement() {
                     description="The full official title of the research project."
                     placeholder="Enter project title"
                     value={formData.projectTitle}
-                    onChange={(e) => setFormData({ ...formData, projectTitle: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, projectTitle: e.target.value })
+                    }
                   />
 
                   <div className="grid grid-cols-2 gap-6">
                     <div className="flex flex-col gap-2">
-                      <label className="text-sm font-bold text-gray-700">Project Year</label>
+                      <label className="text-sm font-bold text-gray-700">
+                        Project Year
+                      </label>
                       <select
                         value={formData.year}
-                        onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-                        className="h-[44px] w-full rounded-[12px] border border-gray-300 px-4 text-sm outline-none bg-white"
+                        onChange={(e) =>
+                          setFormData({ ...formData, year: e.target.value })
+                        }
+                        className="h-[44px] w-full rounded-[12px] border border-gray-300 bg-white px-4 text-sm outline-none"
                       >
                         <option value="">Select Year</option>
-                        {[2025, 2024, 2023, 2022, 2021].map(y => (
-                          <option key={y} value={y.toString()}>{y}</option>
+                        {[2025, 2024, 2023, 2022, 2021].map((y) => (
+                          <option key={y} value={y.toString()}>
+                            {y}
+                          </option>
                         ))}
                       </select>
                     </div>
 
                     <div className="flex flex-col gap-2">
-                      <label className="text-sm font-bold text-gray-700">Status</label>
+                      <label className="text-sm font-bold text-gray-700">
+                        Status
+                      </label>
                       <select
                         value={formData.status}
-                        onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                        className="h-[44px] w-full rounded-[12px] border border-gray-300 px-4 text-sm outline-none bg-white"
+                        onChange={(e) =>
+                          setFormData({ ...formData, status: e.target.value })
+                        }
+                        className="h-[44px] w-full rounded-[12px] border border-gray-300 bg-white px-4 text-sm outline-none"
                       >
                         <option value="">Select Status</option>
                         <option value="Ongoing">Ongoing</option>
@@ -429,32 +480,51 @@ export default function ResearchProjectManagement() {
                     description="Lead researcher responsible for the project."
                     placeholder="Enter name"
                     value={formData.principalInvestigator}
-                    onChange={(e) => setFormData({ ...formData, principalInvestigator: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        principalInvestigator: e.target.value,
+                      })
+                    }
                   />
 
                   <div className="flex flex-col gap-2">
-                    <label className="text-sm font-bold text-gray-700">Researcher Category</label>
+                    <label className="text-sm font-bold text-gray-700">
+                      Researcher Category
+                    </label>
                     <select
                       value={formData.category}
-                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                      className="h-[44px] w-full rounded-[12px] border border-gray-300 px-4 text-sm outline-none bg-white"
+                      onChange={(e) =>
+                        setFormData({ ...formData, category: e.target.value })
+                      }
+                      className="h-[44px] w-full rounded-[12px] border border-gray-300 bg-white px-4 text-sm outline-none"
                     >
                       <option value="">Category</option>
                       <option value="Supervisor">Supervisor</option>
                       <option value="Master's Student">Masters Student</option>
-                      <option value="Undergraduate Student">Undergraduate Student</option>
-                      <option value="Alumni Researchers">Alumni Researchers</option>
+                      <option value="Undergraduate Student">
+                        Undergraduate Student
+                      </option>
+                      <option value="Alumni Researchers">
+                        Alumni Researchers
+                      </option>
                     </select>
                   </div>
 
                   <div className="flex flex-col gap-2">
-                    <label className="text-sm font-bold text-gray-700">Description</label>
-                    <span className="text-xs text-gray-400">Detailed overview of goals and methods.</span>
+                    <label className="text-sm font-bold text-gray-700">
+                      Description
+                    </label>
+                    <span className="text-xs text-gray-400">
+                      Detailed overview of goals and methods.
+                    </span>
                     <div className="min-h-[250px] overflow-hidden rounded-xl border border-gray-300 bg-white">
                       <ReactQuill
                         theme="snow"
                         value={formData.description}
-                        onChange={(val) => setFormData({ ...formData, description: val })}
+                        onChange={(val) =>
+                          setFormData({ ...formData, description: val })
+                        }
                         modules={QUILL_MODULES}
                         className="h-full"
                       />
@@ -465,13 +535,19 @@ export default function ResearchProjectManagement() {
                 {/* Right Column */}
                 <div className="flex flex-col gap-8">
                   <div className="flex flex-col gap-2">
-                    <label className="text-sm font-bold text-gray-700">Research Outputs</label>
-                    <span className="text-xs text-gray-400">Summarize key findings and results.</span>
+                    <label className="text-sm font-bold text-gray-700">
+                      Research Outputs
+                    </label>
+                    <span className="text-xs text-gray-400">
+                      Summarize key findings and results.
+                    </span>
                     <div className="min-h-[250px] overflow-hidden rounded-xl border border-gray-300 bg-white">
                       <ReactQuill
                         theme="snow"
                         value={formData.outputs}
-                        onChange={(val) => setFormData({ ...formData, outputs: val })}
+                        onChange={(val) =>
+                          setFormData({ ...formData, outputs: val })
+                        }
                         modules={QUILL_MODULES}
                         className="h-full"
                       />
@@ -480,14 +556,18 @@ export default function ResearchProjectManagement() {
 
                   {/* Supporting Documents / Image Upload */}
                   <div className="flex flex-col gap-3">
-                    <label className="text-sm font-bold text-gray-700">Supporting Documents (Images)</label>
+                    <label className="text-sm font-bold text-gray-700">
+                      Supporting Documents (Images)
+                    </label>
                     <div
                       onClick={() => fileInputRef.current?.click()}
                       className="flex h-[180px] cursor-pointer flex-col items-center justify-center gap-3 rounded-[20px] border-2 border-dashed border-gray-300 bg-gray-50 transition-colors hover:bg-gray-100"
                     >
                       <span className="text-3xl"></span>
-                      <p className="text-xs text-gray-500 font-medium">Click to upload project images (JPG, PNG)</p>
-                      <button className="rounded-lg bg-white border border-gray-300 px-4 py-1.5 text-xs font-bold text-gray-700 shadow-sm">
+                      <p className="text-xs font-medium text-gray-500">
+                        Click to upload project images (JPG, PNG)
+                      </p>
+                      <button className="rounded-lg border border-gray-300 bg-white px-4 py-1.5 text-xs font-bold text-gray-700 shadow-sm">
                         Select Files
                       </button>
                     </div>
@@ -501,13 +581,24 @@ export default function ResearchProjectManagement() {
                     />
 
                     {/* Image Preview Grid */}
-                    <div className="grid grid-cols-3 gap-4 mt-2">
+                    <div className="mt-2 grid grid-cols-3 gap-4">
                       {formData.images.map((url, idx) => (
-                        <div key={idx} className="group relative aspect-video rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm">
-                          <Image src={url} alt={`Media ${idx}`} fill className="object-cover" />
+                        <div
+                          key={idx}
+                          className="group relative aspect-video overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm"
+                        >
+                          <Image
+                            src={url}
+                            alt={`Media ${idx}`}
+                            fill
+                            className="object-cover"
+                          />
                           <button
-                            onClick={(e) => { e.stopPropagation(); removeImage(idx); }}
-                            className="absolute right-2 top-2 h-6 w-6 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              removeImage(idx);
+                            }}
+                            className="absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white opacity-0 transition-opacity group-hover:opacity-100"
                           >
                             ×
                           </button>
@@ -520,10 +611,10 @@ export default function ResearchProjectManagement() {
             </div>
 
             {/* Footer */}
-            <div className="flex h-[100px] items-center justify-end gap-4 border-t border-gray-200 px-8 flex-shrink-0 bg-gray-50">
+            <div className="flex h-[100px] flex-shrink-0 items-center justify-end gap-4 border-t border-gray-200 bg-gray-50 px-8">
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="h-[52px] min-w-[140px] rounded-xl border border-gray-300 bg-white font-bold text-gray-600 hover:bg-gray-100 transition-colors"
+                className="h-[52px] min-w-[140px] rounded-xl border border-gray-300 bg-white font-bold text-gray-600 transition-colors hover:bg-gray-100"
                 disabled={saving}
               >
                 Cancel
@@ -535,8 +626,10 @@ export default function ResearchProjectManagement() {
               >
                 {saving ? (
                   <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                ) : currentProject ? (
+                  'Update Project'
                 ) : (
-                  currentProject ? 'Update Project' : 'Save Project'
+                  'Save Project'
                 )}
               </button>
             </div>

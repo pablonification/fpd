@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 export default function Card({
   imageSrc,
   imageAlt = 'Card Image',
@@ -8,11 +10,20 @@ export default function Card({
     <div className={`flex w-full flex-col items-start ${className}`}>
       {/* Gambar */}
       {imageSrc && (
-        <img
-          src={imageSrc}
-          alt={imageAlt}
-          className="h-48 w-full rounded-xl object-cover sm:h-60"
-        />
+        <div className="relative h-48 w-full overflow-hidden rounded-xl sm:h-60">
+          <Image
+            src={imageSrc}
+            alt={imageAlt}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
+            className="object-cover"
+            unoptimized={
+              imageSrc.includes('youtube.com') ||
+              imageSrc.includes('gstatic.com') ||
+              imageSrc.includes('picsum.photos')
+            }
+          />
+        </div>
       )}
 
       {/* Konten teks */}

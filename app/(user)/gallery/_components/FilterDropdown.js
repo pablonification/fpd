@@ -1,8 +1,34 @@
-import { useState } from 'react';
+'use client';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function FilterDropdown({ tab, filter, setFilter }) {
   const [open, setOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setOpen(false);
+      }
+    };
+
+    if (open) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleKeyDown);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [open]);
 
   const photoOptions = ['Laboratory Activities', 'Field Research'];
   const videoOptions = ['Workshops', 'Seminars', 'Experiments'];
@@ -19,10 +45,20 @@ export default function FilterDropdown({ tab, filter, setFilter }) {
   };
 
   return (
-    <div className="relative">
+    <div className="relative" ref={dropdownRef}>
       <div
+        role="button"
+        tabIndex={0}
+        aria-haspopup="listbox"
+        aria-expanded={open}
         onClick={() => setOpen(!open)}
-        className="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-gray-700 select-none hover:opacity-90"
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setOpen(!open);
+          }
+        }}
+        className="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-gray-700 select-none hover:opacity-90 focus:ring-2 focus:ring-gray-300 focus:outline-none"
       >
         <span>{filter === 'All' ? 'Activity type' : filter}</span>
         <img
@@ -41,12 +77,21 @@ export default function FilterDropdown({ tab, filter, setFilter }) {
             transition={{ duration: 0.25, ease: 'easeOut' }}
             className="absolute right-0 z-30 mt-2 w-56 rounded-lg border border-gray-300 bg-white shadow-md"
           >
-            <ul className="flex flex-col text-gray-700">
+            <ul className="flex flex-col text-gray-700" role="listbox">
               {options.map((opt) => (
                 <li
                   key={opt}
+                  role="option"
+                  aria-selected={filter === opt}
+                  tabIndex={0}
                   onClick={() => handleSelect(opt)}
-                  className="cursor-pointer rounded-md px-4 py-2 hover:bg-gray-100"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleSelect(opt);
+                    }
+                  }}
+                  className="cursor-pointer rounded-md px-4 py-2 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
                 >
                   {opt}
                 </li>

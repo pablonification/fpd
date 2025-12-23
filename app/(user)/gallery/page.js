@@ -90,7 +90,7 @@ export default function GalleryPage() {
 
   return (
     <main className="mt-32 flex min-h-screen w-full flex-col items-center px-4 py-10 sm:px-6">
-      <div className="flex w-full max-w-7xl flex-col">
+      <div className="flex w-full max-w-6xl flex-col">
         <header className="flex w-full flex-col items-center gap-3 text-center">
           <h1 className="text-[48px] leading-[60px] font-bold tracking-[-1%] text-black sm:text-[60px] sm:leading-[72px]">
             Gallery & Field Activities
@@ -128,13 +128,13 @@ export default function GalleryPage() {
               <div className="flex gap-6">
                 <button
                   onClick={() => setTab('photos')}
-                  className={`pb-1 text-lg ${tab === 'photos' ? 'border-b-2 border-black font-semibold' : 'text-gray-500'}`}
+                  className={`cursor-pointer pb-1 text-lg ${tab === 'photos' ? 'border-b-2 border-black font-semibold' : 'text-gray-500'}`}
                 >
                   Photos
                 </button>
                 <button
                   onClick={() => setTab('videos')}
-                  className={`pb-1 text-lg ${tab === 'videos' ? 'border-b-2 border-black font-semibold' : 'text-gray-500'}`}
+                  className={`cursor-pointer pb-1 text-lg ${tab === 'videos' ? 'border-b-2 border-black font-semibold' : 'text-gray-500'}`}
                 >
                   Videos
                 </button>

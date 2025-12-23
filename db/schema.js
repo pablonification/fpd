@@ -54,7 +54,9 @@ export const projects = pgTable('projects', {
 
 export const projectMedia = pgTable('project_media', {
   id: serial('id').primaryKey(),
-  projectId: integer('project_id').references(() => projects.id, { onDelete: 'cascade' }),
+  projectId: integer('project_id').references(() => projects.id, {
+    onDelete: 'cascade',
+  }),
   url: text('url').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
@@ -140,6 +142,7 @@ export const galleryItems = pgTable('gallery_items', {
   type: mediaTypeEnum('media_type_column').notNull(),
   mediaUrl: text('media_url').notNull(),
   description: text('description'),
+  category: varchar('category', { length: 100 }),
   activityDate: timestamp('activity_date'),
 
   createdAt: timestamp('created_at').defaultNow().notNull(),

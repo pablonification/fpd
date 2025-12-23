@@ -51,7 +51,7 @@ export default function AboutPage() {
   }, []);
 
   return (
-    <main className="mt-42 flex w-full max-w-7xl flex-col items-center gap-12 px-4 pb-20 sm:px-6 mx-auto text-[14px] md:text-[14px]">
+    <main className="mx-auto mt-42 flex w-full max-w-6xl flex-col items-center gap-12 px-4 pb-20 text-[14px] sm:px-6 md:text-[14px]">
       {/* About Us */}
       <section className="w-full text-left md:text-center">
         <header className="flex w-full flex-col items-center gap-3 text-center">
@@ -60,7 +60,7 @@ export default function AboutPage() {
           </h1>
           <div className="w-full max-w-[900px]">
             {loading ? (
-              <div className="flex w-full flex-col items-center gap-2 animate-pulse">
+              <div className="flex w-full animate-pulse flex-col items-center gap-2">
                 <div className="h-4 w-full rounded bg-gray-200"></div>
                 <div className="h-4 w-full rounded bg-gray-200"></div>
                 <div className="h-4 w-3/4 rounded bg-gray-200"></div>
@@ -86,7 +86,7 @@ export default function AboutPage() {
           </h3>
           <div className="w-full">
             {loading ? (
-              <div className="flex flex-col gap-2 animate-pulse">
+              <div className="flex animate-pulse flex-col gap-2">
                 <div className="h-4 w-full rounded bg-gray-200"></div>
                 <div className="h-4 w-5/6 rounded bg-gray-200"></div>
               </div>
@@ -113,7 +113,7 @@ export default function AboutPage() {
           </h3>
           <div className="w-full">
             {loading ? (
-              <div className="flex flex-col gap-2 animate-pulse">
+              <div className="flex animate-pulse flex-col gap-2">
                 <div className="h-4 w-full rounded bg-gray-200"></div>
                 <div className="h-4 w-5/6 rounded bg-gray-200"></div>
               </div>
@@ -133,7 +133,7 @@ export default function AboutPage() {
         </h2>
 
         {loading ? (
-          <div className="space-y-4 animate-pulse">
+          <div className="animate-pulse space-y-4">
             <div className="h-20 w-full rounded-lg bg-gray-100"></div>
             <div className="h-20 w-full rounded-lg bg-gray-100"></div>
           </div>
@@ -155,7 +155,7 @@ export default function AboutPage() {
                 </div>
 
                 <div>
-                  <h4 className="text-left font-semibold italic text-lg">
+                  <h4 className="text-left text-lg font-semibold italic">
                     {item.year}
                   </h4>
                   <p className="text-sm leading-relaxed text-neutral-500">
@@ -171,17 +171,17 @@ export default function AboutPage() {
       </section>
 
       {/* Contact Us */}
-      <section className="py-16 text-center w-full">
+      <section className="w-full py-16 text-center">
         <h2 className="mb-4 text-[24px] font-bold md:text-[44px]">
           Contact Us
         </h2>
         {/* Address and Email Display if needed, or simple social links */}
-        <p className="mb-8 text-neutral-600 max-w-2xl mx-auto">
+        <p className="mx-auto mb-8 max-w-2xl text-neutral-600">
           {contactData.address} <br />
           <span className="font-semibold">{contactData.email}</span>
         </p>
 
-        <div className="flex justify-center gap-6 flex-wrap">
+        <div className="flex flex-wrap justify-center gap-6">
           {contactData.links && contactData.links.length > 0 ? (
             contactData.links.map((link, i) => (
               <a
@@ -189,7 +189,7 @@ export default function AboutPage() {
                 href={link.startsWith('http') ? link : `https://${link}`}
                 target="_blank"
                 rel="noreferrer"
-                className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 md:h-16 md:w-16 transition"
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-200 text-gray-700 transition hover:bg-gray-300 md:h-16 md:w-16"
                 title={link}
               >
                 {/* Generic Link Icon - could map specific icons for fb/twitter/insta later */}

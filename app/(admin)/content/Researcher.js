@@ -110,7 +110,9 @@ export default function ResearcherForm() {
       setAvatarPreview(URL.createObjectURL(file));
     } else {
       setAvatarFile(null);
-      setAvatarPreview(currentResearcher?.avatarUrl || currentResearcher?.avatar_url || null);
+      setAvatarPreview(
+        currentResearcher?.avatarUrl || currentResearcher?.avatar_url || null
+      );
     }
   };
 
@@ -123,7 +125,8 @@ export default function ResearcherForm() {
     setLoading(true);
     setError(null);
 
-    let avatarUrl = currentResearcher?.avatarUrl || currentResearcher?.avatar_url || null;
+    let avatarUrl =
+      currentResearcher?.avatarUrl || currentResearcher?.avatar_url || null;
 
     if (avatarFile) {
       try {
@@ -163,7 +166,9 @@ export default function ResearcherForm() {
       const data = await response.json();
       if (!data.success) throw new Error(data.error || 'Failed to save');
 
-      toast.success(currentResearcher ? 'Researcher updated!' : 'Researcher created!');
+      toast.success(
+        currentResearcher ? 'Researcher updated!' : 'Researcher created!'
+      );
       closeModal();
       fetchResearchers();
     } catch (err) {
@@ -179,7 +184,9 @@ export default function ResearcherForm() {
 
     setLoading(true);
     try {
-      const response = await fetch(`/api/researchers/${id}`, { method: 'DELETE' });
+      const response = await fetch(`/api/researchers/${id}`, {
+        method: 'DELETE',
+      });
       const data = await response.json();
       if (!data.success) throw new Error(data.error || 'Failed to delete');
 
@@ -201,7 +208,7 @@ export default function ResearcherForm() {
           <h1 className="font-hanken text-2xl leading-8 font-semibold tracking-tight">
             All Researchers
           </h1>
-          <div className="flex h-[52px] w-full max-w-md items-center gap-2 rounded-[16px] border border-gray-300 px-4 bg-white">
+          <div className="flex h-[52px] w-full max-w-md items-center gap-2 rounded-[16px] border border-gray-300 bg-white px-4">
             <input
               type="text"
               placeholder="Search researchers..."
@@ -218,11 +225,13 @@ export default function ResearcherForm() {
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
-            className="h-[44px] w-full rounded-md border border-gray-300 px-4 text-sm md:w-[220px] bg-white"
+            className="h-[44px] w-full rounded-md border border-gray-300 bg-white px-4 text-sm md:w-[220px]"
           >
             <option value="">All Roles</option>
             {RESEARCHER_ROLES.map((role) => (
-              <option key={role} value={role}>{role}</option>
+              <option key={role} value={role}>
+                {role}
+              </option>
             ))}
           </select>
 
@@ -246,13 +255,33 @@ export default function ResearcherForm() {
           </div>
 
           {loading && researchers.length === 0 && (
-            <div className="flex items-center justify-center py-20">
-              <CgSpinner className="animate-spin text-4xl text-[#2AB2C7]" />
+            <div className="animate-pulse">
+              {[...Array(5)].map((_, i) => (
+                <div
+                  key={i}
+                  className="grid min-w-[1000px] grid-cols-[2fr_1.5fr_1.5fr_1.5fr_1fr] items-center border-b border-gray-100 px-4 py-4"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 flex-shrink-0 rounded-full bg-gray-200" />
+                    <div className="flex flex-col gap-1">
+                      <div className="h-4 w-32 rounded bg-gray-200" />
+                      <div className="h-3 w-40 rounded bg-gray-200" />
+                    </div>
+                  </div>
+                  <div className="h-4 w-28 rounded bg-gray-200" />
+                  <div className="h-4 w-24 rounded bg-gray-200" />
+                  <div className="h-4 w-32 rounded bg-gray-200" />
+                  <div className="flex items-center justify-end gap-5">
+                    <div className="h-5 w-5 rounded bg-gray-200" />
+                    <div className="h-5 w-5 rounded bg-gray-200" />
+                  </div>
+                </div>
+              ))}
             </div>
           )}
 
           {error && (
-            <div className="m-4 rounded-lg bg-red-50 p-4 text-sm text-red-600 border border-red-200">
+            <div className="m-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-600">
               {error}
             </div>
           )}
@@ -266,26 +295,34 @@ export default function ResearcherForm() {
           {filteredResearchers.map((item) => (
             <div
               key={item.id}
-              className="grid min-w-[1000px] grid-cols-[2fr_1.5fr_1.5fr_1.5fr_1fr] items-center border-b border-gray-100 px-4 py-4 hover:bg-gray-50 transition-colors"
+              className="grid min-w-[1000px] grid-cols-[2fr_1.5fr_1.5fr_1.5fr_1fr] items-center border-b border-gray-100 px-4 py-4 transition-colors hover:bg-gray-50"
             >
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 relative flex-shrink-0">
+                <div className="relative h-10 w-10 flex-shrink-0">
                   <Image
-                    src={item.avatarUrl || item.avatar_url || '/icon/db-user-1.png'}
+                    src={
+                      item.avatarUrl || item.avatar_url || '/icon/db-user-1.png'
+                    }
                     alt={item.name}
                     fill
                     className="rounded-full object-cover"
                   />
                 </div>
                 <div className="flex flex-col">
-                  <span className="font-semibold text-gray-900">{item.name}</span>
+                  <span className="font-semibold text-gray-900">
+                    {item.name}
+                  </span>
                   <span className="text-xs text-gray-500">{item.email}</span>
                 </div>
               </div>
 
               <span className="text-sm text-gray-600">{item.role}</span>
-              <span className="text-sm text-gray-600 truncate pr-4">{item.expertise || '-'}</span>
-              <span className="text-sm text-gray-600 truncate pr-4">{item.affiliation || '-'}</span>
+              <span className="truncate pr-4 text-sm text-gray-600">
+                {item.expertise || '-'}
+              </span>
+              <span className="truncate pr-4 text-sm text-gray-600">
+                {item.affiliation || '-'}
+              </span>
 
               <div className="flex items-center justify-end gap-5">
                 <Image
@@ -293,7 +330,7 @@ export default function ResearcherForm() {
                   alt="Edit"
                   width={20}
                   height={20}
-                  className="cursor-pointer hover:opacity-70 transition-opacity"
+                  className="cursor-pointer transition-opacity hover:opacity-70"
                   onClick={() => openModal(item)}
                 />
                 <Image
@@ -301,7 +338,7 @@ export default function ResearcherForm() {
                   alt="Delete"
                   width={20}
                   height={20}
-                  className="cursor-pointer hover:opacity-70 transition-opacity"
+                  className="cursor-pointer transition-opacity hover:opacity-70"
                   onClick={() => handleDelete(item.id, item.name)}
                 />
               </div>
@@ -313,23 +350,28 @@ export default function ResearcherForm() {
       {/* Slide-over Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex justify-end">
-          <div className="absolute inset-0 bg-black/20 backdrop-blur-sm transition-opacity" onClick={closeModal} />
+          <div
+            className="absolute inset-0 bg-black/20 backdrop-blur-sm transition-opacity"
+            onClick={closeModal}
+          />
 
           <form
             onSubmit={handleSubmit}
-            className="relative h-full w-full max-w-[800px] bg-white shadow-2xl transition-transform duration-300 overflow-hidden flex flex-col"
+            className="relative flex h-full w-full max-w-[800px] flex-col overflow-hidden bg-white shadow-2xl transition-transform duration-300"
           >
             {/* Modal Header */}
-            <div className="flex h-[80px] items-center border-b border-gray-200 px-8 flex-shrink-0">
+            <div className="flex h-[80px] flex-shrink-0 items-center border-b border-gray-200 px-8">
               <button
                 type="button"
                 onClick={closeModal}
-                className="mr-4 flex h-8 w-8 items-center justify-center rounded-full bg-zinc-100 text-xl text-black hover:bg-zinc-200 transition-colors"
+                className="mr-4 flex h-8 w-8 items-center justify-center rounded-full bg-zinc-100 text-xl text-black transition-colors hover:bg-zinc-200"
               >
                 ←
               </button>
               <h2 className="font-hanken text-2xl font-bold text-black">
-                {currentResearcher ? 'Edit Researcher' : 'Create New Researcher'}
+                {currentResearcher
+                  ? 'Edit Researcher'
+                  : 'Create New Researcher'}
               </h2>
             </div>
 
@@ -338,23 +380,33 @@ export default function ResearcherForm() {
               <div className="mx-auto flex w-full max-w-[650px] flex-col gap-9">
                 {/* Profile Picture Upload */}
                 <div className="flex items-center gap-6">
-                  <div className="h-24 w-24 flex-shrink-0 rounded-full bg-gray-100 overflow-hidden relative border border-gray-200">
-                    <Image
-                      src={avatarPreview || '/icon/db-user-1.png'}
-                      alt="Profile"
-                      fill
-                      className="object-cover"
-                    />
+                  <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-full border border-gray-200 bg-gray-100">
+                    {avatarPreview ? (
+                      <Image
+                        src={avatarPreview}
+                        alt="Profile"
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-xs text-gray-400">
+                        No Image
+                      </div>
+                    )}
                   </div>
                   <div className="flex flex-col gap-2">
                     <div>
-                      <h4 className="text-base font-semibold text-gray-900">Profile Picture</h4>
-                      <p className="text-xs text-gray-500">Upload a professional photo for the researcher profile.</p>
+                      <h4 className="text-base font-semibold text-gray-900">
+                        Profile Picture
+                      </h4>
+                      <p className="text-xs text-gray-500">
+                        Upload a professional photo for the researcher profile.
+                      </p>
                     </div>
                     <button
                       type="button"
                       onClick={triggerFileInput}
-                      className="inline-flex h-9 items-center justify-center rounded-lg border border-gray-300 bg-white px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                      className="inline-flex h-9 items-center justify-center rounded-lg border border-gray-300 bg-white px-4 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
                     >
                       Upload New Photo
                     </button>
@@ -375,7 +427,9 @@ export default function ResearcherForm() {
                     description="The official name of the researcher."
                     placeholder="Enter full name"
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
                     required
                   />
 
@@ -385,21 +439,31 @@ export default function ResearcherForm() {
                     type="email"
                     placeholder="Enter email address"
                     value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
                     required
                   />
 
                   <div className="flex flex-col gap-2">
-                    <label className="text-base font-medium text-gray-900">Role</label>
-                    <span className="text-xs text-gray-500 italic">Select the appropriate academic or research role.</span>
+                    <label className="text-base font-medium text-gray-900">
+                      Role
+                    </label>
+                    <span className="text-xs text-gray-500 italic">
+                      Select the appropriate academic or research role.
+                    </span>
                     <select
                       value={formData.role}
-                      onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, role: e.target.value })
+                      }
                       className="h-[44px] w-full rounded-xl border border-zinc-300 bg-white px-4 text-base outline-none focus:border-[#2AB2C7]"
                       required
                     >
                       {RESEARCHER_ROLES.map((role) => (
-                        <option key={role} value={role}>{role}</option>
+                        <option key={role} value={role}>
+                          {role}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -409,7 +473,9 @@ export default function ResearcherForm() {
                     description="Main area of research focus (e.g., AI, Biotechnology)."
                     placeholder="Enter area of expertise"
                     value={formData.expertise}
-                    onChange={(e) => setFormData({ ...formData, expertise: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, expertise: e.target.value })
+                    }
                   />
 
                   <FormField
@@ -417,18 +483,29 @@ export default function ResearcherForm() {
                     description="Current institution or university."
                     placeholder="Enter institution name"
                     value={formData.affiliation}
-                    onChange={(e) => setFormData({ ...formData, affiliation: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, affiliation: e.target.value })
+                    }
                   />
 
                   <div className="flex flex-col gap-2">
-                    <label className="text-base font-medium text-gray-900">Description</label>
-                    <span className="text-xs text-gray-500 italic">A brief biography or research summary.</span>
+                    <label className="text-base font-medium text-gray-900">
+                      Description
+                    </label>
+                    <span className="text-xs text-gray-500 italic">
+                      A brief biography or research summary.
+                    </span>
                     <textarea
                       value={formData.description}
-                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          description: e.target.value,
+                        })
+                      }
                       placeholder="Enter a brief description..."
                       rows={4}
-                      className="w-full rounded-xl border border-zinc-300 p-4 text-base outline-none focus:border-[#2AB2C7] min-h-[120px]"
+                      className="min-h-[120px] w-full rounded-xl border border-zinc-300 p-4 text-base outline-none focus:border-[#2AB2C7]"
                     />
                   </div>
                 </div>
@@ -436,21 +513,27 @@ export default function ResearcherForm() {
             </div>
 
             {/* Modal Footer */}
-            <div className="flex h-[100px] items-center justify-end gap-4 border-t border-gray-200 px-8 flex-shrink-0 bg-gray-50">
+            <div className="flex h-[100px] flex-shrink-0 items-center justify-end gap-4 border-t border-gray-200 bg-gray-50 px-8">
               <button
                 type="button"
                 onClick={closeModal}
-                className="h-[52px] min-w-[160px] rounded-xl border border-gray-300 bg-white px-6 text-lg font-semibold text-gray-600 hover:bg-gray-50 transition-colors"
+                className="h-[52px] min-w-[160px] rounded-xl border border-gray-300 bg-white px-6 text-lg font-semibold text-gray-600 transition-colors hover:bg-gray-50"
                 disabled={loading}
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="h-[52px] min-w-[160px] rounded-xl bg-[#2AB2C7] px-6 text-lg font-semibold text-white hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+                className="flex h-[52px] min-w-[160px] items-center justify-center gap-2 rounded-xl bg-[#2AB2C7] px-6 text-lg font-semibold text-white transition-opacity hover:opacity-90"
                 disabled={loading}
               >
-                {loading ? <CgSpinner className="animate-spin text-2xl" /> : (currentResearcher ? 'Update' : 'Save')}
+                {loading ? (
+                  <CgSpinner className="animate-spin text-2xl" />
+                ) : currentResearcher ? (
+                  'Update'
+                ) : (
+                  'Save'
+                )}
               </button>
             </div>
           </form>

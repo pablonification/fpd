@@ -1,16 +1,17 @@
 import Card from './_components/card';
 import SkeletonCard from './_components/SkeletonCard';
+import Image from 'next/image';
+import Link from 'next/link';
 
 import { Suspense } from 'react';
 
 function getYoutubeThumbnail(url) {
+  if (!url) return null;
   const videoIdMatch = url.match(
     /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/
   );
   const videoId = videoIdMatch ? videoIdMatch[1] : null;
-  return videoId
-    ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`
-    : url;
+  return videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : null;
 }
 
 async function fetchLatestEvents() {
@@ -24,7 +25,20 @@ async function fetchLatestEvents() {
 
 function EventsContent({ events }) {
   if (events.length === 0) {
-    return <div className="text-gray-500">No events available yet.</div>;
+    return (
+      <>
+        {[1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className="flex w-full flex-col items-start justify-start gap-4"
+          >
+            <div className="h-48 w-full rounded-xl bg-gray-200"></div>
+            <div className="mt-4 h-5 w-3/4 rounded bg-gray-200"></div>
+            <div className="mt-2 h-4 w-full rounded bg-gray-200"></div>
+          </div>
+        ))}
+      </>
+    );
   }
 
   return (
@@ -32,13 +46,11 @@ function EventsContent({ events }) {
       {events.map((event) => {
         let imageSrc = event.mediaUrl || 'https://picsum.photos/300/200';
         if (event.type === 'video') {
-          imageSrc = getYoutubeThumbnail(event.mediaUrl);
+          const thumbnail = getYoutubeThumbnail(event.mediaUrl);
+          if (thumbnail) imageSrc = thumbnail;
         }
         return (
-          <div
-            key={event.id}
-            className="flex w-full flex-col items-start justify-start gap-4"
-          >
+          <Link key={event.id} href="/gallery" className="group block w-full">
             <Card
               imageSrc={imageSrc}
               texts={[
@@ -53,8 +65,9 @@ function EventsContent({ events }) {
                     'Gallery activity documentation and updates.',
                 },
               ]}
+              className="[&_p:first-of-type]:group-hover:text-primaryGradientEnd cursor-pointer [&_img]:transition-all [&_img]:duration-300 [&_img]:ease-out [&_img]:group-hover:brightness-[0.8] [&_p:first-of-type]:transition-colors [&_p:first-of-type]:duration-300 [&_p:first-of-type]:ease-out"
             />
-          </div>
+          </Link>
         );
       })}
     </>
@@ -77,15 +90,29 @@ async function fetchLatestNews() {
 
 function NewsContent({ newsList }) {
   if (newsList.length === 0) {
-    return <div className="text-gray-500">No news available yet.</div>;
+    return (
+      <>
+        {[1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className="flex w-full flex-col items-start justify-start gap-4"
+          >
+            <div className="h-48 w-full rounded-xl bg-gray-200"></div>
+            <div className="mt-4 h-5 w-3/4 rounded bg-gray-200"></div>
+            <div className="mt-2 h-4 w-full rounded bg-gray-200"></div>
+          </div>
+        ))}
+      </>
+    );
   }
 
   return (
     <>
       {newsList.map((newsItem) => (
-        <div
+        <Link
           key={newsItem.id}
-          className="flex w-full flex-col items-start justify-start gap-4"
+          href={`/news/${newsItem.slug}`}
+          className="group block w-full"
         >
           <Card
             imageSrc={newsItem.imageUrl || 'https://picsum.photos/300/200'}
@@ -101,8 +128,9 @@ function NewsContent({ newsList }) {
                   (newsItem.content.length > 100 ? '...' : ''),
               },
             ]}
+            className="[&_p:first-of-type]:group-hover:text-primaryGradientEnd cursor-pointer [&_img]:transition-all [&_img]:duration-300 [&_img]:ease-out [&_img]:group-hover:brightness-[0.8] [&_p:first-of-type]:transition-colors [&_p:first-of-type]:duration-300 [&_p:first-of-type]:ease-out"
           />
-        </div>
+        </Link>
       ))}
     </>
   );
@@ -119,27 +147,31 @@ export default function Home() {
       {/* SECTION 1 */}
       <section className="relative flex min-h-screen w-screen snap-start items-center justify-center text-black">
         {/* Background Image */}
-        <img
+        <Image
           src="/img/home.png"
           alt="Background"
-          className="absolute inset-0 h-full w-full object-cover"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+          quality={90}
         />
 
         {/* Gradient Putih - Dari bawah ke atas untuk menyatu dengan section berikutnya */}
         <div className="from-bgMain absolute inset-0 bg-gradient-to-t via-white/30 to-transparent" />
 
-        <div className="relative z-10 flex max-w-7xl flex-col items-center gap-4 px-4 py-8 text-center sm:gap-8 sm:px-6">
+        <div className="relative z-10 flex max-w-6xl flex-col items-center gap-4 px-4 py-8 text-center sm:gap-8 sm:px-6 lg:px-8">
           {/* Announcement Bar */}
           <div className="h-9 w-full max-w-[465px] rounded-[20px] border border-black/50 bg-white/10 px-4 pt-2 pb-3 text-xs backdrop-blur-md sm:text-sm">
             Si-ZERO
           </div>
 
           {/* Title + Description */}
-          <div className="flex flex-col gap-2 sm:gap-4 [text-shadow:_0_2px_10px_rgb(255_255_255_/_30%)]">
+          <div className="flex flex-col gap-2 [text-shadow:_0_2px_10px_rgb(255_255_255_/_30%)] sm:gap-4">
             <h1 className="text-2xl leading-tight font-bold sm:text-3xl md:text-4xl lg:text-6xl">
               Silicon Zero-Emission Recycling, Refining and Production
             </h1>
-            <p className="text-xs font-medium text-black sm:text-sm md:text-base lg:text-xl">
+            <p className="mx-auto max-w-2xl text-xs font-medium text-[#656565] sm:text-sm md:text-base lg:text-lg">
               Brief paragraph summarizing what this platform is, who the users
               are, and the main reasons why this platform matters to them.
             </p>
@@ -148,31 +180,30 @@ export default function Home() {
           {/* Buttons */}
           <div className="mt-2 flex flex-col gap-2 sm:gap-4 md:flex-row md:gap-6">
             <a href="/researcher/project">
-              <button className="from-primaryGradientStart to-primaryGradientEnd shadow-primaryGradientEnd/30 rounded-full bg-gradient-to-r px-4 py-2 text-sm font-semibold text-white shadow-lg transition hover:scale-105 hover:shadow-xl sm:px-6 sm:py-3 sm:text-base">
+              <button className="from-primaryGradientStart to-primaryGradientEnd cursor-pointer rounded-full bg-gradient-to-r px-4 py-2 text-sm font-semibold text-white shadow-[inset_0_2px_4px_0_rgba(255,255,255,0.5)] shadow-lg transition hover:scale-105 hover:shadow-xl sm:px-6 sm:py-3 sm:text-base">
                 Explore Si-ZERO Research Program
               </button>
             </a>
 
             <a href="/about">
-              <button className="rounded-full border border-black/40 px-4 py-2 text-sm font-semibold text-black transition hover:bg-black/40 hover:text-white sm:px-6 sm:py-3 sm:text-base">
+              <button className="cursor-pointer rounded-full border border-[#DCDCDC] bg-white px-4 py-2 text-sm font-semibold text-black transition hover:border-gray-400 hover:bg-gray-50 sm:px-6 sm:py-3 sm:text-base">
                 Connect With Si-Zero
               </button>
             </a>
-
           </div>
         </div>
       </section>
 
       {/* SECTION 2, 3, 4 - Combined */}
       <section className="bg-bgMain flex w-screen snap-start items-center justify-center py-16 sm:py-20">
-        <div className="flex w-full max-w-7xl flex-col items-center gap-16 px-4 sm:gap-20 sm:px-6 md:gap-24">
+        <div className="flex w-full max-w-6xl flex-col items-center gap-16 px-4 sm:gap-20 sm:px-6 md:gap-24 lg:px-8">
           {/* Who Are We */}
-          <div className="flex max-w-7xl flex-col items-center gap-4 text-center sm:gap-8">
+          <div className="flex max-w-6xl flex-col items-center gap-4 text-center sm:gap-8">
             <div className="flex flex-col gap-2 sm:gap-4">
               <h1 className="text-2xl leading-tight font-bold sm:text-3xl md:text-4xl lg:text-6xl">
                 Who We Are
               </h1>
-              <p className="text-xs text-black/50 sm:text-sm md:text-base lg:text-xl">
+              <p className="max-w-3xl text-xs text-black/50 sm:text-sm md:text-base lg:text-xl">
                 Si-ZERO is a global sustainability initiative led by Swinburne
                 University of Technology, bringing together partners across
                 Australia, India, Indonesia, and the United States to advance a
@@ -196,7 +227,7 @@ export default function Home() {
               </h1>
             </div>
             <div className="w-full space-y-6 sm:space-y-8">
-              <div className="mx-auto grid w-full max-w-7xl grid-cols-1 justify-center gap-x-14 gap-y-7 sm:grid-cols-2 sm:gap-x-8 sm:gap-y-10 lg:grid-cols-2 lg:gap-x-11 lg:gap-y-13">
+              <div className="mx-auto grid w-full max-w-6xl grid-cols-1 justify-center gap-x-8 gap-y-7 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-10 lg:grid-cols-2 lg:gap-x-8 lg:gap-y-12">
                 <div className="flex w-full flex-col items-start justify-start gap-4">
                   <Card
                     imageSrc="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQoEBeC-EkOvHutZ0UUBoelSNq0WJpDSLWxsQ&s"
@@ -261,13 +292,11 @@ export default function Home() {
             </div>
           </div>
 
-
-
           {/* Latest Events */}
           <div className="flex w-full flex-col items-center gap-4 text-center sm:gap-8">
             <div>
               <h1 className="text-grayDark text-xl font-bold sm:text-2xl md:text-3xl lg:text-5xl">
-                Latest Events
+                Latest Gallery
               </h1>
             </div>
             <div className="w-full space-y-6 sm:space-y-8">
@@ -286,10 +315,10 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <div className="max-w-9xl flex w-full flex-col items-center gap-4 px-4 py-8 text-center sm:gap-8 sm:px-6">
+          <div className="flex w-full flex-col items-center gap-4 py-8 text-center sm:gap-8">
             <div>
               <h1 className="text-grayDark text-xl font-bold sm:text-2xl md:text-3xl lg:text-5xl">
-                News
+                Latest News
               </h1>
             </div>
             <div className="w-full space-y-6 sm:space-y-8">

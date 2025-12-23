@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
@@ -17,14 +17,14 @@ export function GalleryCard({
   return (
     <div
       onClick={onClick}
-      className="flex w-full max-w-[360px] cursor-pointer flex-col items-center"
+      className="group flex w-full max-w-[360px] cursor-pointer flex-col items-center"
     >
       {/* Thumbnail */}
       <div className="relative w-full">
         <img
           src={imageSrc}
           alt="Card Thumbnail"
-          className="h-48 w-full rounded-xl object-cover sm:h-60"
+          className="h-48 w-full rounded-xl object-cover transition-all duration-300 ease-out group-hover:brightness-[0.8] sm:h-60"
         />
 
         {/* Video Icon Overlay */}
@@ -35,7 +35,7 @@ export function GalleryCard({
         {texts.map((t, index) => (
           <p
             key={index}
-            className={`$${t.bold ? 'font-bold text-black' : 'text-gray-600'} $ {t.size === "large" ? "text-lg" : "text-sm"}`}
+            className={`${t.bold ? 'font-bold text-black' : 'text-gray-600'} ${t.size === 'large' ? 'text-lg' : 'text-sm'} ${index === 0 ? 'group-hover:text-primaryGradientEnd transition-colors duration-300 ease-out' : ''}`}
           >
             {t.text}
           </p>
@@ -50,8 +50,17 @@ export function GalleryCard({
 //---------------------------------------------------------
 export function PhotoModal({ cards = [], index = 0, onClose, setIndex }) {
   const card = cards[index];
-  const prevCard = cards[index - 1];
-  const nextCard = cards[index + 1];
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose();
+      if (e.key === 'ArrowLeft' && index > 0) setIndex(index - 1);
+      if (e.key === 'ArrowRight' && index < cards.length - 1)
+        setIndex(index + 1);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose, index, setIndex, cards.length]);
 
   return (
     <AnimatePresence>
@@ -60,90 +69,80 @@ export function PhotoModal({ cards = [], index = 0, onClose, setIndex }) {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.2 }}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+        className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm sm:p-6"
+        onClick={onClose}
       >
         <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.9, opacity: 0 }}
-          className="relative flex h-[872px] w-[950px] flex-col justify-between rounded-[48px] bg-white p-8"
+          initial={{ scale: 0.95, opacity: 0, y: 20 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          exit={{ scale: 0.95, opacity: 0, y: 20 }}
+          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+          className="relative z-[70] flex max-h-[90vh] w-full max-w-[700px] flex-col overflow-hidden rounded-3xl bg-white shadow-2xl sm:w-[95%]"
+          onClick={(e) => e.stopPropagation()}
         >
-          {/* CLOSE BUTTON */}
-          <button
-            onClick={onClose}
-            className="absolute top-8 right-8 text-3xl text-gray-500 hover:text-black"
-          >
-            ×
-          </button>
+          <div className="absolute top-4 right-4 z-20">
+            <button
+              onClick={onClose}
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-white/80 text-gray-500 backdrop-blur-sm transition-colors hover:bg-gray-100 hover:text-black"
+            >
+              <X size={24} />
+            </button>
+          </div>
 
-          {/* MAIN CONTENT */}
-          <div className="mx-auto flex w-[722px] flex-col gap-8">
-            {/* IMAGE SECTION */}
-            <div className="relative flex h-[550px] w-full items-center justify-center">
-              {/* Left preview */}
-              {prevCard && (
-                <img
-                  src={prevCard.imageSrc}
-                  className="absolute top-[75px] left-[40px] h-[400px] w-[510px] rounded-[30px] opacity-60"
-                />
+          <div className="flex flex-col overflow-y-auto p-6 sm:p-8">
+            <div className="group relative flex min-h-[300px] w-full items-center justify-center rounded-2xl bg-gray-50 p-2 sm:min-h-[400px]">
+              {index > 0 && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIndex(index - 1);
+                  }}
+                  className="absolute left-2 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white/90 text-gray-700 shadow-sm backdrop-blur-sm transition-transform hover:scale-105 hover:bg-white sm:h-12 sm:w-12"
+                >
+                  <ChevronLeft size={24} />
+                </button>
               )}
 
-              {/* Main image */}
-              <img
-                src={card.imageSrc}
-                className="relative z-10 h-[550px] w-[550px] rounded-[32px] object-cover"
-              />
-
-              {/* Right preview */}
-              {nextCard && (
+              <div className="relative flex h-full w-full items-center justify-center">
                 <img
-                  src={nextCard.imageSrc}
-                  className="absolute top-[75px] right-[40px] h-[400px] w-[510px] rounded-[30px] opacity-60"
+                  src={card.imageSrc}
+                  alt={card.title || 'Gallery Image'}
+                  className="max-h-[50vh] w-auto max-w-full rounded-lg object-contain shadow-sm"
                 />
+              </div>
+
+              {index < cards.length - 1 && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIndex(index + 1);
+                  }}
+                  className="absolute right-2 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white/90 text-gray-700 shadow-sm backdrop-blur-sm transition-transform hover:scale-105 hover:bg-white sm:h-12 sm:w-12"
+                >
+                  <ChevronRight size={24} />
+                </button>
               )}
             </div>
 
-            {/* TEXT DETAILS */}
-            <div className="flex flex-col gap-3 text-left">
-              <h2 className="text-[32px] leading-[40px] font-bold text-black">
-                {card?.title ||
-                  'Photo title will be displayed here when filled'}
+            <div className="mt-6 flex flex-col gap-3 text-left">
+              <h2 className="text-2xl leading-tight font-bold text-gray-900 sm:text-3xl">
+                {card?.title || 'Untitled Photo'}
               </h2>
 
-              <p className="w-fit rounded-md bg-[#2497A9]/10 px-2 py-1 text-[16px] font-medium text-[#2497A9]">
-                {card?.typeLabel || 'Photo activity type will appear here'}
-              </p>
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="rounded-full bg-[#2497A9]/10 px-3 py-1 text-sm font-semibold text-[#2497A9]">
+                  {card?.typeLabel || 'Activity'}
+                </span>
+                <span className="text-sm text-gray-500">
+                  {card?.date || ''}
+                </span>
+              </div>
 
-              <p className="text-[14px] text-[#989898]">
-                {card?.date || 'Activity date will be displayed here'}
-              </p>
-
-              <p className="max-w-[722px] text-[18px] leading-[24px] text-[#7C7C7C]">
-                {card?.description ||
-                  'Brief description of activity will appear here when filled'}
+              <p className="text-base leading-relaxed text-gray-600 sm:text-lg">
+                {card?.description || ''}
               </p>
             </div>
           </div>
-
-          {/* LEFT NAV BUTTON */}
-          {index > 0 && (
-            <button
-              onClick={() => setIndex(index - 1)}
-              className="absolute top-1/2 left-4 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-md hover:bg-gray-100"
-            >
-              <ChevronLeft size={24} />
-            </button>
-          )}
-
-          {/* RIGHT NAV BUTTON */}
-          {index < cards.length - 1 && (
-            <button
-              onClick={() => setIndex(index + 1)}
-              className="absolute top-1/2 right-4 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-md hover:bg-gray-100"
-            >
-              <ChevronRight size={24} />
-            </button>
-          )}
         </motion.div>
       </motion.div>
     </AnimatePresence>
@@ -154,15 +153,22 @@ export function PhotoModal({ cards = [], index = 0, onClose, setIndex }) {
 // VIDEO MODAL (Placeholder)
 //---------------------------------------------------------
 export function VideoModal({ index, data, onClose }) {
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   if (!data) return null;
 
-  // Convert YouTube URL to embed format
   const getYoutubeEmbedUrl = (url) => {
     if (!url) return '';
     const regex = /(?:v=|\.be\/)([A-Za-z0-9_-]{6,11})/;
     const match = url.match(regex);
     const id = match ? match[1] : null;
-    return id ? `https://www.youtube.com/embed/${id}` : url;
+    return id ? `https://www.youtube.com/embed/${id}?autoplay=1` : url;
   };
 
   const embedUrl = getYoutubeEmbedUrl(data.videoUrl);
@@ -173,51 +179,57 @@ export function VideoModal({ index, data, onClose }) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+        transition={{ duration: 0.2 }}
+        className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm sm:p-6"
+        onClick={onClose}
       >
         <motion.div
-          initial={{ scale: 0.95, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.95, opacity: 0 }}
-          className="relative flex h-[872px] w-[1062px] flex-col rounded-[48px] bg-white p-[64px]"
+          initial={{ scale: 0.95, opacity: 0, y: 20 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          exit={{ scale: 0.95, opacity: 0, y: 20 }}
+          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+          className="relative z-[70] flex max-h-[90vh] w-full max-w-[700px] flex-col overflow-hidden rounded-3xl bg-white shadow-2xl sm:w-[95%]"
+          onClick={(e) => e.stopPropagation()}
         >
-          {/* Main Content */}
-          <div className="mx-auto flex h-[744px] w-[934px] flex-col gap-[32px]">
-            {/* VIDEO */}
-            <div className="h-[550px] w-[934px] overflow-hidden rounded-[32px] bg-black">
+          <div className="absolute top-4 right-4 z-20">
+            <button
+              onClick={onClose}
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-white/80 text-gray-500 backdrop-blur-sm transition-colors hover:bg-gray-100 hover:text-black"
+            >
+              <X size={24} />
+            </button>
+          </div>
+
+          <div className="flex flex-col overflow-y-auto p-6 sm:p-8">
+            <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-black shadow-md">
               <iframe
                 src={embedUrl}
-                className="h-full w-full"
-                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                className="absolute inset-0 h-full w-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
+                title={data.title || 'Video Player'}
               />
             </div>
 
-            {/* TEXT SECTION */}
-            <div className="flex h-[162px] w-[934px] flex-col gap-[12px]">
-              <h1 className="text-[32px] font-bold text-black">{data.title}</h1>
+            <div className="mt-6 flex flex-col gap-3 text-left">
+              <h2 className="text-2xl leading-tight font-bold text-gray-900 sm:text-3xl">
+                {data.title || 'Untitled Video'}
+              </h2>
 
-              <span className="text-[16px] font-medium text-[#2497A9]">
-                {data.activityType || 'Video Activity'}
-              </span>
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="rounded-full bg-[#2497A9]/10 px-3 py-1 text-sm font-semibold text-[#2497A9]">
+                  {data.activityType || 'Video'}
+                </span>
+                <span className="text-sm text-gray-500">
+                  {data.date ? new Date(data.date).toLocaleDateString() : ''}
+                </span>
+              </div>
 
-              <span className="text-[14px] font-normal text-[#989898]">
-                {data.date ? new Date(data.date).toLocaleDateString() : ''}
-              </span>
-
-              <p className="text-[18px] leading-[24px] font-medium text-[#7C7C7C]">
-                {data.description}
+              <p className="text-base leading-relaxed text-gray-600 sm:text-lg">
+                {data.description || ''}
               </p>
             </div>
           </div>
-
-          {/* Close Button */}
-          <button
-            onClick={onClose}
-            className="absolute top-8 right-8 text-4xl text-gray-500 hover:text-black"
-          >
-            ×
-          </button>
         </motion.div>
       </motion.div>
     </AnimatePresence>
