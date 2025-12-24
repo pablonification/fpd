@@ -2,6 +2,7 @@
 import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
+import ConfirmModal from '../_components/ConfirmModal';
 import dynamic from 'next/dynamic';
 
 // Dynamic import for ReactQuill to avoid SSR issues
@@ -55,6 +56,8 @@ export default function ResearchProjectManagement() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [search, setSearch] = useState('');
   const [specificYear, setSpecificYear] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -189,11 +192,12 @@ export default function ResearchProjectManagement() {
     }
   };
 
-  const handleDelete = async (projectId) => {
-    if (!confirm('Are you sure you want to delete this project?')) return;
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
 
+    setIsDeleting(true);
     try {
-      const response = await fetch(`/api/projects/${projectId}`, {
+      const response = await fetch(`/api/projects/${deleteTarget.id}`, {
         method: 'DELETE',
       });
 
@@ -201,6 +205,7 @@ export default function ResearchProjectManagement() {
 
       if (data.success) {
         toast.success('Project deleted successfully');
+        setDeleteTarget(null);
         fetchProjects();
       } else {
         toast.error(data.error || 'Failed to delete project');
@@ -208,6 +213,8 @@ export default function ResearchProjectManagement() {
     } catch (error) {
       console.error('Error deleting project:', error);
       toast.error('Error deleting project');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -386,7 +393,7 @@ export default function ResearchProjectManagement() {
                       width={20}
                       height={20}
                       className="cursor-pointer transition-transform hover:scale-110"
-                      onClick={() => handleDelete(project.id)}
+                      onClick={() => setDeleteTarget(project)}
                     />
                   </div>
                 </div>
@@ -655,6 +662,17 @@ export default function ResearchProjectManagement() {
           min-h-[200px];
         }
       `}</style>
+
+      <ConfirmModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleDelete}
+        title="Delete Project"
+        message={`Are you sure you want to delete "${deleteTarget?.projectTitle}"? This action cannot be undone.`}
+        confirmText="Delete"
+        isLoading={isDeleting}
+        variant="danger"
+      />
     </div>
   );
 }

@@ -2,12 +2,15 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import Image from 'next/image';
 import FormField from '../_components/FormField';
+import ConfirmModal from '../_components/ConfirmModal';
 import { CgSpinner } from 'react-icons/cg';
 import toast from 'react-hot-toast';
 
 export default function UserForm() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
@@ -230,16 +233,13 @@ export default function UserForm() {
     }
   };
 
-  // --- Handler Delete ---
-  const handleDelete = async (userId, userName) => {
-    if (!window.confirm(`Are you sure you want to delete user ${userName}?`)) {
-      return;
-    }
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
 
-    setLoading(true);
+    setIsDeleting(true);
 
     try {
-      const response = await fetch(`/api/users/${userId}`, {
+      const response = await fetch(`/api/users/${deleteTarget.id}`, {
         method: 'DELETE',
       });
 
@@ -248,12 +248,13 @@ export default function UserForm() {
       }
 
       toast.success('User deleted');
-      fetchUsers(); // Refresh data
+      setDeleteTarget(null);
+      fetchUsers();
     } catch (err) {
       toast.error(err.message);
       console.error(err);
     } finally {
-      setLoading(false);
+      setIsDeleting(false);
     }
   };
 
@@ -379,7 +380,7 @@ export default function UserForm() {
                   width={20}
                   height={20}
                   className="cursor-pointer"
-                  onClick={() => handleDelete(user.id, user.name)}
+                  onClick={() => setDeleteTarget(user)}
                 />
                 <Image
                   src="/icon/db-u-right.png"
@@ -679,6 +680,17 @@ export default function UserForm() {
           </form>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleDelete}
+        title="Delete User"
+        message={`Are you sure you want to delete user "${deleteTarget?.name}"? This action cannot be undone.`}
+        confirmText="Delete"
+        isLoading={isDeleting}
+        variant="danger"
+      />
     </div>
   );
 }

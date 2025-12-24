@@ -2,12 +2,15 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import FormField from '../_components/FormField';
+import ConfirmModal from '../_components/ConfirmModal';
 import { CgSpinner } from 'react-icons/cg';
 import toast from 'react-hot-toast';
 
 export default function ResearcherForm() {
   const [researchers, setResearchers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
@@ -175,23 +178,24 @@ export default function ResearcherForm() {
     }
   };
 
-  const handleDelete = async (id, name) => {
-    if (!window.confirm(`Are you sure you want to delete ${name}?`)) return;
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
 
-    setLoading(true);
+    setIsDeleting(true);
     try {
-      const response = await fetch(`/api/researchers/${id}`, {
+      const response = await fetch(`/api/researchers/${deleteTarget.id}`, {
         method: 'DELETE',
       });
       const data = await response.json();
       if (!data.success) throw new Error(data.error || 'Failed to delete');
 
       toast.success('Researcher deleted');
+      setDeleteTarget(null);
       fetchResearchers();
     } catch (err) {
       toast.error(err.message);
     } finally {
-      setLoading(false);
+      setIsDeleting(false);
     }
   };
 
@@ -328,7 +332,7 @@ export default function ResearcherForm() {
                   width={20}
                   height={20}
                   className="cursor-pointer transition-opacity hover:opacity-70"
-                  onClick={() => handleDelete(item.id, item.name)}
+                  onClick={() => setDeleteTarget(item)}
                 />
               </div>
             </div>
@@ -528,6 +532,17 @@ export default function ResearcherForm() {
           </form>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleDelete}
+        title="Delete Researcher"
+        message={`Are you sure you want to delete "${deleteTarget?.name}"? This action cannot be undone.`}
+        confirmText="Delete"
+        isLoading={isDeleting}
+        variant="danger"
+      />
     </div>
   );
 }

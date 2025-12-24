@@ -2,12 +2,15 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import toast from 'react-hot-toast';
+import ConfirmModal from '../_components/ConfirmModal';
 
 export default function NewsAdmin() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState('add');
   const [currentEditId, setCurrentEditId] = useState(null);
@@ -181,19 +184,21 @@ export default function NewsAdmin() {
     }
   };
 
-  const onDelete = async (id) => {
-    if (!id) return;
-    if (!confirm('Are you sure you want to delete this news?')) return;
-    setLoading(true);
+  const onDelete = async () => {
+    if (!deleteTarget) return;
+    setIsDeleting(true);
     try {
-      const res = await fetch(`/api/news/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/news/${deleteTarget.id}`, {
+        method: 'DELETE',
+      });
       if (!res.ok) throw new Error(`Delete failed: ${res.status}`);
-      setItems((prev) => prev.filter((it) => it.id !== id));
+      setItems((prev) => prev.filter((it) => it.id !== deleteTarget.id));
       toast.success('News deleted');
+      setDeleteTarget(null);
     } catch (e) {
       toast.error(e.message || 'Failed to delete');
     } finally {
-      setLoading(false);
+      setIsDeleting(false);
     }
   };
 
@@ -507,7 +512,7 @@ export default function NewsAdmin() {
                   </svg>
                 </button>
                 <button
-                  onClick={() => onDelete(item.id)}
+                  onClick={() => setDeleteTarget(item)}
                   className="relative h-5 w-5 cursor-pointer"
                   title="Delete"
                 >
@@ -607,6 +612,17 @@ export default function NewsAdmin() {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={onDelete}
+        title="Delete News"
+        message={`Are you sure you want to delete "${deleteTarget?.title}"? This action cannot be undone.`}
+        confirmText="Delete"
+        isLoading={isDeleting}
+        variant="danger"
+      />
     </div>
   );
 }

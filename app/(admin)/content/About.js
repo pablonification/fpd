@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import FormField from '../_components/FormField';
+import ConfirmModal from '../_components/ConfirmModal';
 import toast from 'react-hot-toast';
 import Image from 'next/image';
 
@@ -13,6 +14,8 @@ export default function AboutForm() {
   const [newYear, setNewYear] = useState('');
   const [newDesc, setNewDesc] = useState('');
   const [loading, setLoading] = useState(true);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -101,24 +104,28 @@ export default function AboutForm() {
     }
   };
 
-  const handleDeleteTimeline = async (id) => {
-    if (!confirm('Are you sure?')) return;
+  const handleDeleteTimeline = async () => {
+    if (!deleteTarget) return;
+    setIsDeleting(true);
     try {
       const res = await fetch('/api/about/timeline', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id }),
+        body: JSON.stringify({ id: deleteTarget.id }),
       });
 
       if (res.ok) {
-        setTimelineItems(timelineItems.filter((t) => t.id !== id));
+        setTimelineItems(timelineItems.filter((t) => t.id !== deleteTarget.id));
         toast.success('Timeline deleted');
+        setDeleteTarget(null);
       } else {
         toast.error('Failed to delete');
       }
     } catch (err) {
       console.error(err);
       toast.error('Error deleting timeline');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -271,7 +278,7 @@ export default function AboutForm() {
                     </span>
                   </div>
                   <button
-                    onClick={() => handleDeleteTimeline(item.id)}
+                    onClick={() => setDeleteTarget(item)}
                     className="rounded-full p-2 text-red-500 hover:bg-red-50"
                   >
                     <Image
@@ -287,6 +294,17 @@ export default function AboutForm() {
           </div>
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleDeleteTimeline}
+        title="Delete Timeline"
+        message={`Are you sure you want to delete the timeline for "${deleteTarget?.year}"? This action cannot be undone.`}
+        confirmText="Delete"
+        isLoading={isDeleting}
+        variant="danger"
+      />
     </div>
   );
 }
