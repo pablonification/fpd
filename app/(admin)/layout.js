@@ -25,7 +25,7 @@ export default function AdminLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
-        <Toaster position="bottom-right" />
+        <Toaster position="top-right" />
       </body>
     </html>
   );
