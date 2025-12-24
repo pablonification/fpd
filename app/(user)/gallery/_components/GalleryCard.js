@@ -134,7 +134,13 @@ export function PhotoModal({ cards = [], index = 0, onClose, setIndex }) {
                   {card?.typeLabel || 'Activity'}
                 </span>
                 <span className="text-xs text-gray-500 sm:text-sm">
-                  {card?.date || ''}
+                  {card?.date
+                    ? new Date(card.date).toLocaleDateString('en-GB', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                      })
+                    : ''}
                 </span>
               </div>
 
@@ -221,7 +227,13 @@ export function VideoModal({ index, data, onClose }) {
                   {data.activityType || 'Video'}
                 </span>
                 <span className="text-xs text-gray-500 sm:text-sm">
-                  {data.date ? new Date(data.date).toLocaleDateString() : ''}
+                  {data.date
+                    ? new Date(data.date).toLocaleDateString('en-GB', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                      })
+                    : ''}
                 </span>
               </div>
 

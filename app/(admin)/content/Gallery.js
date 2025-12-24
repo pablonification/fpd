@@ -5,7 +5,10 @@ import { useEffect, useState, useMemo } from 'react';
 export default function GalleryAdmin() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [modalError, setModalError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState('add');
   const [contentType, setContentType] = useState('image');
@@ -53,6 +56,10 @@ export default function GalleryAdmin() {
     if (data) {
       setCurrentEditId(data.id);
       const itemType = data.media_type_column || data.type;
+      const rawDate = data.activity_date || data.activityDate;
+      const formattedDateForInput = rawDate
+        ? new Date(rawDate).toISOString().split('T')[0]
+        : '';
       setFormData({
         title: data.title || '',
         description: data.description || '',
@@ -62,7 +69,7 @@ export default function GalleryAdmin() {
             ? data.media_url || data.mediaUrl
             : '',
         youtubeUrl: itemType === 'video' ? data.media_url || data.mediaUrl : '',
-        activityDate: data.activity_date || data.activityDate || '',
+        activityDate: formattedDateForInput,
       });
       setContentType(
         itemType === 'image' || itemType === 'photo' ? 'image' : 'video'
@@ -93,6 +100,7 @@ export default function GalleryAdmin() {
     });
     setContentType('image');
     setCurrentEditId(null);
+    setModalError('');
   };
 
   const handleInputChange = (e) => {
@@ -110,8 +118,8 @@ export default function GalleryAdmin() {
 
   const onUploadImage = async (file) => {
     if (!file) return;
-    setLoading(true);
-    setError('');
+    setUploading(true);
+    setModalError('');
     try {
       const fd = new FormData();
       fd.append('file', file);
@@ -123,37 +131,36 @@ export default function GalleryAdmin() {
       const { publicUrl } = await res.json();
       setFormData((prev) => ({ ...prev, imageUrl: publicUrl }));
     } catch (e) {
-      setError(e.message || 'Upload failed');
+      setModalError(e.message || 'Upload failed');
     } finally {
-      setLoading(false);
+      setUploading(false);
     }
   };
 
   const handleSubmit = async () => {
-    // Validate required fields
+    setModalError('');
     if (!formData.title.trim()) {
-      setError('Title is required');
+      setModalError('Title is required');
       return;
     }
     if (!formData.activityType) {
-      setError('Activity Type is required');
+      setModalError('Activity Type is required');
       return;
     }
     if (!formData.activityDate) {
-      setError('Activity Date is required');
+      setModalError('Activity Date is required');
       return;
     }
     if (contentType === 'image' && !formData.imageUrl.trim()) {
-      setError('Please upload an image');
+      setModalError('Please upload an image');
       return;
     }
     if (contentType === 'video' && !formData.youtubeUrl.trim()) {
-      setError('Please enter a YouTube URL');
+      setModalError('Please enter a YouTube URL');
       return;
     }
 
-    setLoading(true);
-    setError('');
+    setSaving(true);
     try {
       const payload = {
         type: contentType === 'image' ? 'photo' : 'video',
@@ -196,9 +203,9 @@ export default function GalleryAdmin() {
       }
       closeModal();
     } catch (e) {
-      setError(e.message || 'Failed to save');
+      setModalError(e.message || 'Failed to save');
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
@@ -309,6 +316,12 @@ export default function GalleryAdmin() {
                 {modalType === 'add' ? 'Add New Content' : 'Edit Content'}
               </div>
 
+              {modalError && (
+                <div className="mb-4 rounded-xl bg-red-50 p-4 text-sm text-red-700">
+                  {modalError}
+                </div>
+              )}
+
               {/* Content Type Selector */}
               <div className="mb-6 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
                 <div className="text-base text-neutral-600">Content Type:</div>
@@ -411,28 +424,40 @@ export default function GalleryAdmin() {
                       {/* Custom Upload Area */}
                       <div
                         onClick={() =>
+                          !uploading &&
                           document.getElementById('fileInput')?.click()
                         }
-                        className="inline-flex cursor-pointer flex-col items-center justify-start gap-4 self-stretch rounded-2xl px-5 py-8 outline outline-1 outline-offset-[-1px] outline-stone-300 transition-colors hover:bg-zinc-50"
+                        className={`inline-flex cursor-pointer flex-col items-center justify-start gap-4 self-stretch rounded-2xl px-5 py-8 outline outline-1 outline-offset-[-1px] outline-stone-300 transition-colors hover:bg-zinc-50 ${uploading ? 'pointer-events-none opacity-50' : ''}`}
                       >
-                        <div className="flex flex-col items-center justify-start gap-2">
-                          <div className="relative h-8 w-8">
-                            <div className="absolute top-[14.67px] left-[9.33px] h-2 w-[2.67px] outline outline-1 outline-offset-[-0.55px] outline-stone-500" />
-                            <div className="absolute top-[14.67px] left-[12px] h-[2.67px] w-[2.67px] outline outline-1 outline-offset-[-0.55px] outline-stone-500" />
-                            <div className="absolute top-[2.67px] left-[2.67px] h-7 w-7 outline outline-1 outline-offset-[-0.55px] outline-stone-500" />
-                            <div className="absolute top-[2.67px] left-[18.67px] h-2.5 w-2.5 outline outline-1 outline-offset-[-0.55px] outline-stone-500" />
-                            <div className="absolute top-0 left-0 h-8 w-8 opacity-0" />
+                        {uploading ? (
+                          <div className="flex flex-col items-center gap-2">
+                            <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#2AB2C7] border-t-transparent" />
+                            <div className="text-base font-medium text-[#2AB2C7]">
+                              Uploading...
+                            </div>
                           </div>
-                          <div className="max-w-[240px] text-center text-base leading-5 font-normal text-stone-500">
-                            Attach documents, PDFs, or images related to your
-                            gallery content
-                          </div>
-                        </div>
-                        <div className="inline-flex items-center justify-center gap-2.5 rounded-2xl bg-white px-5 py-2 outline outline-1 outline-offset-[-1px] outline-zinc-300">
-                          <div className="text-base leading-5 font-medium text-zinc-800">
-                            Browse File
-                          </div>
-                        </div>
+                        ) : (
+                          <>
+                            <div className="flex flex-col items-center justify-start gap-2">
+                              <div className="relative h-8 w-8">
+                                <div className="absolute top-[14.67px] left-[9.33px] h-2 w-[2.67px] outline outline-1 outline-offset-[-0.55px] outline-stone-500" />
+                                <div className="absolute top-[14.67px] left-[12px] h-[2.67px] w-[2.67px] outline outline-1 outline-offset-[-0.55px] outline-stone-500" />
+                                <div className="absolute top-[2.67px] left-[2.67px] h-7 w-7 outline outline-1 outline-offset-[-0.55px] outline-stone-500" />
+                                <div className="absolute top-[2.67px] left-[18.67px] h-2.5 w-2.5 outline outline-1 outline-offset-[-0.55px] outline-stone-500" />
+                                <div className="absolute top-0 left-0 h-8 w-8 opacity-0" />
+                              </div>
+                              <div className="max-w-[240px] text-center text-base leading-5 font-normal text-stone-500">
+                                Attach documents, PDFs, or images related to
+                                your gallery content
+                              </div>
+                            </div>
+                            <div className="inline-flex items-center justify-center gap-2.5 rounded-2xl bg-white px-5 py-2 outline outline-1 outline-offset-[-1px] outline-zinc-300">
+                              <div className="text-base leading-5 font-medium text-zinc-800">
+                                Browse File
+                              </div>
+                            </div>
+                          </>
+                        )}
                       </div>
                       <input
                         id="fileInput"
@@ -486,16 +511,17 @@ export default function GalleryAdmin() {
               <div className="mt-8 flex items-center justify-end gap-3">
                 <button
                   onClick={closeModal}
-                  className="rounded-xl border border-zinc-300 bg-white px-6 py-3 text-base font-medium text-neutral-600 hover:bg-zinc-50"
+                  disabled={saving || uploading}
+                  className="rounded-xl border border-zinc-300 bg-white px-6 py-3 text-base font-medium text-neutral-600 hover:bg-zinc-50 disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleSubmit}
-                  disabled={loading}
+                  disabled={saving || uploading}
                   className="bg-primary-700 hover:bg-primary-700 rounded-xl px-6 py-3 text-base font-medium text-white disabled:opacity-50"
                 >
-                  {loading ? 'Saving...' : 'Save Changes'}
+                  {saving ? 'Saving...' : 'Save Changes'}
                 </button>
               </div>
             </div>

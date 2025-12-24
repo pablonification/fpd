@@ -138,11 +138,14 @@ export default function AboutPage() {
             <div className="h-20 w-full rounded-lg bg-gray-100"></div>
           </div>
         ) : timelineData.length > 0 ? (
-          <div className="mx-auto max-w-3xl space-y-10 px-6">
-            {timelineData.map((item) => (
-              <div key={item.id} className="flex items-start gap-4 text-left">
-                {/* Timeline Dot */}
-                <div className="mt-1 flex-shrink-0">
+          <div className="mx-auto max-w-3xl px-6">
+            {timelineData.map((item, index) => (
+              <div
+                key={item.id}
+                className="flex gap-4 pb-10 text-left last:pb-0"
+              >
+                {/* Timeline Dot & Line */}
+                <div className="flex flex-shrink-0 flex-col items-center pt-1">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="16"
@@ -152,6 +155,9 @@ export default function AboutPage() {
                   >
                     <circle cx="8" cy="8" r="8" fill="#2AB2C7" />
                   </svg>
+                  {index !== timelineData.length - 1 && (
+                    <div className="w-[2px] flex-grow bg-[#2AB2C7]" />
+                  )}
                 </div>
 
                 <div>

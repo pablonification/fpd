@@ -5,7 +5,10 @@ import { useEffect, useState, useMemo } from 'react';
 export default function NewsAdmin() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [modalError, setModalError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState('add');
   const [currentEditId, setCurrentEditId] = useState(null);
@@ -78,6 +81,7 @@ export default function NewsAdmin() {
       isFeatured: false,
     });
     setCurrentEditId(null);
+    setModalError('');
   };
 
   const handleInputChange = (e) => {
@@ -101,8 +105,8 @@ export default function NewsAdmin() {
 
   const onUploadImage = async (file) => {
     if (!file) return;
-    setLoading(true);
-    setError('');
+    setUploading(true);
+    setModalError('');
     try {
       const fd = new FormData();
       fd.append('file', file);
@@ -114,29 +118,28 @@ export default function NewsAdmin() {
       const { publicUrl } = await res.json();
       setFormData((prev) => ({ ...prev, imageUrl: publicUrl }));
     } catch (e) {
-      setError(e.message || 'Upload failed');
+      setModalError(e.message || 'Upload failed');
     } finally {
-      setLoading(false);
+      setUploading(false);
     }
   };
 
   const handleSubmit = async () => {
-    // Validate required fields
+    setModalError('');
     if (!formData.title.trim()) {
-      setError('Title is required');
+      setModalError('Title is required');
       return;
     }
     if (!formData.slug.trim()) {
-      setError('Slug is required');
+      setModalError('Slug is required');
       return;
     }
     if (!formData.content.trim()) {
-      setError('Content is required');
+      setModalError('Content is required');
       return;
     }
 
-    setLoading(true);
-    setError('');
+    setSaving(true);
     try {
       const payload = {
         title: formData.title.trim(),
@@ -175,9 +178,9 @@ export default function NewsAdmin() {
       }
       closeModal();
     } catch (e) {
-      setError(e.message || 'Failed to save');
+      setModalError(e.message || 'Failed to save');
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
@@ -271,6 +274,12 @@ export default function NewsAdmin() {
                 {modalType === 'add' ? 'Add New News' : 'Edit News'}
               </div>
 
+              {modalError && (
+                <div className="mb-4 rounded-xl bg-red-50 p-4 text-sm text-red-700">
+                  {modalError}
+                </div>
+              )}
+
               {/* Form Fields */}
               <div className="space-y-5">
                 <div>
@@ -336,27 +345,39 @@ export default function NewsAdmin() {
                     {/* Custom Upload Area */}
                     <div
                       onClick={() =>
+                        !uploading &&
                         document.getElementById('newsFileInput')?.click()
                       }
-                      className="inline-flex cursor-pointer flex-col items-center justify-start gap-4 self-stretch rounded-2xl px-5 py-8 outline outline-1 outline-offset-[-1px] outline-stone-300 transition-colors hover:bg-zinc-50"
+                      className={`inline-flex cursor-pointer flex-col items-center justify-start gap-4 self-stretch rounded-2xl px-5 py-8 outline outline-1 outline-offset-[-1px] outline-stone-300 transition-colors hover:bg-zinc-50 ${uploading ? 'pointer-events-none opacity-50' : ''}`}
                     >
-                      <div className="flex flex-col items-center justify-start gap-2">
-                        <div className="relative h-8 w-8">
-                          <div className="absolute top-[14.67px] left-[9.33px] h-2 w-[2.67px] outline outline-1 outline-offset-[-0.55px] outline-stone-500" />
-                          <div className="absolute top-[14.67px] left-[12px] h-[2.67px] w-[2.67px] outline outline-1 outline-offset-[-0.55px] outline-stone-500" />
-                          <div className="absolute top-[2.67px] left-[2.67px] h-7 w-7 outline outline-1 outline-offset-[-0.55px] outline-stone-500" />
-                          <div className="absolute top-[2.67px] left-[18.67px] h-2.5 w-2.5 outline outline-1 outline-offset-[-0.55px] outline-stone-500" />
-                          <div className="absolute top-0 left-0 h-8 w-8 opacity-0" />
+                      {uploading ? (
+                        <div className="flex flex-col items-center gap-2">
+                          <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#2AB2C7] border-t-transparent" />
+                          <div className="text-base font-medium text-[#2AB2C7]">
+                            Uploading...
+                          </div>
                         </div>
-                        <div className="w-60 text-center text-base leading-5 font-normal text-stone-500">
-                          Attach a featured image for this news article
-                        </div>
-                      </div>
-                      <div className="inline-flex items-center justify-center gap-2.5 rounded-2xl bg-white px-5 py-2 outline outline-1 outline-offset-[-1px] outline-zinc-300">
-                        <div className="text-base leading-5 font-medium text-zinc-800">
-                          Browse File
-                        </div>
-                      </div>
+                      ) : (
+                        <>
+                          <div className="flex flex-col items-center justify-start gap-2">
+                            <div className="relative h-8 w-8">
+                              <div className="absolute top-[14.67px] left-[9.33px] h-2 w-[2.67px] outline outline-1 outline-offset-[-0.55px] outline-stone-500" />
+                              <div className="absolute top-[14.67px] left-[12px] h-[2.67px] w-[2.67px] outline outline-1 outline-offset-[-0.55px] outline-stone-500" />
+                              <div className="absolute top-[2.67px] left-[2.67px] h-7 w-7 outline outline-1 outline-offset-[-0.55px] outline-stone-500" />
+                              <div className="absolute top-[2.67px] left-[18.67px] h-2.5 w-2.5 outline outline-1 outline-offset-[-0.55px] outline-stone-500" />
+                              <div className="absolute top-0 left-0 h-8 w-8 opacity-0" />
+                            </div>
+                            <div className="w-60 text-center text-base leading-5 font-normal text-stone-500">
+                              Attach a featured image for this news article
+                            </div>
+                          </div>
+                          <div className="inline-flex items-center justify-center gap-2.5 rounded-2xl bg-white px-5 py-2 outline outline-1 outline-offset-[-1px] outline-zinc-300">
+                            <div className="text-base leading-5 font-medium text-zinc-800">
+                              Browse File
+                            </div>
+                          </div>
+                        </>
+                      )}
                     </div>
                     <input
                       id="newsFileInput"
@@ -395,16 +416,17 @@ export default function NewsAdmin() {
               <div className="mt-8 flex items-center justify-end gap-3">
                 <button
                   onClick={closeModal}
-                  className="rounded-xl border border-zinc-300 bg-white px-6 py-3 text-base font-medium text-neutral-600 hover:bg-zinc-50"
+                  disabled={saving || uploading}
+                  className="rounded-xl border border-zinc-300 bg-white px-6 py-3 text-base font-medium text-neutral-600 hover:bg-zinc-50 disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleSubmit}
-                  disabled={loading}
+                  disabled={saving || uploading}
                   className="rounded-xl bg-[#2AB2C7] px-6 py-3 text-base font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
                 >
-                  {loading ? 'Saving...' : 'Save Changes'}
+                  {saving ? 'Saving...' : 'Save Changes'}
                 </button>
               </div>
             </div>
