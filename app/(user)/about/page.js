@@ -171,35 +171,73 @@ export default function AboutPage() {
       </section>
 
       {/* Contact Us */}
-      <section className="w-full py-16 text-center">
+      <section
+        id="contact-us"
+        className="w-full scroll-mt-32 py-16 text-center"
+      >
         <h2 className="mb-4 text-2xl leading-tight font-bold sm:text-3xl md:text-4xl">
           Contact Us
         </h2>
-        {/* Address and Email Display if needed, or simple social links */}
-        <p className="mx-auto mb-8 max-w-2xl text-neutral-600">
-          {contactData.address} <br />
-          <span className="font-semibold">{contactData.email}</span>
-        </p>
 
-        <div className="flex flex-wrap justify-center gap-6">
-          {contactData.links && contactData.links.length > 0 ? (
-            contactData.links.map((link, i) => (
-              <a
-                key={i}
-                href={link.startsWith('http') ? link : `https://${link}`}
-                target="_blank"
-                rel="noreferrer"
-                className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-200 text-gray-700 transition hover:bg-gray-300 md:h-16 md:w-16"
-                title={link}
-              >
-                {/* Generic Link Icon - could map specific icons for fb/twitter/insta later */}
-                <HiLink className="h-6 w-6" />
-              </a>
-            ))
-          ) : (
-            <p className="text-gray-400 italic">No contact links available.</p>
-          )}
-        </div>
+        {loading ? (
+          <div className="mx-auto flex w-full max-w-3xl animate-pulse flex-col items-center gap-8">
+            <div className="flex w-full max-w-md flex-col items-center gap-3">
+              <div className="h-4 w-3/4 rounded bg-gray-200"></div>
+              <div className="h-4 w-1/2 rounded bg-gray-200"></div>
+            </div>
+
+            <div className="flex flex-col items-center gap-6 sm:flex-row sm:justify-center">
+              {[1, 2].map((i) => (
+                <div key={i} className="flex items-center gap-4 p-2">
+                  <div className="h-12 w-12 flex-shrink-0 rounded-full bg-gray-200"></div>
+                  <div className="h-4 w-32 rounded bg-gray-200"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Address and Email Display if needed, or simple social links */}
+            <p className="mx-auto mb-8 max-w-2xl text-neutral-600">
+              {contactData.address} <br />
+              <span className="font-semibold">{contactData.email}</span>
+            </p>
+
+            <div className="flex flex-col items-center gap-6 sm:flex-row sm:flex-wrap sm:justify-center">
+              {contactData.links && contactData.links.length > 0 ? (
+                contactData.links.map((link, i) => (
+                  <div
+                    key={i}
+                    className="flex flex-row items-center gap-4 rounded-xl p-2 transition hover:bg-gray-50"
+                  >
+                    <a
+                      href={link.startsWith('http') ? link : `https://${link}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gray-200 text-gray-700 transition hover:bg-gray-300"
+                      title={link}
+                    >
+                      {/* Generic Link Icon - could map specific icons for fb/twitter/insta later */}
+                      <HiLink className="h-6 w-6" />
+                    </a>
+                    <a
+                      href={link.startsWith('http') ? link : `https://${link}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-sm font-medium break-all text-gray-700 hover:text-gray-900 hover:underline"
+                    >
+                      {link}
+                    </a>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-400 italic">
+                  No contact links available.
+                </p>
+              )}
+            </div>
+          </>
+        )}
       </section>
     </main>
   );

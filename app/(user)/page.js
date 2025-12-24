@@ -148,7 +148,7 @@ export default function Home() {
       <section className="relative flex min-h-screen w-screen snap-start items-center justify-center text-black">
         {/* Background Image */}
         <Image
-          src="/img/home.png"
+          src="/img/home4.png"
           alt="Background"
           fill
           priority
@@ -185,7 +185,7 @@ export default function Home() {
               </button>
             </a>
 
-            <a href="/about">
+            <a href="/about#contact-us">
               <button className="cursor-pointer rounded-full border border-[#DCDCDC] bg-white px-4 py-2 text-sm font-semibold text-black transition hover:border-gray-400 hover:bg-gray-50 sm:px-6 sm:py-3 sm:text-base">
                 Connect With Si-Zero
               </button>
@@ -201,7 +201,7 @@ export default function Home() {
           <div className="flex max-w-6xl flex-col items-center gap-4 text-center sm:gap-8">
             <div className="flex flex-col gap-2 sm:gap-4">
               <h2 className="text-2xl leading-tight font-bold sm:text-3xl md:text-4xl">
-                Who We Are
+                Who Are We
               </h2>
               <p className="max-w-3xl text-sm leading-relaxed text-black/50 sm:text-base">
                 Si-ZERO is a global sustainability initiative led by Swinburne
@@ -230,7 +230,7 @@ export default function Home() {
               <div className="mx-auto grid w-full max-w-6xl grid-cols-1 justify-center gap-x-8 gap-y-7 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-10 lg:grid-cols-2 lg:gap-x-8 lg:gap-y-12">
                 <div className="flex w-full flex-col items-start justify-start gap-4">
                   <Card
-                    imageSrc="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQoEBeC-EkOvHutZ0UUBoelSNq0WJpDSLWxsQ&s"
+                    imageSrc="/img/upscaled/img1.png"
                     texts={[
                       {
                         text: 'Mechanical and Heat Pre-Treatments of Solar PV Panel',
@@ -245,7 +245,7 @@ export default function Home() {
                 </div>
                 <div className="flex w-full flex-col items-start justify-start gap-4">
                   <Card
-                    imageSrc="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRQqCNkh-JGAbGpMbsbNUPUPDLVcRTCt4SRGg&s"
+                    imageSrc="/img/upscaled/img2.png"
                     texts={[
                       {
                         text: 'Slag Optimisation & Distribution Measurement',
@@ -260,7 +260,7 @@ export default function Home() {
                 </div>
                 <div className="flex w-full flex-col items-start justify-start gap-4">
                   <Card
-                    imageSrc="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_H9MRm9RyuRxBbaM9rmM32-uSbhS-4ekpRw&s"
+                    imageSrc="/img/upscaled/img3.png"
                     texts={[
                       {
                         text: 'Blue Laser Melting & Hydrometallurgical Processing for Ag Recovery',
@@ -275,7 +275,7 @@ export default function Home() {
                 </div>
                 <div className="flex w-full flex-col items-start justify-start gap-4">
                   <Card
-                    imageSrc="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRv5ErhCJhaG4U1pF4dE-oJ1163U-_eflTBqg&s"
+                    imageSrc="/img/upscaled/img4.png"
                     texts={[
                       {
                         text: 'Zero-Carbon Silicon Electrochemical Production & Refining',

@@ -31,7 +31,7 @@ export default function Footer() {
             </div>
             <div className="flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-3">
               <Link
-                href="/contact"
+                href="/about#contact-us"
                 className="flex cursor-pointer items-center justify-center gap-2.5 rounded-2xl border border-[#DCDCDC] bg-white px-4 py-2 text-sm font-medium text-stone-500 transition hover:border-gray-400 hover:bg-gray-50 sm:px-6 sm:py-2 sm:text-base"
               >
                 Visit Our Facility
