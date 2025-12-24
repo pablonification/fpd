@@ -478,13 +478,15 @@ export default function UserForm() {
                 {/* 1. Profile Picture */}
                 <div className="flex flex-col items-start gap-5 md:flex-row md:items-center">
                   <div className="flex h-24 w-24 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-gray-200 text-xs text-gray-500">
-                    <Image
-                      src={avatarPreview || '/icon/db-user-1.png'}
-                      alt="Profile"
-                      width={96} // 24 * 4 = 96px (3rem)
-                      height={96}
-                      className="h-full w-full rounded-full object-cover"
-                    />
+                    {avatarPreview ? (
+                      <Image
+                        src={avatarPreview}
+                        alt="Profile"
+                        width={96}
+                        height={96}
+                        className="h-full w-full rounded-full object-cover"
+                      />
+                    ) : null}
                   </div>
                   <div className="flex flex-1 flex-col items-start gap-2">
                     <div className="flex flex-col gap-1">
