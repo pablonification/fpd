@@ -29,7 +29,7 @@ export default function Footer() {
             <div className="text-lg font-medium text-black sm:text-xl">
               Get in Touch & Visit Us
             </div>
-            <div className="flex flex-row flex-wrap items-center justify-left gap-2 sm:gap-3">
+            <div className="justify-left flex flex-row flex-wrap items-center gap-2 sm:gap-3">
               <Link
                 href="/about#contact-us"
                 className="flex cursor-pointer items-center justify-center gap-2.5 rounded-2xl border border-[#DCDCDC] bg-white px-4 py-2 text-sm font-medium text-stone-500 transition hover:border-gray-400 hover:bg-gray-50 sm:px-6 sm:py-2 sm:text-base"
