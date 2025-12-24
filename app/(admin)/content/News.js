@@ -8,7 +8,6 @@ export default function NewsAdmin() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState('add');
   const [currentEditId, setCurrentEditId] = useState(null);
@@ -27,7 +26,6 @@ export default function NewsAdmin() {
     let active = true;
     const load = async () => {
       setLoading(true);
-      setError('');
       try {
         const res = await fetch('/api/news', { cache: 'no-store' });
         if (!res.ok) throw new Error(`Failed to load: ${res.status}`);
@@ -36,7 +34,7 @@ export default function NewsAdmin() {
         const list = response.data || [];
         setItems(list);
       } catch (e) {
-        setError(e.message || 'Failed to load news');
+        toast.error(e.message || 'Failed to load news');
       } finally {
         if (active) setLoading(false);
       }
@@ -187,13 +185,13 @@ export default function NewsAdmin() {
     if (!id) return;
     if (!confirm('Are you sure you want to delete this news?')) return;
     setLoading(true);
-    setError('');
     try {
       const res = await fetch(`/api/news/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error(`Delete failed: ${res.status}`);
       setItems((prev) => prev.filter((it) => it.id !== id));
+      toast.success('News deleted');
     } catch (e) {
-      setError(e.message || 'Failed to delete');
+      toast.error(e.message || 'Failed to delete');
     } finally {
       setLoading(false);
     }
@@ -242,12 +240,6 @@ export default function NewsAdmin() {
           <img src="/icon/search.png" alt="Search" className="h-5 w-5" />
         </div>
       </div>
-
-      {error && (
-        <div className="rounded-xl bg-red-50 p-4 text-sm text-red-700">
-          {error}
-        </div>
-      )}
 
       {/* Filter Section & Add Button */}
       <div className="flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">

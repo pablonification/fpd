@@ -8,7 +8,6 @@ import toast from 'react-hot-toast';
 export default function ResearcherForm() {
   const [researchers, setResearchers] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
@@ -39,7 +38,6 @@ export default function ResearcherForm() {
   // Fetch researchers
   const fetchResearchers = useCallback(async () => {
     setLoading(true);
-    setError(null);
     try {
       const response = await fetch('/api/researchers', { cache: 'no-store' });
       const data = await response.json();
@@ -50,7 +48,7 @@ export default function ResearcherForm() {
         throw new Error(data.error || 'Failed to fetch researchers');
       }
     } catch (err) {
-      setError(err.message);
+      toast.error(err.message);
       console.error(err);
     } finally {
       setLoading(false);
@@ -123,7 +121,6 @@ export default function ResearcherForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
 
     let avatarUrl =
       currentResearcher?.avatarUrl || currentResearcher?.avatar_url || null;
@@ -142,7 +139,7 @@ export default function ResearcherForm() {
         if (!uploadRes.ok) throw new Error(uploadData.message);
         avatarUrl = uploadData.publicUrl;
       } catch (err) {
-        setError(`Upload failed: ${err.message}`);
+        toast.error(`Upload failed: ${err.message}`);
         setLoading(false);
         return;
       }
@@ -172,7 +169,6 @@ export default function ResearcherForm() {
       closeModal();
       fetchResearchers();
     } catch (err) {
-      setError(err.message);
       toast.error(err.message);
     } finally {
       setLoading(false);
@@ -193,7 +189,6 @@ export default function ResearcherForm() {
       toast.success('Researcher deleted');
       fetchResearchers();
     } catch (err) {
-      setError(err.message);
       toast.error(err.message);
     } finally {
       setLoading(false);
@@ -277,12 +272,6 @@ export default function ResearcherForm() {
                   </div>
                 </div>
               ))}
-            </div>
-          )}
-
-          {error && (
-            <div className="m-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-600">
-              {error}
             </div>
           )}
 

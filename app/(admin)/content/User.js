@@ -3,11 +3,11 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import Image from 'next/image';
 import FormField from '../_components/FormField';
 import { CgSpinner } from 'react-icons/cg';
+import toast from 'react-hot-toast';
 
 export default function UserForm() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
@@ -31,7 +31,6 @@ export default function UserForm() {
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
-    setError(null);
     try {
       const response = await fetch('/api/users');
       if (!response.ok) {
@@ -46,7 +45,7 @@ export default function UserForm() {
       }));
       setUsers(usersWithAvatar);
     } catch (err) {
-      setError(err.message);
+      toast.error(err.message);
       console.error(err);
     } finally {
       setLoading(false);
@@ -135,7 +134,6 @@ export default function UserForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
 
     const isCreating = !currentUser;
 
@@ -159,7 +157,7 @@ export default function UserForm() {
         avatarUrl = uploadData.publicUrl;
         console.log(avatarUrl);
       } catch (err) {
-        setError(`Avatar upload failed: ${err.message}`);
+        toast.error(`Avatar upload failed: ${err.message}`);
         setLoading(false);
         return;
       }
@@ -187,7 +185,7 @@ export default function UserForm() {
       !payload.role ||
       (isCreating && !payload.password)
     ) {
-      alert(
+      toast.error(
         'Please fill in all required fields (Full Name, Email, Role, and Password for new user).'
       );
       setLoading(false);
@@ -221,12 +219,12 @@ export default function UserForm() {
         );
       }
 
+      toast.success(isCreating ? 'User created' : 'User updated');
       closeModal();
       fetchUsers(); // Refresh data
     } catch (err) {
-      setError(err.message);
+      toast.error(err.message);
       console.error(err);
-      alert(`Error: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -239,7 +237,6 @@ export default function UserForm() {
     }
 
     setLoading(true);
-    setError(null);
 
     try {
       const response = await fetch(`/api/users/${userId}`, {
@@ -250,11 +247,11 @@ export default function UserForm() {
         throw new Error('Failed to delete user');
       }
 
+      toast.success('User deleted');
       fetchUsers(); // Refresh data
     } catch (err) {
-      setError(err.message);
+      toast.error(err.message);
       console.error(err);
-      alert(`Error: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -336,17 +333,6 @@ export default function UserForm() {
                   </div>
                 </div>
               ))}
-            </div>
-          )}
-
-          {/* Error State */}
-          {error && (
-            <div
-              className="relative m-4 rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700"
-              role="alert"
-            >
-              <strong className="font-bold">Error:</strong>
-              <span className="ml-2 block sm:inline">{error}</span>
             </div>
           )}
 
