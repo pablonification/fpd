@@ -49,6 +49,12 @@ function EventsContent({ events }) {
           const thumbnail = getYoutubeThumbnail(event.mediaUrl);
           if (thumbnail) imageSrc = thumbnail;
         }
+
+        const rawDesc =
+          event.description || 'Gallery activity documentation and updates.';
+        const desc =
+          rawDesc.length > 100 ? rawDesc.substring(0, 100) + '...' : rawDesc;
+
         return (
           <Link key={event.id} href="/gallery" className="group block w-full">
             <Card
@@ -60,9 +66,7 @@ function EventsContent({ events }) {
                   size: 'large',
                 },
                 {
-                  text:
-                    event.description ||
-                    'Gallery activity documentation and updates.',
+                  text: desc,
                 },
               ]}
               className="[&_p:first-of-type]:group-hover:text-primaryGradientEnd cursor-pointer [&_img]:transition-all [&_img]:duration-300 [&_img]:ease-out [&_img]:group-hover:brightness-[0.8] [&_p:first-of-type]:transition-colors [&_p:first-of-type]:duration-300 [&_p:first-of-type]:ease-out"
