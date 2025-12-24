@@ -40,6 +40,7 @@ export default function AdminDashboardPage() {
   const [notifOpen, setNotifOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [latestUpdates, setLatestUpdates] = useState([]);
+  const [hasNewNotifications, setHasNewNotifications] = useState(false);
   const [user, setUser] = useState(null);
 
   // Fetch Data (Stats & User)
@@ -51,6 +52,16 @@ export default function AdminDashboardPage() {
         const statsJson = await statsRes.json();
         if (statsJson.success) {
           setLatestUpdates(statsJson.data.latestUpdates);
+
+          // Check if there are new notifications since last seen
+          const lastSeen = localStorage.getItem('notifLastSeen');
+          if (statsJson.data.latestUpdates.length > 0) {
+            const latestTime = new Date(
+              statsJson.data.latestUpdates[0].time
+            ).getTime();
+            const lastSeenTime = lastSeen ? parseInt(lastSeen, 10) : 0;
+            setHasNewNotifications(latestTime > lastSeenTime);
+          }
         }
 
         // Fetch User
@@ -84,7 +95,7 @@ export default function AdminDashboardPage() {
   };
 
   return (
-    <div className="flex h-screen w-full bg-white overflow-hidden">
+    <div className="flex h-screen w-full overflow-hidden bg-white">
       {/* MOBILE BACKDROP OVERLAY */}
       {mobileOpen && (
         <div
@@ -95,23 +106,21 @@ export default function AdminDashboardPage() {
 
       {/* SIDEBAR */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex flex-col border-r border-[#DCDCDC] bg-[#F8F8F8] transition-all duration-300
-          ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} 
-          md:relative md:translate-x-0 
-          ${sidebarOpen ? 'md:w-[268px] md:p-6' : 'md:w-20 md:p-2'}
-          w-[268px] p-6
-        `}
+        className={`fixed inset-y-0 left-0 z-50 flex flex-col border-r border-[#DCDCDC] bg-[#F8F8F8] transition-all duration-300 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 ${sidebarOpen ? 'md:w-[268px] md:p-6' : 'md:w-20 md:p-2'} w-[268px] p-6`}
       >
         {/* Sidebar Header */}
         <div className="mb-8 flex h-12 items-center justify-between">
           {/* Logo Placeholder (visible if open or on mobile) */}
-          {(sidebarOpen || mobileOpen) && <div className="h-9 w-9 rounded bg-gray-400"></div>}
+          {(sidebarOpen || mobileOpen) && (
+            <div className="h-9 w-9 rounded bg-gray-400"></div>
+          )}
 
           {/* Desktop Toggle Button */}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className={`hidden md:flex items-center justify-center rounded-lg transition-all ${sidebarOpen ? 'h-9 w-9' : 'h-12 w-12'
-              }`}
+            className={`hidden items-center justify-center rounded-lg transition-all md:flex ${
+              sidebarOpen ? 'h-9 w-9' : 'h-12 w-12'
+            }`}
           >
             <Image
               src={'/icon/db-toggle-1.png'}
@@ -124,7 +133,7 @@ export default function AdminDashboardPage() {
           {/* Mobile Close Button */}
           <button
             onClick={() => setMobileOpen(false)}
-            className="flex md:hidden items-center justify-center h-9 w-9"
+            className="flex h-9 w-9 items-center justify-center md:hidden"
           >
             <span className="text-xl font-bold">✕</span>
           </button>
@@ -141,23 +150,24 @@ export default function AdminDashboardPage() {
                   setActiveItem(item.name);
                   setMobileOpen(false); // Close on mobile click
                 }}
-                className={`flex items-center rounded-lg transition-colors whitespace-nowrap
-                  ${/* Mobile: always full width */ ''}
-                  md:transition-all
-                  ${sidebarOpen
+                className={`flex items-center rounded-lg whitespace-nowrap transition-colors ${/* Mobile: always full width */ ''} md:transition-all ${
+                  sidebarOpen
                     ? `h-12 w-full gap-3 px-3`
-                    : `md:h-12 md:w-12 md:justify-center md:px-0 h-12 w-full gap-3 px-3`
-                  }
-                  ${isActive ? 'bg-[#E0E0E0]' : 'hover:bg-[#F0F0F0]'}
-                `}
+                    : `h-12 w-full gap-3 px-3 md:h-12 md:w-12 md:justify-center md:px-0`
+                } ${isActive ? 'bg-[#E0E0E0]' : 'hover:bg-[#F0F0F0]'} `}
               >
                 <div className="flex-shrink-0">
-                  <Image src={item.icon} alt={item.name} width={24} height={24} />
+                  <Image
+                    src={item.icon}
+                    alt={item.name}
+                    width={24}
+                    height={24}
+                  />
                 </div>
                 {/* Text: Visible on Mobile, or Desktop Open */}
-                <span className={`text-[16px] font-medium transition-opacity duration-200
-                  ${!sidebarOpen ? 'md:hidden' : 'md:block'}
-                `}>
+                <span
+                  className={`text-[16px] font-medium transition-opacity duration-200 ${!sidebarOpen ? 'md:hidden' : 'md:block'} `}
+                >
                   {item.name}
                 </span>
               </button>
@@ -169,15 +179,27 @@ export default function AdminDashboardPage() {
       {/* MAIN CONTENT */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex h-16 items-center justify-between border-b border-gray-300 px-4 md:h-20 md:px-6 lg:px-8 bg-white relative z-30">
+        <div className="relative z-30 flex h-16 items-center justify-between border-b border-gray-300 bg-white px-4 md:h-20 md:px-6 lg:px-8">
           <div className="flex items-center gap-4">
             {/* Mobile Hamburger Button */}
             <button
               onClick={() => setMobileOpen(true)}
-              className="md:hidden p-2 -ml-2 text-gray-700"
+              className="-ml-2 p-2 text-gray-700 md:hidden"
             >
               {/* Simple Hamburger Icon */}
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
             </button>
 
             <h1 className="truncate text-lg font-semibold md:text-xl lg:text-2xl">
@@ -185,15 +207,23 @@ export default function AdminDashboardPage() {
             </h1>
           </div>
 
-          <div className="flex items-center gap-3 md:gap-4 relative">
+          <div className="relative flex items-center gap-3 md:gap-4">
             {/* Notifications */}
             <div className="relative">
               <button
                 onClick={() => {
-                  setNotifOpen(!notifOpen);
+                  const isOpening = !notifOpen;
+                  setNotifOpen(isOpening);
                   setProfileOpen(false);
+                  if (isOpening && latestUpdates.length > 0) {
+                    localStorage.setItem(
+                      'notifLastSeen',
+                      Date.now().toString()
+                    );
+                    setHasNewNotifications(false);
+                  }
                 }}
-                className="relative flex items-center justify-center p-2 rounded-full hover:bg-gray-100 outline-none"
+                className="relative flex items-center justify-center rounded-full p-2 outline-none hover:bg-gray-100"
               >
                 <Image
                   src="/icon/db-notifikasi.png"
@@ -201,27 +231,30 @@ export default function AdminDashboardPage() {
                   width={24}
                   height={24}
                 />
-                {latestUpdates.length > 0 && (
+                {hasNewNotifications && (
                   <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500"></span>
                 )}
               </button>
 
               {/* Notifications Dropdown */}
               {notifOpen && (
-                <div className="absolute right-0 top-full mt-2 w-80 rounded-xl border border-gray-200 bg-white shadow-xl z-50 overflow-hidden">
+                <div className="absolute top-full right-0 z-50 mt-2 w-80 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl">
                   <div className="border-b border-gray-100 bg-gray-50 px-4 py-3 text-sm font-semibold text-gray-700">
                     Notifications
                   </div>
                   <div className="max-h-[300px] overflow-y-auto">
                     {latestUpdates.length === 0 ? (
-                      <div className="p-4 text-center text-gray-500 text-sm">
+                      <div className="p-4 text-center text-sm text-gray-500">
                         No new updates.
                       </div>
                     ) : (
                       <div className="flex flex-col">
                         {latestUpdates.map((update, index) => (
-                          <div key={index} className="border-b border-gray-100 p-3 hover:bg-gray-50 last:border-0">
-                            <p className="text-sm text-gray-800 font-medium mb-1 line-clamp-2">
+                          <div
+                            key={index}
+                            className="border-b border-gray-100 p-3 last:border-0 hover:bg-gray-50"
+                          >
+                            <p className="mb-1 line-clamp-2 text-sm font-medium text-gray-800">
                               {update.text}
                             </p>
                             <p className="text-xs text-gray-500">
@@ -243,47 +276,70 @@ export default function AdminDashboardPage() {
                   setProfileOpen(!profileOpen);
                   setNotifOpen(false);
                 }}
-                className="flex items-center gap-2 rounded-full hover:bg-gray-100 p-1 md:pr-3 transition-colors outline-none"
+                className="flex items-center gap-2 rounded-full p-1 transition-colors outline-none hover:bg-gray-100 md:pr-3"
               >
                 <div className="relative h-8 w-8 overflow-hidden rounded-full bg-gray-300 md:h-10 md:w-10">
                   {/* Real User Avatar from DB */}
                   <Image
-                    src={user?.avatarUrl || "https://api.dicebear.com/9.x/avataaars/svg?seed=Admin"}
+                    src={
+                      user?.avatarUrl ||
+                      'https://api.dicebear.com/9.x/avataaars/svg?seed=Admin'
+                    }
                     alt="User"
                     fill
                     className="object-cover"
                   />
                 </div>
-                <div className="hidden md:flex flex-col items-start">
-                  <span className="text-sm font-medium text-gray-900 leading-none">
+                <div className="hidden flex-col items-start md:flex">
+                  <span className="text-sm leading-none font-medium text-gray-900">
                     {user ? user.name : 'Loading...'}
                   </span>
                   <span className="text-xs text-gray-500">
                     {user ? getRoleLabel(user.role) : '...'}
                   </span>
                 </div>
-                <svg className="hidden md:block w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                <svg
+                  className="hidden h-4 w-4 text-gray-400 md:block"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
                 </svg>
               </button>
 
               {/* Profile Dropdown */}
               {profileOpen && (
-                <div className="absolute right-0 top-full mt-2 w-56 rounded-xl border border-gray-200 bg-white shadow-xl z-50 overflow-hidden py-1">
+                <div className="absolute top-full right-0 z-50 mt-2 w-56 overflow-hidden rounded-xl border border-gray-200 bg-white py-1 shadow-xl">
                   <div className="border-b border-gray-100 px-4 py-3">
-                    <p className="text-sm font-medium text-gray-900 truncate">
+                    <p className="truncate text-sm font-medium text-gray-900">
                       {user?.name || 'User'}
                     </p>
-                    <p className="text-xs text-gray-500 truncate">
+                    <p className="truncate text-xs text-gray-500">
                       {user?.email || ''}
                     </p>
                   </div>
                   <button
                     onClick={handleLogout}
-                    className="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors text-left"
+                    className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-red-600 transition-colors hover:bg-red-50"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    <svg
+                      className="h-4 w-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                      />
                     </svg>
                     Sign Out
                   </button>
@@ -294,10 +350,13 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Content Content */}
-        <div className="flex-1 overflow-auto bg-gray-50 p-4 md:p-6" onClick={() => {
-          setNotifOpen(false);
-          setProfileOpen(false);
-        }}>
+        <div
+          className="flex-1 overflow-auto bg-gray-50 p-4 md:p-6"
+          onClick={() => {
+            setNotifOpen(false);
+            setProfileOpen(false);
+          }}
+        >
           <ContentRenderer activeItem={activeItem} />
         </div>
       </div>
