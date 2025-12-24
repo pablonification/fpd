@@ -153,8 +153,10 @@ export default function Home() {
           fill
           priority
           sizes="100vw"
-          className="object-cover"
+          className="object-cover transition-opacity duration-700"
           quality={90}
+          placeholder="blur"
+          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAIAAoDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAUH/8QAIhAAAgEDBAMBAAAAAAAAAAAAAQIDAAQRBQYSIRMxQVH/xAAUAQEAAAAAAAAAAAAAAAAAAAAA/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8AqXW5r+31C7t4bmWOKOZkRFbgAoJAHXwcVH/dV7/Vx/KKKoP/2Q=="
         />
 
         {/* Gradient Putih - Dari bawah ke atas untuk menyatu dengan section berikutnya */}
@@ -179,17 +181,17 @@ export default function Home() {
 
           {/* Buttons */}
           <div className="mt-2 flex flex-col gap-2 sm:gap-4 md:flex-row md:gap-6">
-            <a href="/researcher/project">
+            <Link href="/researcher/project">
               <button className="from-primaryGradientStart to-primaryGradientEnd cursor-pointer rounded-full bg-gradient-to-r px-4 py-2 text-sm font-semibold text-white shadow-[inset_0_2px_4px_0_rgba(255,255,255,0.5)] shadow-lg transition hover:scale-105 hover:shadow-xl sm:px-6 sm:py-3 sm:text-base">
                 Explore Si-ZERO Research Program
               </button>
-            </a>
+            </Link>
 
-            <a href="/about#contact-us">
+            <Link href="/about#contact-us">
               <button className="cursor-pointer rounded-full border border-[#DCDCDC] bg-white px-4 py-2 text-sm font-semibold text-black transition hover:border-gray-400 hover:bg-gray-50 sm:px-6 sm:py-3 sm:text-base">
                 Connect With Si-Zero
               </button>
-            </a>
+            </Link>
           </div>
         </div>
       </section>
@@ -203,7 +205,7 @@ export default function Home() {
               <h2 className="text-2xl leading-tight font-bold sm:text-3xl md:text-4xl">
                 Who Are We
               </h2>
-              <p className="max-w-3xl text-sm leading-relaxed text-black/50 sm:text-base">
+              <p className="max-w-5xl text-sm leading-relaxed text-black/50 sm:text-base">
                 Si-ZERO is a global sustainability initiative led by Swinburne
                 University of Technology, bringing together partners across
                 Australia, India, Indonesia, and the United States to advance a
@@ -231,6 +233,7 @@ export default function Home() {
                 <div className="flex w-full flex-col items-start justify-start gap-4">
                   <Card
                     imageSrc="/img/upscaled/img1.png"
+                    priority={true}
                     texts={[
                       {
                         text: 'Mechanical and Heat Pre-Treatments of Solar PV Panel',
@@ -246,6 +249,7 @@ export default function Home() {
                 <div className="flex w-full flex-col items-start justify-start gap-4">
                   <Card
                     imageSrc="/img/upscaled/img2.png"
+                    priority={true}
                     texts={[
                       {
                         text: 'Slag Optimisation & Distribution Measurement',

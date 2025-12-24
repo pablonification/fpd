@@ -5,7 +5,7 @@ import { FaLinkedin } from 'react-icons/fa';
 
 export default function Footer() {
   return (
-    <div className="mt-16 inline-flex w-full flex-col items-center justify-end">
+    <footer className="mt-auto inline-flex w-full flex-col items-center justify-end">
       {/* Main Footer Content */}
       <div className="flex w-full flex-col items-start justify-between gap-6 border-t border-zinc-300 bg-white px-4 py-6 sm:px-8 sm:py-11 lg:flex-row lg:gap-8 lg:px-16">
         {/* Left Section - Logo & Description */}
@@ -90,6 +90,6 @@ export default function Footer() {
           of Technology. All rights reserved.
         </div>
       </div>
-    </div>
+    </footer>
   );
 }
