@@ -26,22 +26,33 @@ export default function Home() {
     latestUpdates: [],
   });
   const [loading, setLoading] = useState(true);
+  const [userName, setUserName] = useState('');
 
   useEffect(() => {
-    async function fetchStats() {
+    async function fetchData() {
       try {
-        const res = await fetch('/api/dashboard/stats');
-        const json = await res.json();
-        if (json.success) {
-          setStats(json.data);
+        const [statsRes, userRes] = await Promise.all([
+          fetch('/api/dashboard/stats'),
+          fetch('/api/auth/me'),
+        ]);
+
+        const statsJson = await statsRes.json();
+        if (statsJson.success) {
+          setStats(statsJson.data);
+        }
+
+        const userJson = await userRes.json();
+        if (userJson.success && userJson.data?.name) {
+          const firstName = userJson.data.name.split(' ')[0];
+          setUserName(firstName);
         }
       } catch (error) {
-        console.error('Failed to fetch stats:', error);
+        console.error('Failed to fetch data:', error);
       } finally {
         setLoading(false);
       }
     }
-    fetchStats();
+    fetchData();
   }, []);
 
   const SkeletonStatCard = () => (
@@ -93,10 +104,10 @@ export default function Home() {
       <div className="flex h-full min-h-screen w-full flex-col items-start justify-start gap-4 p-4 md:p-10">
         <div className="flex w-full flex-col items-start justify-start gap-1 md:w-80">
           <div className="justify-start self-stretch text-2xl leading-10 font-bold text-black md:text-3xl">
-            Welcome, Admin!
+            Welcome{userName ? `, ${userName}` : ''}!
           </div>
           <div className="justify-start self-stretch text-base leading-6 font-medium text-neutral-500 md:text-lg">
-            Here's an overview of today's updates.
+            Here&apos;s an overview of today&apos;s updates.
           </div>
         </div>
 
@@ -131,10 +142,10 @@ export default function Home() {
       {/* Welcome Section */}
       <div className="flex w-full flex-col items-start justify-start gap-1 md:w-80">
         <div className="justify-start self-stretch text-2xl leading-10 font-bold text-black md:text-3xl">
-          Welcome, Admin!
+          Welcome{userName ? `, ${userName}` : ''}!
         </div>
         <div className="justify-start self-stretch text-base leading-6 font-medium text-neutral-500 md:text-lg">
-          Here's an overview of today's updates.
+          Here&apos;s an overview of today&apos;s updates.
         </div>
       </div>
 
