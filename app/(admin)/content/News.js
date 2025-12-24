@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
+import toast from 'react-hot-toast';
 
 export default function NewsAdmin() {
   const [items, setItems] = useState([]);
@@ -8,7 +9,6 @@ export default function NewsAdmin() {
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
-  const [modalError, setModalError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState('add');
   const [currentEditId, setCurrentEditId] = useState(null);
@@ -81,7 +81,6 @@ export default function NewsAdmin() {
       isFeatured: false,
     });
     setCurrentEditId(null);
-    setModalError('');
   };
 
   const handleInputChange = (e) => {
@@ -106,7 +105,6 @@ export default function NewsAdmin() {
   const onUploadImage = async (file) => {
     if (!file) return;
     setUploading(true);
-    setModalError('');
     try {
       const fd = new FormData();
       fd.append('file', file);
@@ -118,24 +116,23 @@ export default function NewsAdmin() {
       const { publicUrl } = await res.json();
       setFormData((prev) => ({ ...prev, imageUrl: publicUrl }));
     } catch (e) {
-      setModalError(e.message || 'Upload failed');
+      toast.error(e.message || 'Upload failed');
     } finally {
       setUploading(false);
     }
   };
 
   const handleSubmit = async () => {
-    setModalError('');
     if (!formData.title.trim()) {
-      setModalError('Title is required');
+      toast.error('Title is required');
       return;
     }
     if (!formData.slug.trim()) {
-      setModalError('Slug is required');
+      toast.error('Slug is required');
       return;
     }
     if (!formData.content.trim()) {
-      setModalError('Content is required');
+      toast.error('Content is required');
       return;
     }
 
@@ -163,6 +160,7 @@ export default function NewsAdmin() {
         setItems((prev) =>
           prev.map((it) => (it.id === currentEditId ? result.data : it))
         );
+        toast.success('News updated');
       } else {
         const res = await fetch('/api/news', {
           method: 'POST',
@@ -175,10 +173,11 @@ export default function NewsAdmin() {
         }
         const result = await res.json();
         setItems((prev) => [result.data, ...prev]);
+        toast.success('News created');
       }
       closeModal();
     } catch (e) {
-      setModalError(e.message || 'Failed to save');
+      toast.error(e.message || 'Failed to save');
     } finally {
       setSaving(false);
     }
@@ -273,12 +272,6 @@ export default function NewsAdmin() {
               <div className="mb-6 text-2xl font-semibold text-zinc-800">
                 {modalType === 'add' ? 'Add New News' : 'Edit News'}
               </div>
-
-              {modalError && (
-                <div className="mb-4 rounded-xl bg-red-50 p-4 text-sm text-red-700">
-                  {modalError}
-                </div>
-              )}
 
               {/* Form Fields */}
               <div className="space-y-5">

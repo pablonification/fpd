@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
+import toast from 'react-hot-toast';
 
 export default function GalleryAdmin() {
   const [items, setItems] = useState([]);
@@ -8,7 +9,6 @@ export default function GalleryAdmin() {
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
-  const [modalError, setModalError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState('add');
   const [contentType, setContentType] = useState('image');
@@ -100,7 +100,6 @@ export default function GalleryAdmin() {
     });
     setContentType('image');
     setCurrentEditId(null);
-    setModalError('');
   };
 
   const handleInputChange = (e) => {
@@ -119,7 +118,6 @@ export default function GalleryAdmin() {
   const onUploadImage = async (file) => {
     if (!file) return;
     setUploading(true);
-    setModalError('');
     try {
       const fd = new FormData();
       fd.append('file', file);
@@ -131,32 +129,31 @@ export default function GalleryAdmin() {
       const { publicUrl } = await res.json();
       setFormData((prev) => ({ ...prev, imageUrl: publicUrl }));
     } catch (e) {
-      setModalError(e.message || 'Upload failed');
+      toast.error(e.message || 'Upload failed');
     } finally {
       setUploading(false);
     }
   };
 
   const handleSubmit = async () => {
-    setModalError('');
     if (!formData.title.trim()) {
-      setModalError('Title is required');
+      toast.error('Title is required');
       return;
     }
     if (!formData.activityType) {
-      setModalError('Activity Type is required');
+      toast.error('Activity Type is required');
       return;
     }
     if (!formData.activityDate) {
-      setModalError('Activity Date is required');
+      toast.error('Activity Date is required');
       return;
     }
     if (contentType === 'image' && !formData.imageUrl.trim()) {
-      setModalError('Please upload an image');
+      toast.error('Please upload an image');
       return;
     }
     if (contentType === 'video' && !formData.youtubeUrl.trim()) {
-      setModalError('Please enter a YouTube URL');
+      toast.error('Please enter a YouTube URL');
       return;
     }
 
@@ -188,6 +185,7 @@ export default function GalleryAdmin() {
         setItems((prev) =>
           prev.map((it) => (it.id === currentEditId ? result.data : it))
         );
+        toast.success('Gallery item updated');
       } else {
         const res = await fetch('/api/gallery', {
           method: 'POST',
@@ -200,10 +198,11 @@ export default function GalleryAdmin() {
         }
         const result = await res.json();
         setItems((prev) => [result.data, ...prev]);
+        toast.success('Gallery item created');
       }
       closeModal();
     } catch (e) {
-      setModalError(e.message || 'Failed to save');
+      toast.error(e.message || 'Failed to save');
     } finally {
       setSaving(false);
     }
@@ -315,12 +314,6 @@ export default function GalleryAdmin() {
               <div className="mb-6 text-2xl font-semibold text-zinc-800">
                 {modalType === 'add' ? 'Add New Content' : 'Edit Content'}
               </div>
-
-              {modalError && (
-                <div className="mb-4 rounded-xl bg-red-50 p-4 text-sm text-red-700">
-                  {modalError}
-                </div>
-              )}
 
               {/* Content Type Selector */}
               <div className="mb-6 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
