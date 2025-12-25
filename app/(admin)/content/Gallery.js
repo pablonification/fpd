@@ -568,8 +568,8 @@ export default function GalleryAdmin() {
                     <div className="line-clamp-2 self-stretch text-base leading-5 font-normal text-black">
                       {item.title}
                     </div>
-                    <div className="w-80 text-sm leading-4 font-normal text-neutral-500">
-                      {item.description}
+                    <div className="w-80 max-w-[320px] truncate text-sm leading-4 font-normal text-neutral-500">
+                      {item.description || '-'}
                     </div>
                   </div>
                 </div>

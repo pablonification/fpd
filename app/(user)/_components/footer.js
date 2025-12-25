@@ -5,7 +5,7 @@ import { FaLinkedin } from 'react-icons/fa';
 
 export default function Footer() {
   return (
-    <div className="mt-16 inline-flex w-full flex-col items-center justify-end">
+    <footer className="mt-auto inline-flex w-full flex-col items-center justify-end">
       {/* Main Footer Content */}
       <div className="flex w-full flex-col items-start justify-between gap-6 border-t border-zinc-300 bg-white px-4 py-6 sm:px-8 sm:py-11 lg:flex-row lg:gap-8 lg:px-16">
         {/* Left Section - Logo & Description */}
@@ -29,7 +29,7 @@ export default function Footer() {
             <div className="text-lg font-medium text-black sm:text-xl">
               Get in Touch & Visit Us
             </div>
-            <div className="flex flex-row flex-wrap items-center justify-left gap-2 sm:gap-3">
+            <div className="justify-left flex flex-row flex-wrap items-center gap-2 sm:gap-3">
               <Link
                 href="/about#contact-us"
                 className="flex cursor-pointer items-center justify-center gap-2.5 rounded-2xl border border-[#DCDCDC] bg-white px-4 py-2 text-sm font-medium text-stone-500 transition hover:border-gray-400 hover:bg-gray-50 sm:px-6 sm:py-2 sm:text-base"
@@ -90,6 +90,6 @@ export default function Footer() {
           of Technology. All rights reserved.
         </div>
       </div>
-    </div>
+    </footer>
   );
 }

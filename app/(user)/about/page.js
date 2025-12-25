@@ -139,37 +139,36 @@ export default function AboutPage() {
           </div>
         ) : timelineData.length > 0 ? (
           <div className="mx-auto max-w-3xl px-6">
-            {timelineData.map((item, index) => (
+            <div className="relative">
+              {/* Vertical connecting line */}
               <div
-                key={item.id}
-                className="flex gap-4 pb-10 text-left last:pb-0"
-              >
-                {/* Timeline Dot & Line */}
-                <div className="flex flex-shrink-0 flex-col items-center pt-1">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                  >
-                    <circle cx="8" cy="8" r="8" fill="#2AB2C7" />
-                  </svg>
-                  {index !== timelineData.length - 1 && (
-                    <div className="w-[2px] flex-grow bg-[#2AB2C7]" />
-                  )}
-                </div>
+                className="absolute top-[8px] left-[7px] w-[2px] bg-[#DCDCDC]"
+                style={{
+                  height: `calc(100% - 16px)`,
+                }}
+              />
 
-                <div>
-                  <h4 className="text-left text-lg font-semibold italic sm:text-xl">
-                    {item.year}
-                  </h4>
-                  <p className="text-sm leading-relaxed text-neutral-500 sm:text-base">
-                    {item.description}
-                  </p>
+              {timelineData.map((item, index) => (
+                <div
+                  key={item.id}
+                  className="relative flex gap-4 pb-10 text-left last:pb-0"
+                >
+                  {/* Timeline Dot */}
+                  <div className="relative z-10 flex flex-shrink-0 items-start pt-1">
+                    <div className="h-4 w-4 rounded-full bg-[#2AB2C7] ring-4 ring-white" />
+                  </div>
+
+                  <div className="flex-1">
+                    <h4 className="text-left text-lg font-semibold italic sm:text-xl">
+                      {item.year}
+                    </h4>
+                    <p className="text-sm leading-relaxed text-neutral-500 sm:text-base">
+                      {item.description}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         ) : (
           <p className="text-neutral-400">No milestones yet.</p>

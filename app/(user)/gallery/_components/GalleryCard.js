@@ -32,14 +32,28 @@ export function GalleryCard({
 
       {/* Text */}
       <div className="mt-4 flex w-full flex-col gap-2 px-2 text-left sm:px-0">
-        {texts.map((t, index) => (
-          <p
-            key={index}
-            className={`${t.bold ? 'leading-tight font-bold text-black' : 'leading-normal text-gray-600'} ${t.size === 'large' ? 'text-lg sm:text-xl' : 'text-sm sm:text-base'} ${index === 0 ? 'group-hover:text-primaryGradientEnd transition-colors duration-300 ease-out' : ''}`}
-          >
-            {t.text}
-          </p>
-        ))}
+        {texts.map((t, index) => {
+          const isDescription = index > 0;
+          return (
+            <p
+              key={index}
+              className={`${t.bold ? 'leading-tight font-bold text-black' : 'leading-normal text-gray-600'} ${t.size === 'large' ? 'text-lg sm:text-xl' : 'text-sm sm:text-base'} ${index === 0 ? 'group-hover:text-primaryGradientEnd transition-colors duration-300 ease-out' : ''}`}
+              style={
+                isDescription
+                  ? {
+                      display: '-webkit-box',
+                      WebkitLineClamp: 3,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }
+                  : undefined
+              }
+            >
+              {t.text}
+            </p>
+          );
+        })}
       </div>
     </div>
   );
