@@ -34,7 +34,7 @@ export default function TeamSection() {
               researcher.avatar_url ||
               '/placeholder-avatar.png',
             name: researcher.name,
-            bidang: researcher.expertise || 'Research',
+            bidang: researcher.role || 'Proffesor',
             expertise: researcher.expertise || '',
             affiliation: researcher.affiliation || '',
             email: researcher.email || '',
