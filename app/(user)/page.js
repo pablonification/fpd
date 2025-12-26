@@ -1,6 +1,12 @@
+import WhoAreWe from './_components/WhoAreWe';
+import HeroSection from './_components/HeroSection';
+import WhatWeDo from './_components/WhatWeDo';
+import {
+  LatestGallerySection,
+  LatestNewsSection,
+} from './_components/LatestSections';
 import Card from './_components/card';
 import SkeletonCard from './_components/SkeletonCard';
-import Image from 'next/image';
 import Link from 'next/link';
 
 import { Suspense } from 'react';
@@ -148,203 +154,44 @@ async function LatestNews() {
 export default function Home() {
   return (
     <main className="overflow-x-clip overflow-y-auto">
-      {/* SECTION 1 */}
-      <section className="relative flex min-h-screen w-screen snap-start items-center justify-center text-black">
-        {/* Background Image */}
-        <Image
-          src="/img/home4.png"
-          alt="Background"
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover transition-opacity duration-700"
-          quality={90}
-          placeholder="blur"
-          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAIAAoDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAUH/8QAIhAAAgEDBAMBAAAAAAAAAAAAAQIDAAQRBQYSIRMxQVH/xAAUAQEAAAAAAAAAAAAAAAAAAAAA/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8AqXW5r+31C7t4bmWOKOZkRFbgAoJAHXwcVH/dV7/Vx/KKKoP/2Q=="
-        />
-
-        {/* Gradient Putih - Dari bawah ke atas untuk menyatu dengan section berikutnya */}
-        <div className="from-bgMain absolute inset-0 bg-gradient-to-t via-white/30 to-transparent" />
-
-        <div className="relative z-10 flex max-w-6xl flex-col items-center gap-4 px-4 py-8 text-center sm:gap-8 sm:px-6 lg:px-8">
-          {/* Announcement Bar */}
-          <div className="h-9 w-full max-w-[465px] rounded-[20px] border border-black/50 bg-white/10 px-4 pt-2 pb-3 text-xs backdrop-blur-md sm:text-sm">
-            Si-ZERO
-          </div>
-
-          {/* Title + Description */}
-          <div className="flex flex-col gap-2 [text-shadow:_0_2px_10px_rgb(255_255_255_/_30%)] sm:gap-4">
-            <h1 className="text-3xl leading-tight font-bold sm:text-4xl md:text-5xl lg:text-6xl">
-              Silicon Zero-Emission Recycling, Refining and Production
-            </h1>
-            <p className="mx-auto max-w-2xl text-sm leading-relaxed font-normal text-[#656565] sm:text-base">
-              Brief paragraph summarizing what this platform is, who the users
-              are, and the main reasons why this platform matters to them.
-            </p>
-          </div>
-
-          {/* Buttons */}
-          <div className="mt-2 flex flex-col gap-2 sm:gap-4 md:flex-row md:gap-6">
-            <Link href="/researcher/project">
-              <button className="from-primaryGradientStart to-primaryGradientEnd cursor-pointer rounded-full bg-gradient-to-r px-4 py-2 text-sm font-semibold text-white shadow-[inset_0_2px_4px_0_rgba(255,255,255,0.5)] shadow-lg transition hover:scale-105 hover:shadow-xl sm:px-6 sm:py-3 sm:text-base">
-                Explore Si-ZERO Research Program
-              </button>
-            </Link>
-
-            <Link href="/about#contact-us">
-              <button className="cursor-pointer rounded-full border border-[#DCDCDC] bg-white px-4 py-2 text-sm font-semibold text-black transition hover:border-gray-400 hover:bg-gray-50 sm:px-6 sm:py-3 sm:text-base">
-                Connect With Si-Zero
-              </button>
-            </Link>
-          </div>
-        </div>
-      </section>
+      <HeroSection />
 
       {/* SECTION 2, 3, 4 - Combined */}
       <section className="bg-bgMain flex w-screen snap-start items-center justify-center py-16 sm:py-20">
         <div className="flex w-full max-w-6xl flex-col items-center gap-16 px-4 sm:gap-20 sm:px-6 md:gap-24 lg:px-8">
-          {/* Who Are We */}
-          <div className="flex max-w-6xl flex-col items-center gap-4 text-center sm:gap-8">
-            <div className="flex flex-col gap-2 sm:gap-4">
-              <h2 className="text-2xl leading-tight font-bold sm:text-3xl md:text-4xl">
-                Who Are We
-              </h2>
-              <p className="max-w-5xl text-sm leading-relaxed text-black/50 sm:text-base">
-                Si-ZERO is a global sustainability initiative led by Swinburne
-                University of Technology, bringing together partners across
-                Australia, India, Indonesia, and the United States to advance a
-                circular and low-carbon future for silicon production and
-                materials recovery from solar-panel. By integrating innovative
-                recycling, processing, and clean-technology solutions, we
-                transform end-of-life solar panels into valuable resources,
-                supporting a sustainable and resilient renewable-energy supply
-                chain. Our mission is to foster collaboration between research,
-                industry and government to accelerate circularity and build a
-                sustainable, future-ready solar ecosystem
-              </p>
-            </div>
-          </div>
+          <WhoAreWe />
 
-          {/* What We Do */}
-          <div className="mt-14 flex w-full flex-col items-center gap-4 text-center sm:gap-8">
-            <div>
-              <h2 className="text-grayDark text-2xl leading-tight font-bold sm:text-3xl md:text-4xl">
-                What We Do
-              </h2>
-            </div>
-            <div className="w-full space-y-6 sm:space-y-8">
-              <div className="mx-auto grid w-full max-w-6xl grid-cols-1 justify-center gap-x-8 gap-y-7 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-10 lg:grid-cols-2 lg:gap-x-8 lg:gap-y-12">
-                <div className="flex w-full flex-col items-start justify-start gap-4">
-                  <Card
-                    imageSrc="/img/upscaled/img1.png"
-                    priority={true}
-                    texts={[
-                      {
-                        text: 'Mechanical and Heat Pre-Treatments of Solar PV Panel',
-                        bold: true,
-                        size: 'large',
-                      },
-                      {
-                        text: 'Partnership: SUT (Australia), Remind (Indonesia), UGM (Indonesia), BRIN (Indonesia) We develop efficient pre-treatment processes that mechanically and thermally separate solar PV components for high-value material recovery. By improving delamination, glass liberation, and EVA removal, this program lays the foundation for scalable end-of-life PV recycling solutions',
-                      },
-                    ]}
-                  />
-                </div>
-                <div className="flex w-full flex-col items-start justify-start gap-4">
-                  <Card
-                    imageSrc="/img/upscaled/img2.png"
-                    priority={true}
-                    texts={[
-                      {
-                        text: 'Slag Optimisation & Distribution Measurement',
-                        bold: true,
-                        size: 'large',
-                      },
-                      {
-                        text: 'Partnership: SUT (Australia), IIT Hyderabad (India) We engineer high-performance slag systems through advanced modelling and property measurement to support cleaner and more efficient silicon refining. This program provides the thermodynamic insights and slag behaviour data required for next-generation electro-slag and molten-oxide refining technologies.',
-                      },
-                    ]}
-                  />
-                </div>
-                <div className="flex w-full flex-col items-start justify-start gap-4">
-                  <Card
-                    imageSrc="/img/upscaled/img3.png"
-                    texts={[
-                      {
-                        text: 'Blue Laser Melting & Hydrometallurgical Processing for Ag Recovery',
-                        bold: true,
-                        size: 'large',
-                      },
-                      {
-                        text: 'Partnership: SUT (Australia), UGM (Indonesia), BRIN (Indonesia) We advance selective blue-laser melting technologies to cleanly detach metallic layers from PV cells, enabling high-purity silver extraction. Combined with targeted hydrometallurgical processing, this process unlocks efficient recovery of critical metals from waste PV modules.',
-                      },
-                    ]}
-                  />
-                </div>
-                <div className="flex w-full flex-col items-start justify-start gap-4">
-                  <Card
-                    imageSrc="/img/upscaled/img4.png"
-                    texts={[
-                      {
-                        text: 'Zero-Carbon Silicon Electrochemical Production & Refining',
-                        bold: true,
-                        size: 'large',
-                      },
-                      {
-                        text: 'Partnership: SUT (Australia), Sadoway Labs Foundation (USA), IIT Hyderabad (India), Greenko (India) We advance new pathways for producing and refining silicon with a significantly lower environmental footprint. This program brings together innovative electrical and slag-based refining approaches to create cleaner, more efficient alternatives to conventional silicon manufacturing. ',
-                      },
-                    ]}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+          <WhatWeDo />
 
           {/* Latest Events */}
-          <div className="flex w-full flex-col items-center gap-4 text-center sm:gap-8">
-            <div>
-              <h2 className="text-grayDark text-2xl leading-tight font-bold sm:text-3xl md:text-4xl">
-                Latest Gallery
-              </h2>
-            </div>
-            <div className="w-full space-y-6 sm:space-y-8">
-              <div className="mx-auto grid w-full max-w-6xl grid-cols-1 justify-center gap-x-7 gap-y-7 sm:grid-cols-2 sm:gap-x-8 sm:gap-y-10 md:grid-cols-3 lg:grid-cols-3 lg:gap-x-10 lg:gap-y-12">
-                <Suspense
-                  fallback={
-                    <>
-                      <SkeletonCard />
-                      <SkeletonCard />
-                      <SkeletonCard />
-                    </>
-                  }
-                >
-                  <LatestEvents />
-                </Suspense>
-              </div>
-            </div>
-          </div>
-          <div className="flex w-full flex-col items-center gap-4 py-8 text-center sm:gap-8">
-            <div>
-              <h2 className="text-grayDark text-2xl leading-tight font-bold sm:text-3xl md:text-4xl">
-                Latest News
-              </h2>
-            </div>
-            <div className="w-full space-y-6 sm:space-y-8">
-              <div className="mx-auto grid w-full max-w-6xl grid-cols-1 justify-center gap-x-7 gap-y-7 sm:grid-cols-2 sm:gap-x-8 sm:gap-y-10 md:grid-cols-3 lg:grid-cols-3 lg:gap-x-10 lg:gap-y-12">
-                <Suspense
-                  fallback={
-                    <>
-                      <SkeletonCard />
-                      <SkeletonCard />
-                      <SkeletonCard />
-                    </>
-                  }
-                >
-                  <LatestNews />
-                </Suspense>
-              </div>
-            </div>
-          </div>
+          <LatestGallerySection>
+            <Suspense
+              fallback={
+                <>
+                  <SkeletonCard />
+                  <SkeletonCard />
+                  <SkeletonCard />
+                </>
+              }
+            >
+              <LatestEvents />
+            </Suspense>
+          </LatestGallerySection>
+
+          {/* Latest News */}
+          <LatestNewsSection>
+            <Suspense
+              fallback={
+                <>
+                  <SkeletonCard />
+                  <SkeletonCard />
+                  <SkeletonCard />
+                </>
+              }
+            >
+              <LatestNews />
+            </Suspense>
+          </LatestNewsSection>
         </div>
       </section>
 
