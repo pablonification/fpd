@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { FaLinkedin } from 'react-icons/fa';
+import Image from 'next/image';
 
 export default function Footer() {
   return (
@@ -10,7 +11,17 @@ export default function Footer() {
       <div className="flex w-full flex-col items-start justify-between gap-6 border-t border-zinc-300 bg-white px-4 py-6 sm:px-8 sm:py-11 lg:flex-row lg:gap-8 lg:px-16">
         {/* Left Section - Logo & Description */}
         <div className="flex flex-col items-start justify-start gap-4">
-          <div className="h-20 w-20 bg-zinc-300 sm:h-28 sm:w-28" />
+
+          {/* Logo */}
+          <div className="h-20 w-20 overflow-hidden sm:h-28 sm:w-28">
+            <img
+              src="/img/logo-dummy.jpg"
+              alt="Fluid & Process Dynamics Research Group Logo"
+              className="h-full w-full object-contain"
+            />
+          </div>
+
+
           <div className="flex flex-col items-start justify-start gap-2">
             <div className="text-lg font-semibold text-black sm:text-xl">
               Fluid & Process Dynamics Research Group
