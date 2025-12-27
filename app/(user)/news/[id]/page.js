@@ -5,10 +5,12 @@ import { useParams } from 'next/navigation';
 import { ArrowLeft, Calendar } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import Card from './../../_components/card';
 
 export default function NewsDetailPage() {
   const params = useParams();
   const [news, setNews] = useState(null);
+  const [relatedNews, setRelatedNews] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -24,11 +26,29 @@ export default function NewsDetailPage() {
       const data = await response.json();
       if (data.success) {
         setNews(data.data);
+        // Fetch all news to get related news
+        fetchRelatedNews(data.data.slug);
       }
     } catch (error) {
       console.error('Error fetching news:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchRelatedNews = async (currentSlug) => {
+    try {
+      const response = await fetch('/api/news');
+      const data = await response.json();
+      if (data.success) {
+        // Filter out current news and get only 3 related news
+        const related = (data.data || [])
+          .filter((item) => item.slug !== currentSlug)
+          .slice(0, 3);
+        setRelatedNews(related);
+      }
+    } catch (error) {
+      console.error('Error fetching related news:', error);
     }
   };
 
@@ -136,6 +156,60 @@ export default function NewsDetailPage() {
         <article className="prose prose-sm sm:prose-base prose-gray prose-headings:font-bold prose-headings:text-gray-900 prose-p:leading-relaxed prose-p:text-gray-600 prose-a:text-[#2497A9] prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl max-w-none">
           <div dangerouslySetInnerHTML={{ __html: news.content }} />
         </article>
+
+        {/* Related News Section */}
+        {relatedNews.length > 0 && (
+          <section className="mt-16 border-t border-gray-200 pt-16">
+            <h2 className="mb-8 text-2xl tracking-tight text-neutral-950 sm:text-3xl">
+              Other News
+            </h2>
+            
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {relatedNews.map((item) => (
+                <Link
+                  key={item.slug}
+                  href={`/news/${item.slug}`}
+                  className="group block h-full"
+                >
+                  <Card
+                    imageSrc={
+                      item.imageUrl ||
+                      item.image_url ||
+                      'https://picsum.photos/400/250'
+                    }
+                    texts={[
+                      {
+                        text: item.title,
+                        bold: true,
+                        size: 'large',
+                      },
+                      {
+                        text:
+                          item.content.replace(/<[^>]*>/g, '').substring(0, 150) +
+                          (item.content.length > 150 ? '...' : ''),
+                      },
+                      {
+                        text: item.isFeatured || item.is_featured ? 'Featured' : 'News',
+                      },
+                    ]}
+                    className="
+                      h-full cursor-pointer
+                      [&_img]:transition-all
+                      [&_img]:duration-300
+                      [&_img]:ease-out
+                      [&_img]:group-hover:brightness-[0.8]
+                      [&_p:first-of-type]:transition-colors
+                      [&_p:first-of-type]:duration-300
+                      [&_p:first-of-type]:ease-out
+                      [&_p:first-of-type]:group-hover:text-primaryGradientEnd
+                    "
+                  />
+                </Link>
+              ))}
+            </div>
+
+          </section>
+        )}
       </div>
     </main>
   );
