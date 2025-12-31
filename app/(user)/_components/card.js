@@ -12,6 +12,21 @@ export default function Card({
 }) {
   const [isLoaded, setIsLoaded] = useState(false);
 
+  const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+  const highlightText = (text, words = []) => {
+    if (!words.length) return text;
+    let result = text;
+    words.forEach((word) => {
+      const pattern = new RegExp(`(${escapeRegex(word)})`, 'gi');
+      result = result.replace(
+        pattern,
+        '<span style="color:#0ea57a;font-weight:700;">$1</span>'
+      );
+    });
+    return result;
+  };
+
   const isExternal =
     imageSrc?.includes('youtube.com') ||
     imageSrc?.includes('gstatic.com') ||
@@ -46,16 +61,43 @@ export default function Card({
       {/* Konten teks */}
       <div className="mt-4 flex w-full flex-col gap-2 px-0 text-left">
         {texts.map((t, index) => (
-          <p
-            key={index}
-            className={`break-words ${
-              t.bold
-                ? 'text-grayDark leading-tight font-bold'
-                : 'leading-normal text-gray-600'
-            } ${t.size === 'large' ? 'text-lg sm:text-xl' : 'text-sm sm:text-base'}`}
-          >
-            {t.text}
-          </p>
+          // Optional accents and per-word highlighting for key terms
+          t.highlightWords && t.highlightWords.length ? (
+            <p
+              key={index}
+              className={`break-words ${
+                t.bold
+                  ? 'text-grayDark leading-tight font-bold'
+                  : 'leading-normal text-gray-600'
+              } ${
+                t.size === 'large' ? 'text-lg sm:text-xl' : 'text-sm sm:text-base'
+              } ${
+                t.accent === 'gradient'
+                  ? 'bg-gradient-to-r from-[#2ab2c7] to-[#0e9db3] bg-clip-text text-transparent'
+                  : ''
+              }`}
+              dangerouslySetInnerHTML={{
+                __html: highlightText(t.text, t.highlightWords),
+              }}
+            />
+          ) : (
+            <p
+              key={index}
+              className={`break-words ${
+                t.bold
+                  ? 'text-grayDark leading-tight font-bold'
+                  : 'leading-normal text-gray-600'
+              } ${
+                t.size === 'large' ? 'text-lg sm:text-xl' : 'text-sm sm:text-base'
+              } ${
+                t.accent === 'gradient'
+                  ? 'bg-gradient-to-r from-[#2ab2c7] to-[#0e9db3] bg-clip-text text-transparent'
+                  : ''
+              }`}
+            >
+              {t.text}
+            </p>
+          )
         ))}
       </div>
     </div>

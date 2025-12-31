@@ -75,9 +75,15 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: 'easeOut' }}
-          className="h-9 w-full max-w-[465px] rounded-[20px] border border-black/50 bg-white/10 px-4 pt-2 pb-3 text-xs backdrop-blur-md sm:text-sm"
+          className="flex w-full items-center justify-center sm:max-w-[460px]"
         >
-          Si-ZERO
+          <Image
+            src="/institution/sizero.png"
+            alt="Swinburne University of Technology"
+            width={960}
+            height={400}
+            className="h-14 w-auto object-contain sm:h-16 md:h-20"
+          />
         </motion.div>
 
         <div className="flex flex-col gap-2 [text-shadow:_0_2px_10px_rgb(255_255_255_/_30%)] sm:gap-4">

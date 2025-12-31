@@ -110,9 +110,17 @@ export default function AdminDashboardPage() {
       >
         {/* Sidebar Header */}
         <div className="mb-8 flex h-12 items-center justify-between">
-          {/* Logo Placeholder (visible if open or on mobile) */}
-          {(sidebarOpen || mobileOpen) && (
-            <div className="h-9 w-9 rounded bg-gray-400"></div>
+          {/* Logo (full when open/mobile, icon when collapsed) */}
+          {sidebarOpen || mobileOpen ? (
+            <Image
+              src="/institution/sizero.png"
+              alt="Si-Zero Logo"
+              width={360}
+              height={180}
+              className="h-14 w-auto"
+            />
+          ) : (
+            <></>
           )}
 
           {/* Desktop Toggle Button */}
