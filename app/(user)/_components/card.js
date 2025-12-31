@@ -60,7 +60,7 @@ export default function Card({
 
       {/* Konten teks */}
       <div className="mt-4 flex w-full flex-col gap-2 px-0 text-left">
-        {texts.map((t, index) => (
+        {texts.map((t, index) =>
           // Optional accents and per-word highlighting for key terms
           t.highlightWords && t.highlightWords.length ? (
             <p
@@ -70,7 +70,9 @@ export default function Card({
                   ? 'text-grayDark leading-tight font-bold'
                   : 'leading-normal text-gray-600'
               } ${
-                t.size === 'large' ? 'text-lg sm:text-xl' : 'text-sm sm:text-base'
+                t.size === 'large'
+                  ? 'text-lg sm:text-xl'
+                  : 'text-sm sm:text-base'
               } ${
                 t.accent === 'gradient'
                   ? 'bg-gradient-to-r from-[#2ab2c7] to-[#0e9db3] bg-clip-text text-transparent'
@@ -88,7 +90,9 @@ export default function Card({
                   ? 'text-grayDark leading-tight font-bold'
                   : 'leading-normal text-gray-600'
               } ${
-                t.size === 'large' ? 'text-lg sm:text-xl' : 'text-sm sm:text-base'
+                t.size === 'large'
+                  ? 'text-lg sm:text-xl'
+                  : 'text-sm sm:text-base'
               } ${
                 t.accent === 'gradient'
                   ? 'bg-gradient-to-r from-[#2ab2c7] to-[#0e9db3] bg-clip-text text-transparent'
@@ -98,7 +102,7 @@ export default function Card({
               {t.text}
             </p>
           )
-        ))}
+        )}
       </div>
     </div>
   );
