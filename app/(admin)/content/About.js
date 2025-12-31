@@ -4,6 +4,41 @@ import FormField from '../_components/FormField';
 import ConfirmModal from '../_components/ConfirmModal';
 import toast from 'react-hot-toast';
 import Image from 'next/image';
+import dynamic from 'next/dynamic';
+
+// Dynamic import for ReactQuill to avoid SSR issues
+const ReactQuill = dynamic(() => import('react-quill-new'), {
+  ssr: false,
+  loading: () => (
+    <div className="h-[200px] w-full animate-pulse rounded-xl bg-gray-100" />
+  ),
+});
+import 'react-quill-new/dist/quill.snow.css';
+
+const QUILL_MODULES = {
+  toolbar: [
+    [{ header: [1, 2, false] }],
+    ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+    [{ list: 'ordered' }, { list: 'bullet' }],
+    ['link', 'clean'],
+  ],
+  keyboard: {
+    bindings: {
+      // Disable automatic list formatting with dash
+      'list autofill': {
+        key: ' ',
+        shiftKey: null,
+        collapsed: true,
+        format: { list: false },
+        prefix: /^\s*?(\d+\.|-|\*|\[ ?\]|\[x\])$/,
+        handler: function (range, context) {
+          // Do nothing - prevents auto-conversion
+          return true;
+        },
+      },
+    },
+  },
+};
 
 export default function AboutForm() {
   const [title, setTitle] = useState('');
@@ -182,34 +217,61 @@ export default function AboutForm() {
           onSubmit={handleSubmit}
           className="flex flex-col gap-6 rounded-[16px] border border-gray-300 bg-white p-6"
         >
-          <FormField
-            label="About Content"
-            description="Describe the group profile, including a general description, field of focus, laboratorium, and collaborators."
-            placeholder="Add a Description"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-          <FormField
-            label="Vision"
-            description="Describe the group’s vision."
-            placeholder="Add a Description"
-            value={vision}
-            onChange={(e) => setVision(e.target.value)}
-          />
-          <FormField
-            label="Mission"
-            description="Describe the group’s mission."
-            placeholder="Add a Description"
-            value={mission}
-            onChange={(e) => setMission(e.target.value)}
-          />
-          <FormField
-            label="Values"
-            description="Describe the group’s values."
-            placeholder="Add a Description"
-            value={values}
-            onChange={(e) => setValues(e.target.value)}
-          />
+          <div className="flex w-full flex-col gap-2">
+            <label className="text-sm font-bold text-gray-700">
+              About Content
+            </label>
+            <span className="text-xs text-gray-400">
+              Describe the group profile, including a general description, field
+              of focus, laboratorium, and collaborators.
+            </span>
+            <ReactQuill
+              theme="snow"
+              value={title}
+              onChange={setTitle}
+              modules={QUILL_MODULES}
+              className="bg-white"
+            />
+          </div>
+          <div className="flex w-full flex-col gap-2">
+            <label className="text-sm font-bold text-gray-700">Vision</label>
+            <span className="text-xs text-gray-400">
+              Describe the group vision.
+            </span>
+            <ReactQuill
+              theme="snow"
+              value={vision}
+              onChange={setVision}
+              modules={QUILL_MODULES}
+              className="bg-white"
+            />
+          </div>
+          <div className="flex w-full flex-col gap-2">
+            <label className="text-sm font-bold text-gray-700">Mission</label>
+            <span className="text-xs text-gray-400">
+              Describe the group mission.
+            </span>
+            <ReactQuill
+              theme="snow"
+              value={mission}
+              onChange={setMission}
+              modules={QUILL_MODULES}
+              className="bg-white"
+            />
+          </div>
+          <div className="flex w-full flex-col gap-2">
+            <label className="text-sm font-bold text-gray-700">Values</label>
+            <span className="text-xs text-gray-400">
+              Describe the group values.
+            </span>
+            <ReactQuill
+              theme="snow"
+              value={values}
+              onChange={setValues}
+              modules={QUILL_MODULES}
+              className="bg-white"
+            />
+          </div>
 
           <button
             type="submit"

@@ -89,15 +89,6 @@ export default function HeroSection() {
           >
             Silicon Zero-Emission Recycling, Refining and Production
           </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4, ease: 'easeOut' }}
-            className="mx-auto max-w-2xl text-sm leading-relaxed font-normal text-[#656565] sm:text-base"
-          >
-            Brief paragraph summarizing what this platform is, who the users
-            are, and the main reasons why this platform matters to them.
-          </motion.p>
         </div>
 
         <motion.div

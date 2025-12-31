@@ -95,7 +95,7 @@ export default function GalleryPage() {
           <h1 className="text-3xl leading-tight font-bold tracking-tight text-black sm:text-4xl md:text-5xl lg:text-6xl">
             Gallery & Field Activities
           </h1>
-          <p className="max-w-[900px] text-sm leading-relaxed tracking-normal text-[#7C7C7C] sm:text-base">
+          <p className="max-w-7xl text-sm leading-relaxed tracking-normal text-[#7C7C7C] sm:text-base">
             Collection of photos and videos showcasing laboratory activities,
             field research, seminars, and workshops organized by our team.
           </p>
