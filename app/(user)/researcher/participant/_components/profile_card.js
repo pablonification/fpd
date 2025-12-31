@@ -7,6 +7,8 @@ export default function CardProfile({
   bidang = '',
   description = '',
   className = '',
+  expertise = '',
+  affiliation = '',
   onClick,
 }) {
   return (
@@ -29,12 +31,12 @@ export default function CardProfile({
 
         {description && (
           <p className="line-clamp-2 text-sm text-gray-600 sm:text-base">
-            {description}
+            {expertise}
           </p>
         )}
 
         {bidang && (
-          <p className="text-sm text-[#2497A9] sm:text-base">{bidang}</p>
+          <p className="text-sm text-[#2497A9] sm:text-base">{affiliation}</p>
         )}
       </div>
     </div>

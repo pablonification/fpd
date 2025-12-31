@@ -90,7 +90,7 @@ export default function WhoAreWe() {
             >
               Driving the Future of{' '}
               <span className="bg-gradient-to-r from-[#2ab2c7] to-[#0e9db3] bg-clip-text text-transparent">
-                Solar Sustainability
+                Green Solar Panel Supply Chain
               </span>
             </motion.h2>
 
@@ -131,10 +131,10 @@ export default function WhoAreWe() {
             animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            <div className="relative z-10 grid gap-6 sm:grid-cols-2">
+            <div className="relative z-10 grid items-stretch gap-6 sm:grid-cols-2">
               <motion.div
                 whileHover={{ y: -5 }}
-                className="group flex flex-col justify-between rounded-2xl border border-gray-100 bg-white p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all"
+                className="group flex h-full flex-col justify-between rounded-2xl border border-gray-100 bg-white p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all"
               >
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#eefbfd] text-[#2ab2c7] transition-colors duration-300 group-hover:bg-[#2ab2c7] group-hover:text-white">
                   <Globe size={24} />
@@ -151,7 +151,7 @@ export default function WhoAreWe() {
 
               <motion.div
                 whileHover={{ y: -5 }}
-                className="group flex flex-col justify-between rounded-2xl border border-gray-100 bg-white p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all sm:translate-y-8"
+                className="group flex h-full flex-col justify-between rounded-2xl border border-gray-100 bg-white p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all"
               >
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#eefbfd] text-[#2ab2c7] transition-colors duration-300 group-hover:bg-[#2ab2c7] group-hover:text-white">
                   <Users size={24} />
@@ -168,7 +168,7 @@ export default function WhoAreWe() {
 
               <motion.div
                 whileHover={{ y: -5 }}
-                className="group flex flex-col justify-between rounded-2xl border border-gray-100 bg-white p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all"
+                className="group flex h-full flex-col justify-between rounded-2xl border border-gray-100 bg-white p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all"
               >
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#eefbfd] text-[#2ab2c7] transition-colors duration-300 group-hover:bg-[#2ab2c7] group-hover:text-white">
                   <FlaskConical size={24} />
@@ -183,7 +183,7 @@ export default function WhoAreWe() {
                 </div>
               </motion.div>
 
-              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#2ab2c7] to-[#0e9db3] p-6 text-white shadow-lg sm:translate-y-8">
+              <div className="relative h-full overflow-hidden rounded-2xl bg-gradient-to-br from-[#2ab2c7] to-[#0e9db3] p-6 text-white shadow-lg">
                 <div className="absolute top-0 right-0 -mt-8 -mr-8 h-32 w-32 rounded-full bg-white/10 blur-2xl"></div>
                 <div className="absolute bottom-0 left-0 -mb-8 -ml-8 h-32 w-32 rounded-full bg-black/10 blur-2xl"></div>
 
@@ -197,6 +197,53 @@ export default function WhoAreWe() {
             </div>
           </motion.div>
         </div>
+
+        {/* Partner Institutions */}
+        <motion.div
+          className="mt-16"
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+        >
+          <div className="mb-8 flex items-center justify-center gap-2">
+            <span className="h-px w-8 bg-[#2ab2c7]"></span>
+            <h3 className="text-center text-lg font-semibold text-[#3d3d3d]">
+              Our Partner Institutions
+            </h3>
+            <span className="h-px w-8 bg-[#2ab2c7]"></span>
+          </div>
+          <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-5">
+            {[
+              {
+                name: 'Swinburne University',
+                src: '/institution/swinburne.png',
+              },
+              { name: 'UGM', src: '/institution/ugm.png' },
+              { name: 'BRIN', src: '/institution/BRIN.png' },
+              { name: 'IIT', src: '/institution/iit.png' },
+              { name: 'Sadoway', src: '/institution/sadoway.png' },
+            ].map((institution, index) => (
+              <motion.div
+                key={institution.name}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={
+                  isInView
+                    ? { opacity: 1, scale: 1 }
+                    : { opacity: 0, scale: 0.9 }
+                }
+                transition={{ duration: 0.5, delay: 0.7 + index * 0.1 }}
+                whileHover={{ scale: 1.05 }}
+                className="group flex items-center justify-center rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition-all hover:shadow-md"
+              >
+                <img
+                  src={institution.src}
+                  alt={institution.name}
+                  className="h-24 w-auto object-contain transition-transform duration-300"
+                />
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
       </div>
     </section>
   );

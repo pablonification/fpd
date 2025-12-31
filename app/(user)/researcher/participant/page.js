@@ -139,7 +139,7 @@ export default function TeamSection() {
           <h1 className="text-3xl leading-tight font-bold tracking-tight text-black sm:text-4xl md:text-5xl lg:text-6xl">
             Researchers
           </h1>
-          <p className="max-w-[900px] text-sm leading-relaxed text-gray-600 sm:text-base">
+          <p className="max-w-7xl text-sm leading-relaxed text-gray-600 sm:text-base">
             Meet our dedicated researchers who are passionate about pushing the
             boundaries of knowledge and making a positive impact on society.
           </p>
