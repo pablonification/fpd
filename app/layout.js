@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: {
-    default: 'Si-Zero | Platform Riset Teknologi Hijau',
-    template: '%s | Si-Zero',
+    default: 'Si-Zero',
+    template: '%s',
   },
   description:
     'Si-Zero adalah platform riset kolaboratif yang berfokus pada pengembangan teknologi hijau, energi terbarukan, dan solusi berkelanjutan untuk masa depan yang lebih baik.',
@@ -51,7 +51,7 @@ export const metadata = {
     type: 'website',
     locale: 'id_ID',
     siteName: 'Si-Zero',
-    title: 'Si-Zero | Platform Riset Teknologi Hijau',
+    title: 'Si-Zero',
     description:
       'Platform riset kolaboratif yang berfokus pada pengembangan teknologi hijau dan solusi berkelanjutan.',
     images: [
@@ -65,7 +65,7 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Si-Zero | Platform Riset Teknologi Hijau',
+    title: 'Si-Zero',
     description:
       'Platform riset kolaboratif yang berfokus pada pengembangan teknologi hijau dan solusi berkelanjutan.',
     images: ['/logo.png'],
