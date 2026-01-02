@@ -69,24 +69,24 @@ export default function HeroSection() {
 
       <motion.div
         style={{ y: textY }}
-        className="relative z-10 flex max-w-6xl flex-col items-center gap-4 px-4 py-8 text-center sm:gap-8 sm:px-6 lg:px-8"
+        className="relative z-10 flex max-w-6xl flex-col items-center gap-4 px-4 py-8 text-center sm:px-6 lg:px-8"
       >
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: 'easeOut' }}
-          className="flex w-full items-center justify-center sm:max-w-[460px]"
+          className="flex w-full items-center justify-center sm:max-w-[600px]"
         >
           <Image
-            src="/institution/sizero.png"
-            alt="Swinburne University of Technology"
-            width={960}
-            height={400}
-            className="h-14 w-auto object-contain sm:h-16 md:h-20"
+            src="/logo-black.svg"
+            alt="Si-Zero Logo"
+            width={2000}
+            height={1000}
+            className="h-36 w-auto object-contain"
           />
         </motion.div>
 
-        <div className="flex flex-col gap-2 [text-shadow:_0_2px_10px_rgb(255_255_255_/_30%)] sm:gap-4">
+        <div className="-mt-2 flex flex-col [text-shadow:_0_2px_10px_rgb(255_255_255_/_30%)]">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

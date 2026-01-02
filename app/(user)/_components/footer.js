@@ -10,13 +10,13 @@ export default function Footer() {
       {/* Main Footer Content */}
       <div className="flex w-full flex-col items-start justify-between gap-6 border-t border-zinc-300 bg-white px-4 py-6 sm:px-8 sm:py-11 lg:flex-row lg:gap-8 lg:px-16">
         {/* Left Section - Logo & Description */}
-        <div className="flex flex-col items-start justify-start gap-4">
+        <div className="flex flex-col items-start justify-start">
           {/* Logo */}
           <div className="h-20 w-20 overflow-hidden sm:h-28 sm:w-28">
             <img
-              src="/institution/sizero.png"
+              src="/logo-black.svg"
               alt="SiZero Logo"
-              className="h-full w-full object-contain"
+              className="h-full w-full object-contain mt-2"
             />
           </div>
 

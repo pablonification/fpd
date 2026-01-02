@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -43,7 +44,13 @@ export default function LoginPage() {
       <div className="flex w-[500px] flex-col items-center justify-start gap-6 rounded-[36px] bg-white/80 p-11 shadow-[0px_0px_32px_0px_rgba(0,0,0,0.07)] outline outline-1 outline-offset-[-1px] outline-zinc-300 backdrop-blur-lg">
         {/* Header */}
         <div className="flex flex-col items-center justify-start gap-4 self-stretch">
-          <div className="h-7 w-7 bg-zinc-300" />
+          <Image
+            src="/icon-black.svg"
+            alt="Si-Zero Logo"
+            width={2000}
+            height={1000}
+            className="h-28 w-auto object-contain"
+          />
           <div className="flex flex-col items-center justify-start gap-3 self-stretch">
             <div className="text-center text-2xl leading-8 font-medium text-black">
               Welcome Back

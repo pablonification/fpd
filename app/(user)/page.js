@@ -10,6 +10,9 @@ import SkeletonCard from './_components/SkeletonCard';
 import Link from 'next/link';
 
 import { Suspense } from 'react';
+import { db } from '@/db/db';
+import { news, galleryItems } from '@/db/schema';
+import { desc } from 'drizzle-orm';
 
 function getYoutubeThumbnail(url) {
   if (!url) return null;
@@ -21,12 +24,12 @@ function getYoutubeThumbnail(url) {
 }
 
 async function fetchLatestEvents() {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/gallery?limit=3`,
-    { cache: 'no-store' }
-  );
-  const result = await res.json();
-  return (result.data || []).slice(0, 3);
+  const items = await db
+    .select()
+    .from(galleryItems)
+    .orderBy(desc(galleryItems.createdAt))
+    .limit(3);
+  return items;
 }
 
 function EventsContent({ events }) {
@@ -90,12 +93,12 @@ async function LatestEvents() {
 }
 
 async function fetchLatestNews() {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/news?limit=3`,
-    { cache: 'no-store' }
-  );
-  const result = await res.json();
-  return (result.data || []).slice(0, 3);
+  const items = await db
+    .select()
+    .from(news)
+    .orderBy(desc(news.createdAt))
+    .limit(3);
+  return items;
 }
 
 function NewsContent({ newsList }) {

@@ -5,7 +5,7 @@ import Card from './card';
 
 const cardsData = [
   {
-    imageSrc: '/img/upscaled/img1.png',
+    imageSrc: '/revised-img/mech.png',
     priority: true,
     texts: [
       {
@@ -26,7 +26,7 @@ const cardsData = [
     ],
   },
   {
-    imageSrc: '/img/upscaled/img2.png',
+    imageSrc: '/revised-img/slag.png',
     priority: true,
     texts: [
       {
@@ -47,7 +47,7 @@ const cardsData = [
     ],
   },
   {
-    imageSrc: '/img/upscaled/img3.png',
+    imageSrc: '/revised-img/blue.png',
     priority: false,
     texts: [
       {
@@ -68,7 +68,7 @@ const cardsData = [
     ],
   },
   {
-    imageSrc: '/img/upscaled/img4.png',
+    imageSrc: '/revised-img/zero.png',
     priority: false,
     texts: [
       {
