@@ -75,7 +75,7 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: 'easeOut' }}
-          className="flex w-full items-center justify-center sm:max-w-[600px]"
+          className="flex w-full max-w-[280px] items-center justify-center sm:max-w-[600px]"
         >
           <Image
             src="/logo-black.svg"
