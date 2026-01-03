@@ -45,7 +45,7 @@ export default function LoginPage() {
         {/* Header */}
         <div className="flex flex-col items-center justify-start gap-4 self-stretch">
           <Image
-            src="/icon-black.svg"
+            src="/final-logo.svg"
             alt="Si-Zero Logo"
             width={2000}
             height={1000}

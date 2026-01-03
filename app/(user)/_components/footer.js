@@ -14,7 +14,7 @@ export default function Footer() {
           {/* Logo */}
           <div className="h-20 w-20 overflow-hidden sm:h-28 sm:w-28">
             <img
-              src="/logo-black.svg"
+              src="/final-logo-full.svg"
               alt="SiZero Logo"
               className="h-full w-full object-contain mt-2"
             />

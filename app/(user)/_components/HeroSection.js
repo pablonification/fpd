@@ -78,7 +78,7 @@ export default function HeroSection() {
           className="flex w-full max-w-[280px] items-center justify-center sm:max-w-[600px]"
         >
           <Image
-            src="/logo-black.svg"
+            src="/final-logo-full.svg"
             alt="Si-Zero Logo"
             width={2000}
             height={1000}

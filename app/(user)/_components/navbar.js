@@ -39,7 +39,7 @@ export default function Navbar() {
         {/* Logo */}
         <div className="flex h-9 w-9 items-center justify-center rounded-lg sm:h-10 sm:w-10">
           <img
-            src="/icon-black.svg"
+            src="/final-logo.svg"
             alt="Si-Zero"
             className="h-full w-full object-contain"
           />

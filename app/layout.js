@@ -43,9 +43,9 @@ export const metadata = {
     },
   },
   icons: {
-    icon: '/icon-black.svg',
-    shortcut: '/icon-black.svg',
-    apple: '/icon-black.svg',
+    icon: '/final-logo.svg',
+    shortcut: '/final-logo.svg',
+    apple: '/final-logo.svg',
   },
   openGraph: {
     type: 'website',

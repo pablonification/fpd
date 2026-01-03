@@ -113,7 +113,7 @@ export default function AdminDashboardPage() {
           {/* Logo (full when open/mobile, icon when collapsed) */}
           {sidebarOpen || mobileOpen ? (
             <Image
-              src="/logo-black.svg"
+              src="/final-logo-full.svg"
               alt="Si-Zero Logo"
               width={360}
               height={180}
