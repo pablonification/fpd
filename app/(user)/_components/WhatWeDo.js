@@ -126,7 +126,7 @@ export default function WhatWeDo() {
         className="flex flex-col items-center gap-2"
       >
         <h2 className="text-grayDark text-2xl leading-tight font-bold sm:text-3xl md:text-4xl">
-          What We Do
+          Our Programs
         </h2>
         <div className="from-primaryGradientStart to-primaryGradientEnd h-1.5 w-24 rounded-full bg-gradient-to-r opacity-80" />
       </motion.div>
