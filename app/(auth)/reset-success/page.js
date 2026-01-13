@@ -8,7 +8,7 @@ export default function ResetSuccess() {
         {/* Header */}
         <div className="flex flex-col items-center justify-start gap-4 self-stretch">
           <Image
-            src="/icon/lock.png" // icon dari folder public
+            src="/icon/lock.webp" // icon dari folder public
             alt="Edit"
             width={120}
             height={120}

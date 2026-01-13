@@ -272,7 +272,7 @@ export default function GalleryAdmin() {
             }}
             className="flex-1 text-base leading-5 font-normal text-black outline-none placeholder:text-neutral-400"
           />
-          <img src="/icon/search.png" alt="Search" className="h-5 w-5" />
+          <img src="/icon/search.webp" alt="Search" className="h-5 w-5" />
         </div>
       </div>
 

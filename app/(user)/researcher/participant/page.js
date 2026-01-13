@@ -32,7 +32,7 @@ export default function TeamSection() {
             imageSrc:
               researcher.avatarUrl ||
               researcher.avatar_url ||
-              '/placeholder-avatar.png',
+              '/placeholder-avatar.webp',
             name: researcher.name,
             bidang: researcher.role || 'Proffesor',
             expertise: researcher.expertise || '',

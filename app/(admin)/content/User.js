@@ -43,7 +43,7 @@ export default function UserForm() {
       const usersWithAvatar = data.map((user) => ({
         ...user,
         status: user.isActive ? 'Active' : 'Inactive',
-        avatar: user.avatarUrl || '/icon/db-user-1.png',
+        avatar: user.avatarUrl || '/icon/db-user-1.webp',
         name: user.name,
       }));
       setUsers(usersWithAvatar);
@@ -274,7 +274,7 @@ export default function UserForm() {
               onChange={(e) => setSearch(e.target.value)}
               className="flex-1 text-sm outline-none"
             />
-            <img src="/icon/search.png" alt="Search" className="h-5 w-5" />
+            <img src="/icon/search.webp" alt="Search" className="h-5 w-5" />
           </div>
         </div>
 
@@ -367,7 +367,7 @@ export default function UserForm() {
 
               <div className="flex items-center justify-end gap-4">
                 <Image
-                  src="/icon/db-u-edit.png"
+                  src="/icon/db-u-edit.webp"
                   alt="Edit"
                   width={20}
                   height={20}
@@ -375,7 +375,7 @@ export default function UserForm() {
                   onClick={() => openModal(user)}
                 />
                 <Image
-                  src="/icon/db-u-trash.png"
+                  src="/icon/db-u-trash.webp"
                   alt="Delete"
                   width={20}
                   height={20}
@@ -383,7 +383,7 @@ export default function UserForm() {
                   onClick={() => setDeleteTarget(user)}
                 />
                 <Image
-                  src="/icon/db-u-right.png"
+                  src="/icon/db-u-right.webp"
                   alt="Info"
                   width={20}
                   height={20}

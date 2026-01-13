@@ -25,7 +25,7 @@ export default function HeroSection() {
         className="absolute inset-0 h-[120%] w-full"
       >
         <Image
-          src="/img/home4.png"
+          src="/img/home4.webp"
           alt="Background"
           fill
           priority

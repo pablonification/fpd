@@ -216,12 +216,12 @@ export default function WhoAreWe() {
             {[
               {
                 name: 'Swinburne University',
-                src: '/institution/swinburne.png',
+                src: '/institution/swinburne.webp',
               },
-              { name: 'UGM', src: '/institution/ugm.png' },
-              { name: 'BRIN', src: '/institution/BRIN.png' },
-              { name: 'IIT', src: '/institution/iit.png' },
-              { name: 'Sadoway', src: '/institution/sadoway.png' },
+              { name: 'UGM', src: '/institution/ugm.webp' },
+              { name: 'BRIN', src: '/institution/BRIN.webp' },
+              { name: 'IIT', src: '/institution/iit.webp' },
+              { name: 'Sadoway', src: '/institution/sadoway.webp' },
             ].map((institution, index) => (
               <motion.div
                 key={institution.name}

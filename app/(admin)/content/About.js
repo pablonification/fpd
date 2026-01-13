@@ -344,7 +344,7 @@ export default function AboutForm() {
                     className="rounded-full p-2 text-red-500 hover:bg-red-50"
                   >
                     <Image
-                      src="/icon/db-u-trash.png"
+                      src="/icon/db-u-trash.webp"
                       alt="Delete"
                       width={20}
                       height={20}

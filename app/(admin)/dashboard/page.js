@@ -6,14 +6,14 @@ import AboutForm from '../content/About';
 import ContentRenderer from '../_components/ContentRenderer';
 
 const navItems = [
-  { name: 'Home', icon: '/icon/db-home-1.png' },
-  { name: 'Users', icon: '/icon/db-user-1.png' },
-  { name: 'Research Projects', icon: '/icon/db-research-1.png' },
-  { name: 'Researcher', icon: '/icon/db-researcher.png' },
-  { name: 'Gallery', icon: '/icon/db-gallery.png' },
-  { name: 'News', icon: '/icon/db-news-2.png' },
-  { name: 'Contact', icon: '/icon/db-contact.png' },
-  { name: 'About', icon: '/icon/db-about.png' },
+  { name: 'Home', icon: '/icon/db-home-1.webp' },
+  { name: 'Users', icon: '/icon/db-user-1.webp' },
+  { name: 'Research Projects', icon: '/icon/db-research-1.webp' },
+  { name: 'Researcher', icon: '/icon/db-researcher.webp' },
+  { name: 'Gallery', icon: '/icon/db-gallery.webp' },
+  { name: 'News', icon: '/icon/db-news-2.webp' },
+  { name: 'Contact', icon: '/icon/db-contact.webp' },
+  { name: 'About', icon: '/icon/db-about.webp' },
 ];
 
 function timeAgo(dateString) {
@@ -131,7 +131,7 @@ export default function AdminDashboardPage() {
             }`}
           >
             <Image
-              src={'/icon/db-toggle-1.png'}
+              src={'/icon/db-toggle-1.webp'}
               alt={'toggle'}
               width={26}
               height={26}
@@ -234,7 +234,7 @@ export default function AdminDashboardPage() {
                 className="relative flex items-center justify-center rounded-full p-2 outline-none hover:bg-gray-100"
               >
                 <Image
-                  src="/icon/db-notifikasi.png"
+                  src="/icon/db-notifikasi.webp"
                   alt="Notifications"
                   width={24}
                   height={24}

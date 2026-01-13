@@ -40,7 +40,7 @@ export default function ForgotPassPage() {
         <div className="flex flex-col items-center justify-start gap-4 self-stretch">
           <div className="flex h-24 w-24 items-center justify-center rounded-3xl bg-[#2AB2C7]/10 p-4">
             <Image
-              src="/icon/keys.png"
+              src="/icon/keys.webp"
               alt="Forgot Password"
               width={80}
               height={80}

@@ -1,8 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import VisionImage from './_components/VisionIcon.png';
-import ValuesImage from './_components/OurValuesIcon.png';
+import VisionImage from './_components/VisionIcon.webp';
+import ValuesImage from './_components/OurValuesIcon.webp';
 // Simple social icons mapping or generic
 import { HiLink } from 'react-icons/hi';
 

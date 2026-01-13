@@ -56,7 +56,7 @@ export const metadata = {
       'Platform riset kolaboratif yang berfokus pada pengembangan teknologi hijau dan solusi berkelanjutan.',
     images: [
       {
-        url: '/logo.png',
+        url: '/logo.webp',
         width: 1200,
         height: 630,
         alt: 'Si-Zero Logo',
@@ -68,7 +68,7 @@ export const metadata = {
     title: 'Si-Zero',
     description:
       'Platform riset kolaboratif yang berfokus pada pengembangan teknologi hijau dan solusi berkelanjutan.',
-    images: ['/logo.png'],
+    images: ['/logo.webp'],
   },
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'

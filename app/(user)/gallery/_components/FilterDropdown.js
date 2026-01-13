@@ -62,7 +62,7 @@ export default function FilterDropdown({ tab, filter, setFilter }) {
       >
         <span>{filter === 'All' ? 'All Activities' : filter}</span>
         <img
-          src="/icon/arrow-down.png"
+          src="/icon/arrow-down.webp"
           alt="arrow down"
           className={`h-4 w-4 transition-transform ${open ? 'rotate-180' : ''}`}
         />

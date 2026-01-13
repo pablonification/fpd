@@ -44,7 +44,7 @@ export default function FilterRow({
             className="h-[56px] w-full rounded-[16px] border border-gray-300 bg-white/70 px-5 pr-12 text-lg text-gray-700 shadow-sm backdrop-blur-md placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 focus:outline-none"
           />
           <img
-            src="/icon/search.png"
+            src="/icon/search.webp"
             alt="Search"
             className="absolute top-1/2 right-4 h-6 w-6 -translate-y-1/2 opacity-50"
           />

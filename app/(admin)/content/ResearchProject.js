@@ -284,7 +284,7 @@ export default function ResearchProjectManagement() {
               onChange={(e) => setSearch(e.target.value)}
               className="flex-1 text-sm outline-none"
             />
-            <Image src="/icon/search.png" alt="Search" width={20} height={20} />
+            <Image src="/icon/search.webp" alt="Search" width={20} height={20} />
           </div>
         </div>
 
@@ -380,7 +380,7 @@ export default function ResearchProjectManagement() {
                   </div>
                   <div className="flex items-center justify-end gap-5">
                     <Image
-                      src="/icon/db-u-edit.png"
+                      src="/icon/db-u-edit.webp"
                       alt="Edit"
                       width={20}
                       height={20}
@@ -388,7 +388,7 @@ export default function ResearchProjectManagement() {
                       onClick={() => openModal(project)}
                     />
                     <Image
-                      src="/icon/db-u-trash.png"
+                      src="/icon/db-u-trash.webp"
                       alt="Delete"
                       width={20}
                       height={20}

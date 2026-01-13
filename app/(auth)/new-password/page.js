@@ -136,7 +136,7 @@ export default function NewPassPage() {
     <div className="relative flex min-h-screen w-full items-center justify-center bg-zinc-50 px-4 md:bg-gradient-to-b md:from-[#DFF5F8] md:to-white">
       <div className="flex w-full max-w-[480px] flex-col items-center justify-start gap-8 rounded-[36px] bg-white p-8 shadow-2xl md:p-12 outline outline-1 outline-offset-[-1px] outline-zinc-200">
         <div className="flex flex-col items-center gap-4">
-          <Image src="/icon/lock.png" alt="Reset Password" width={100} height={100} />
+          <Image src="/icon/lock.webp" alt="Reset Password" width={100} height={100} />
         </div>
 
         <Suspense fallback={<CgSpinner className="h-10 w-10 animate-spin text-[#2AB2C7]" />}>

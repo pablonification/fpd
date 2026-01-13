@@ -46,7 +46,7 @@ function SortableItem({ id, link, onDelete }) {
         className="text-red-500 hover:text-red-700"
       >
         <Image
-          src="/icon/db-u-trash.png"
+          src="/icon/db-u-trash.webp"
           alt="Delete"
           width={20}
           height={20}
