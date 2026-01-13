@@ -122,12 +122,11 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* Sign Up */}
         <Link
-          href="/login"
+          href="/about#contact-us"
           className="bg-grayDark hidden items-center rounded-3xl px-4 py-2 text-white transition hover:opacity-90 md:flex"
         >
-          Sign Up
+          Contact Us
         </Link>
 
         {/* Hamburger Mobile */}
