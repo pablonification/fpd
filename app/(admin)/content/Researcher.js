@@ -30,12 +30,20 @@ export default function ResearcherForm() {
   const [avatarPreview, setAvatarPreview] = useState(null);
   const fileInputRef = useRef(null);
 
-  const RESEARCHER_ROLES = [
+  const PREDEFINED_ROLES = [
     'Principal Investigator',
     "Master's Student",
     'Undergraduate Student',
     'Alumni Researcher',
     'Collaborator',
+  ];
+
+  const [isCustomRole, setIsCustomRole] = useState(false);
+  const [customRoleInput, setCustomRoleInput] = useState('');
+
+  const allRolesInData = [...new Set(researchers.map((r) => r.role))];
+  const AVAILABLE_ROLES = [
+    ...new Set([...PREDEFINED_ROLES, ...allRolesInData]),
   ];
 
   // Fetch researchers
@@ -73,16 +81,21 @@ export default function ResearcherForm() {
   const openModal = (researcher = null) => {
     setCurrentResearcher(researcher);
     if (researcher) {
+      const roleIsCustom = !PREDEFINED_ROLES.includes(researcher.role);
+      setIsCustomRole(roleIsCustom);
+      setCustomRoleInput(roleIsCustom ? researcher.role : '');
       setFormData({
         name: researcher.name,
         email: researcher.email,
-        role: researcher.role,
+        role: roleIsCustom ? 'Other' : researcher.role,
         expertise: researcher.expertise || '',
         affiliation: researcher.affiliation || '',
         description: researcher.description || '',
       });
       setAvatarPreview(researcher.avatarUrl || researcher.avatar_url || null);
     } else {
+      setIsCustomRole(false);
+      setCustomRoleInput('');
       setFormData({
         name: '',
         email: '',
@@ -102,6 +115,8 @@ export default function ResearcherForm() {
     setCurrentResearcher(null);
     setAvatarFile(null);
     setAvatarPreview(null);
+    setIsCustomRole(false);
+    setCustomRoleInput('');
   };
 
   const handleFileChange = (e) => {
@@ -154,11 +169,20 @@ export default function ResearcherForm() {
         : '/api/researchers';
       const method = currentResearcher ? 'PUT' : 'POST';
 
+      const finalRole = isCustomRole ? customRoleInput.trim() : formData.role;
+
+      if (!finalRole) {
+        toast.error('Role is required');
+        setLoading(false);
+        return;
+      }
+
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
+          role: finalRole,
           avatarUrl,
         }),
       });
@@ -215,7 +239,12 @@ export default function ResearcherForm() {
               onChange={(e) => setSearch(e.target.value)}
               className="flex-1 text-sm outline-none"
             />
-            <Image src="/icon/search.webp" alt="Search" width={20} height={20} />
+            <Image
+              src="/icon/search.webp"
+              alt="Search"
+              width={20}
+              height={20}
+            />
           </div>
         </div>
 
@@ -227,7 +256,7 @@ export default function ResearcherForm() {
             className="h-[44px] w-full rounded-md border border-gray-300 bg-white px-4 text-sm md:w-[220px]"
           >
             <option value="">All Roles</option>
-            {RESEARCHER_ROLES.map((role) => (
+            {AVAILABLE_ROLES.map((role) => (
               <option key={role} value={role}>
                 {role}
               </option>
@@ -294,7 +323,9 @@ export default function ResearcherForm() {
                 <div className="relative h-10 w-10 flex-shrink-0">
                   <Image
                     src={
-                      item.avatarUrl || item.avatar_url || '/icon/db-user-1.webp'
+                      item.avatarUrl ||
+                      item.avatar_url ||
+                      '/icon/db-user-1.webp'
                     }
                     alt={item.name}
                     fill
@@ -443,22 +474,41 @@ export default function ResearcherForm() {
                       Role
                     </label>
                     <span className="text-xs text-gray-500 italic">
-                      Select the appropriate academic or research role.
+                      Select the appropriate role or choose "Other" to add a
+                      custom role.
                     </span>
                     <select
-                      value={formData.role}
-                      onChange={(e) =>
-                        setFormData({ ...formData, role: e.target.value })
-                      }
+                      value={isCustomRole ? 'Other' : formData.role}
+                      onChange={(e) => {
+                        if (e.target.value === 'Other') {
+                          setIsCustomRole(true);
+                          setFormData({ ...formData, role: 'Other' });
+                        } else {
+                          setIsCustomRole(false);
+                          setCustomRoleInput('');
+                          setFormData({ ...formData, role: e.target.value });
+                        }
+                      }}
                       className="h-[44px] w-full rounded-xl border border-zinc-300 bg-white px-4 text-base outline-none focus:border-[#2AB2C7]"
-                      required
+                      required={!isCustomRole}
                     >
-                      {RESEARCHER_ROLES.map((role) => (
+                      {PREDEFINED_ROLES.map((role) => (
                         <option key={role} value={role}>
                           {role}
                         </option>
                       ))}
+                      <option value="Other">Other (Custom Role)</option>
                     </select>
+                    {isCustomRole && (
+                      <input
+                        type="text"
+                        value={customRoleInput}
+                        onChange={(e) => setCustomRoleInput(e.target.value)}
+                        placeholder="Enter custom role name"
+                        className="mt-2 h-[44px] w-full rounded-xl border border-zinc-300 bg-white px-4 text-base outline-none focus:border-[#2AB2C7]"
+                        required
+                      />
+                    )}
                   </div>
 
                   <FormField

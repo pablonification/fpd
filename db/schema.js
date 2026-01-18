@@ -156,18 +156,19 @@ export const files = pgTable('files', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
-export const researcherRoleEnum = pgEnum('researcher_role', [
+// Predefined researcher roles (for UI suggestions, not database constraint)
+export const PREDEFINED_RESEARCHER_ROLES = [
   'Principal Investigator',
   "Master's Student",
   'Undergraduate Student',
   'Alumni Researcher',
   'Collaborator',
-]);
+];
 
 export const researchers = pgTable('researchers', {
   id: serial('id').primaryKey(),
   name: text('name').notNull(),
-  role: researcherRoleEnum('role').notNull(),
+  role: text('role').notNull(),
   expertise: text('expertise'),
   affiliation: text('affiliation'),
   email: varchar('email', { length: 255 }).notNull(),
