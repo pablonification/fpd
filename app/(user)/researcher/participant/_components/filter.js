@@ -7,31 +7,25 @@ import { HiChevronDown, HiCheck } from 'react-icons/hi';
 export default function FilterRow({
   search = '',
   onSearchChange,
-  expertiseOptions = [],
-  selectedExpertise = '',
-  onExpertiseChange,
+  roleOptions = [],       // Menerima opsi Role dari parent
+  selectedRole = '',      // Menerima state role yang dipilih
+  onRoleChange,           // Menerima fungsi pengubah role
 }) {
-  const [roleOpen, setRoleOpen] = useState(false);
-  const [expertiseOpen, setExpertiseOpen] = useState(false);
-
-  const [selectedRole, setSelectedRole] = useState('');
-
-  // Local fallback if onExpertiseChange is not provided (though page passes it)
-  const [localExpertise, setLocalExpertise] = useState('');
-
-  // Local search state fallback
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [localSearch, setLocalSearch] = useState('');
 
-  const roles = ['Supervisor', 'Researcher', 'Participant']; // Updated to likely roles
-  const displayedExpertise = selectedExpertise || localExpertise;
+  // Teks yang ditampilkan di tombol dropdown
+  const displayedLabel = selectedRole || 'All Role';
 
   return (
     <div className="flex w-full justify-center">
       <div className="flex w-full max-w-6xl flex-col gap-4 md:flex-row md:items-center md:gap-6">
+        
+        {/* SEARCH INPUT */}
         <div className="relative w-full flex-grow">
           <input
             type="text"
-            placeholder="Search researchers by name or expertise"
+            placeholder="Search researchers by name..."
             value={onSearchChange ? search : localSearch}
             onChange={(e) => {
               const val = e.target.value;
@@ -41,89 +35,81 @@ export default function FilterRow({
                 setLocalSearch(val);
               }
             }}
-            className="h-[56px] w-full rounded-[16px] border border-gray-300 bg-white/70 px-5 pr-12 text-lg text-gray-700 shadow-sm backdrop-blur-md placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            className="h-[56px] w-full rounded-[16px] border border-zinc-300 bg-white/70 px-5 pr-12 text-lg text-zinc-700 shadow-sm backdrop-blur-md placeholder:text-zinc-400 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 focus:outline-none transition-all"
           />
-          <img
-            src="/icon/search.webp"
-            alt="Search"
-            className="absolute top-1/2 right-4 h-6 w-6 -translate-y-1/2 opacity-50"
-          />
+          {/* Icon Search */}
+          <div className="absolute top-1/2 right-4 -translate-y-1/2 opacity-50">
+             <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+             </svg>
+          </div>
         </div>
 
+        {/* DROPDOWN FILTER (ROLE) */}
         <div className="flex w-full gap-4 md:w-auto">
-          {/* Role Dropdown - Keeping logic but maybe not used by parent yet? 
-              The parent page does not seem to pass role or handle it, 
-              but we will keep it for UI consistency if needed. 
-              Alternatively, since user said 'filter bar', maybe just expertise?
-              I'll leave it but resize it.
-          */}
-          {/* Expertise Dropdown */}
-          <div className="relative flex-1 md:w-[220px] md:flex-none">
+          <div className="relative flex-1 md:w-[240px] md:flex-none">
             <button
-              onClick={() => {
-                setExpertiseOpen(!expertiseOpen);
-                setRoleOpen(false);
-              }}
+              onClick={() => setDropdownOpen(!dropdownOpen)}
               className={`flex h-[56px] w-full cursor-pointer items-center justify-between rounded-[16px] border ${
-                displayedExpertise
-                  ? 'border-blue-400 bg-blue-50'
-                  : 'border-gray-300 bg-white/70'
-              } px-5 text-gray-800 shadow-sm backdrop-blur-md transition hover:opacity-90`}
+                selectedRole
+                  ? 'border-teal-500 bg-teal-50 text-teal-800'
+                  : 'border-zinc-300 bg-white/70 text-zinc-800'
+              } px-5 shadow-sm backdrop-blur-md transition hover:bg-zinc-50`}
             >
-              <span className="truncate text-lg">
-                {displayedExpertise || 'All Expertise'}
+              <span className="truncate text-lg font-medium">
+                {displayedLabel}
               </span>
               <motion.div
-                animate={{ rotate: expertiseOpen ? 180 : 0 }}
-                transition={{ duration: 0.25 }}
+                animate={{ rotate: dropdownOpen ? 180 : 0 }}
+                transition={{ duration: 0.2 }}
               >
-                <HiChevronDown className="h-6 w-6 text-gray-600" />
+                <HiChevronDown className={`h-6 w-6 ${selectedRole ? 'text-teal-600' : 'text-zinc-500'}`} />
               </motion.div>
             </button>
 
             <AnimatePresence>
-              {expertiseOpen && (
+              {dropdownOpen && (
                 <motion.ul
-                  initial={{ opacity: 0, y: -6 }}
+                  initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
-                  transition={{ duration: 0.25 }}
-                  className="absolute right-0 z-10 mt-2 max-h-[300px] w-full overflow-y-auto rounded-[12px] border border-gray-200 bg-white shadow-xl"
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute right-0 z-20 mt-2 max-h-[300px] w-full overflow-y-auto rounded-xl border border-zinc-200 bg-white shadow-xl ring-1 ring-black/5"
                 >
+                  {/* Pilihan Default: All Role */}
                   <li
                     onClick={() => {
-                      if (onExpertiseChange) onExpertiseChange('');
-                      setLocalExpertise('');
-                      setExpertiseOpen(false);
+                      if (onRoleChange) onRoleChange('');
+                      setDropdownOpen(false);
                     }}
-                    className="flex cursor-pointer items-center justify-between px-5 py-3 text-gray-700 hover:bg-gray-100"
+                    className="flex cursor-pointer items-center justify-between px-5 py-3 text-zinc-700 hover:bg-zinc-100 transition-colors"
                   >
-                    All Expertise
-                    {displayedExpertise === '' && (
-                      <HiCheck className="h-5 w-5 text-blue-500" />
+                    All Role
+                    {selectedRole === '' && (
+                      <HiCheck className="h-5 w-5 text-teal-500" />
                     )}
                   </li>
-                  {expertiseOptions.length > 0 ? (
-                    expertiseOptions.map((item) => (
+                  
+                  {/* Pilihan Dinamis dari Props */}
+                  {roleOptions.length > 0 ? (
+                    roleOptions.map((role) => (
                       <li
-                        key={item}
+                        key={role}
                         onClick={() => {
-                          if (onExpertiseChange) onExpertiseChange(item);
-                          setLocalExpertise(item);
-                          setExpertiseOpen(false);
+                          if (onRoleChange) onRoleChange(role);
+                          setDropdownOpen(false);
                         }}
-                        className="flex cursor-pointer items-center justify-between px-5 py-3 text-gray-700 hover:bg-gray-100"
+                        className="flex cursor-pointer items-center justify-between px-5 py-3 text-zinc-700 hover:bg-zinc-100 transition-colors"
                       >
-                        {item}
-                        {displayedExpertise === item && (
-                          <HiCheck className="h-5 w-5 text-blue-500" />
+                        {role}
+                        {selectedRole === role && (
+                          <HiCheck className="h-5 w-5 text-teal-500" />
                         )}
                       </li>
                     ))
                   ) : (
-                    // Fallback if no options passed
-                    <li className="px-5 py-3 text-gray-400">
-                      No expertise found
+                    <li className="px-5 py-3 text-sm text-zinc-400 italic">
+                      No roles found
                     </li>
                   )}
                 </motion.ul>

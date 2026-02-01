@@ -5,15 +5,13 @@ import { FaLinkedin } from 'react-icons/fa';
 
 export default function Footer() {
   return (
-    <footer className="mt-auto w-full">
-      {/* Main Footer Content */}
-      <div className="border-t border-zinc-200 bg-white px-6 py-10 sm:px-10 sm:py-12 lg:px-16">
-        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3">
-          {/* Column 1 - Logo & Description */}
-          <div className="flex flex-col gap-4">
+    <footer className="bg-white px-6 py-12">
+      <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
+        {/* Column 1 - Logo & Description */}
+        <div className="flex flex-col gap-4">
             <div className="flex items-center gap-3">
               <img
-                src="/final-logo-full.svg"
+                  src="/final-logo-full.svg"
                 alt="SiZero Logo"
                 className="h-14 w-14 object-contain"
               />
@@ -27,10 +25,11 @@ export default function Footer() {
                 Advancing innovation through science, engineering, and
                 real-world experimentation.
               </p>
+              <p className="mt-1 text-sm font-medium text-zinc-800">
+                Department of Industry Science and Resources (DISR)
+              </p> 
             </div>
-          </div>
-
-          {/* Column 2 - Partners */}
+{/* Column 2 - Partners */}
           <div className="flex flex-col gap-4">
             <h3 className="text-base font-semibold text-zinc-900">Partners</h3>
             <ul className="flex flex-col gap-2 text-sm">
@@ -51,7 +50,8 @@ export default function Footer() {
                   rel="noopener noreferrer"
                   className="text-teal-700 transition-colors hover:text-teal-900 hover:underline"
                 >
-                  Materials Science & Metallurgical Engineering
+                  {/* UPDATE: Menambahkan IITH di depan */}
+                  IITH - Materials Science & Metallurgical Engineering
                 </a>
               </li>
               <li>
@@ -92,6 +92,17 @@ export default function Footer() {
                   className="text-teal-700 transition-colors hover:text-teal-900 hover:underline"
                 >
                   Universitas Gadjah Mada
+                </a>
+              </li>
+              {/* UPDATE: Menambahkan Partner Baru */}
+              <li>
+                <a
+                  href="https://www.pvrs.org.au/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-teal-700 transition-colors hover:text-teal-900 hover:underline"
+                >
+                  PV Solar Panel Recycling and Sustainability (PVRS)
                 </a>
               </li>
             </ul>

@@ -1,184 +1,110 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import CardProfile from './_components/profile_card';
-import ProfileModal from './_components/profile_modal';
-import FilterRow from './_components/filter';
+import ProfileCard from './_components/profile_card';
+import Filter from './_components/filter';
 import SkeletonProfileCard from './_components/SkeletonProfileCard';
 
-export default function TeamSection() {
-  const [search, setSearch] = useState('');
-  const [selectedExpertise, setSelectedExpertise] = useState('');
-  const [team, setTeam] = useState([]);
+// 1. Definisikan Hirarki Role (Semakin kecil angka, semakin tinggi posisi)
+const ROLE_HIERARCHY = {
+  "Director": 1,
+  "Co-Deputy Director": 2,
+  "Principal Investigator": 3,
+  "PhD Student": 4,
+  "Master Student": 5,
+  "Undergraduate Student": 6,
+  "Research Assistant": 7,
+};
+
+export default function ResearcherPage() {
+  const [researchers, setResearchers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [selectedMember, setSelectedMember] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [index, setIndex] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedRole, setSelectedRole] = useState(''); // State untuk filter Role
 
-  // Fetch researchers from API
   useEffect(() => {
-    const fetchTeam = async () => {
+    const fetchResearchers = async () => {
       try {
-        setLoading(true);
-        const response = await fetch('/api/researchers', { cache: 'no-store' });
+        const response = await fetch('/api/researchers');
         const data = await response.json();
+        
+        // 2. Logika Sorting Custom
+        const sortedData = data.sort((a, b) => {
+          // Ambil nilai prioritas, jika tidak ada di list beri nilai besar (999) agar di bawah
+          const priorityA = ROLE_HIERARCHY[a.role] || 999;
+          const priorityB = ROLE_HIERARCHY[b.role] || 999;
+          
+          return priorityA - priorityB;
+        });
 
-        if (data.success) {
-          // Transform API data to match the expected format
-          const transformedData = data.data.map((researcher) => ({
-            id: researcher.id,
-            imageSrc:
-              researcher.avatarUrl ||
-              researcher.avatar_url ||
-              '/placeholder-avatar.webp',
-            name: researcher.name,
-            bidang: researcher.role || 'Proffesor',
-            expertise: researcher.expertise || '',
-            affiliation: researcher.affiliation || '',
-            email: researcher.email || '',
-            description: researcher.description || '',
-          }));
-          setTeam(transformedData);
-        } else {
-          setError('Failed to fetch researchers');
-        }
-      } catch (err) {
-        console.error('Error fetching team:', err);
-        setError(err.message);
+        setResearchers(sortedData);
+      } catch (error) {
+        console.error('Failed to fetch researchers:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchTeam();
+    fetchResearchers();
   }, []);
 
-  // Apply filters
-  const filteredTeam = team.filter((t) => {
-    const q = search.trim().toLowerCase();
-    const matchesSearch = !q
-      ? true
-      : [t.name, t.affiliation, t.bidang, t.expertise, t.description]
-          .filter(Boolean)
-          .some((field) => field.toLowerCase().includes(q));
+  // 3. Filter Logic
+  const filteredResearchers = researchers.filter((item) => {
+    // Filter by Name (Search)
+    const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    // Filter by Role (Dropdown)
+    const matchesRole = selectedRole ? item.role === selectedRole : true;
 
-    const matchesExpertise = !selectedExpertise
-      ? true
-      : (t.expertise || '')
-          .toLowerCase()
-          .includes(selectedExpertise.toLowerCase());
-
-    return matchesSearch && matchesExpertise;
+    return matchesSearch && matchesRole;
   });
 
-  // Build expertise options from team data
-  const expertiseOptions = Array.from(
-    new Set(
-      team
-        .map((t) => t.bidang)
-        .filter(Boolean)
-        .map((b) => {
-          return b
-            .replace(' and ', ' & ')
-            .replace('Advanced ', '')
-            .replace('Biomedical ', 'Biomedical ')
-            .replace('Materials ', 'Materials ')
-            .trim();
-        })
-    )
-  );
-
-  const openModal = (i) => {
-    setIndex(i);
-    setModalOpen(true);
-  };
-
-  // Show loading state
-  if (loading) {
-    return (
-      <section className="bg-bgMain mt-32 flex justify-center px-4 py-12 sm:px-6">
-        <div className="w-full max-w-6xl">
-          {/* Header Skeleton */}
-          <div className="flex w-full flex-col items-center gap-2 text-center sm:gap-3">
-            <div className="h-10 w-48 animate-pulse rounded bg-gray-200"></div>
-            <div className="h-6 w-full max-w-2xl animate-pulse rounded bg-gray-200"></div>
-          </div>
-
-          {/* Filter Skeleton */}
-          <div className="mt-10 mb-10 w-full">
-            <div className="h-[56px] w-full animate-pulse rounded-[16px] bg-gray-200"></div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {[...Array(8)].map((_, i) => (
-              <SkeletonProfileCard key={i} />
-            ))}
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  // Show error state
-  if (error) {
-    return (
-      <section className="bg-bgMain mt-26 flex justify-center px-4 py-12 sm:px-8">
-        <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-red-600">
-          Error loading researchers: {error}
-        </div>
-      </section>
-    );
-  }
+  // Ambil list role unik untuk opsi dropdown
+  const uniqueRoles = [...new Set(researchers.map(r => r.role))].filter(Boolean);
 
   return (
-    <section className="bg-bgMain mt-32 flex justify-center px-4 py-12 sm:px-6">
-      <div className="w-full max-w-6xl">
-        <header className="flex w-full flex-col items-center gap-2 text-center sm:gap-3">
-          <h1 className="text-3xl leading-tight font-bold tracking-tight text-black sm:text-4xl md:text-5xl lg:text-6xl">
-            Researchers
-          </h1>
-          <p className="max-w-7xl text-sm leading-relaxed text-gray-600 sm:text-base">
-            Meet our dedicated researchers who are passionate about pushing the
-            boundaries of knowledge and making a positive impact on society.
+    <main className="min-h-screen bg-zinc-50 pb-20 pt-24 sm:pb-24 sm:pt-32">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+        
+        {/* Header */}
+        <div className="max-w-2xl text-center sm:text-left">
+          <h2 className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl">
+            Our Researchers
+          </h2>
+          <p className="mt-4 text-lg text-zinc-600">
+            Meet the team dedicated to advancing fluid and process dynamics.
           </p>
-        </header>
-        {/* Filter */}
-        <div className="mt-10 mb-10 w-full">
-          <FilterRow
-            search={search}
-            onSearchChange={setSearch}
-            selectedExpertise={selectedExpertise}
-            onExpertiseChange={setSelectedExpertise}
-            expertiseOptions={expertiseOptions}
-          />
         </div>
 
-        {/* Cards */}
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {filteredTeam.length === 0 ? (
-            <div className="col-span-full rounded-xl border border-neutral-200 bg-white p-6 text-center text-neutral-600">
-              No matching participants found.
-            </div>
-          ) : (
-            filteredTeam.map((item, i) => (
-              <CardProfile key={i} {...item} onClick={() => openModal(i)} />
+        {/* Filter Section */}
+        <div className="mt-10">
+            <Filter 
+            search={searchQuery}
+            onSearchChange={setSearchQuery} 
+            selectedRole={selectedRole}
+            onRoleChange={setSelectedRole} 
+            roleOptions={uniqueRoles} // Kirim opsi role ke dropdown
+            />
+        </div>
+
+        {/* Grid List */}
+        <div className="mt-10 grid grid-cols-1 justify-items-center gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
+          {loading ? (
+             [...Array(6)].map((_, i) => <SkeletonProfileCard key={i} />)
+          ) : filteredResearchers.length > 0 ? (
+            filteredResearchers.map((researcher) => (
+              <ProfileCard 
+                key={researcher.id} 
+                data={researcher} 
+              />
             ))
+          ) : (
+            <div className="col-span-full py-12 text-center text-zinc-500">
+              No researchers found matching your criteria.
+            </div>
           )}
         </div>
       </div>
-
-      {/* Modal */}
-      <ProfileModal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        data={filteredTeam[index]}
-        onNext={() => setIndex((i) => Math.min(i + 1, filteredTeam.length - 1))}
-        onPrev={() => setIndex((i) => Math.max(i - 1, 0))}
-        hasNext={index < filteredTeam.length - 1}
-        hasPrev={index > 0}
-      />
-    </section>
+    </main>
   );
 }
