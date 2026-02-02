@@ -223,26 +223,31 @@ export default function WhoAreWe() {
               { name: 'IIT', src: '/institution/iit.webp' },
               { name: 'Sadoway', src: '/institution/sadoway.webp' },
               { name: 'Remind', src: '/institution/remind.webp' },
-            ].map((institution, index) => (
-              <motion.div
-                key={institution.name}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={
-                  isInView
-                    ? { opacity: 1, scale: 1 }
-                    : { opacity: 0, scale: 0.9 }
-                }
-                transition={{ duration: 0.5, delay: 0.7 + index * 0.1 }}
-                whileHover={{ scale: 1.05 }}
-                className="group flex items-center justify-center rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition-all hover:shadow-md"
-              >
-                <img
-                  src={institution.src}
-                  alt={institution.name}
-                  className="h-24 w-auto object-contain transition-transform duration-300"
-                />
-              </motion.div>
-            ))}
+            ].map((institution, index) => {
+              const isRemind = institution.name === 'Remind';
+              return (
+                <motion.div
+                  key={institution.name}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={
+                    isInView
+                      ? { opacity: 1, scale: 1 }
+                      : { opacity: 0, scale: 0.9 }
+                  }
+                  transition={{ duration: 0.5, delay: 0.7 + index * 0.1 }}
+                  whileHover={{ scale: 1.05 }}
+                  className="group flex items-center justify-center rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition-all hover:shadow-md"
+                >
+                  <img
+                    src={institution.src}
+                    alt={institution.name}
+                    className={`h-24 w-auto object-contain transition-transform duration-300 ${
+                      isRemind ? 'scale-[1.3] md:scale-[1.45]' : ''
+                    }`}
+                  />
+                </motion.div>
+              );
+            })}
           </div>
         </motion.div>
       </div>

@@ -1,15 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import FilterDropdown from './_components/FilterDropdown';
-import YearDropdown from './_components/YearDropdown';
 import ProjectCard from './_components/ProjectCard';
 import SkeletonProjectCard from './_components/SkeletonProjectCard';
 
 export default function ResearchProject() {
-  const [tab, setTab] = useState('ongoing');
-  const [filter, setFilter] = useState('All');
-  const [year, setYear] = useState('All');
+  const [tab, setTab] = useState('all');
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -36,8 +32,8 @@ export default function ResearchProject() {
 
   // Filter logic
   const filteredList = projects.filter((p) => {
-    const matchesStatus = p.status === tab;
-    return matchesStatus;
+    if (tab === 'all') return true;
+    return p.status === tab;
   });
 
   return (
@@ -57,6 +53,14 @@ export default function ResearchProject() {
         {/* NAVBAR KECIL */}
         <div className="mt-2 flex w-full flex-col gap-4 sm:mt-4">
           <div className="flex flex-wrap gap-3 sm:gap-6">
+            <button
+              onClick={() => setTab('all')}
+              className={`cursor-pointer pb-1 text-sm font-medium sm:text-base ${
+                tab === 'all' ? 'border-b-2 border-black' : 'text-gray-500'
+              }`}
+            >
+              All
+            </button>
             <button
               onClick={() => setTab('ongoing')}
               className={`cursor-pointer pb-1 text-sm font-medium sm:text-base ${
@@ -83,11 +87,6 @@ export default function ResearchProject() {
             >
               Upcoming
             </button>
-          </div>
-
-          <div className="flex flex-wrap gap-3 sm:gap-6">
-            <FilterDropdown filter={filter} setFilter={setFilter} />
-            <YearDropdown year={year} setYear={setYear} />
           </div>
         </div>
 
