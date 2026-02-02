@@ -293,39 +293,33 @@ export default function AboutPage() {
             </div>
           ) : (
             <div className="mx-auto max-w-4xl">
-              {/* Email and Address Cards */}
-              <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
-                {/* Email Card */}
-                {contactData.email && (
-                  <div className="group flex items-center gap-4 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm transition-all hover:shadow-md">
-                    <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#2ab2c7] to-[#0e9db3] text-white">
-                      <svg
-                        className="h-7 w-7"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                        />
-                      </svg>
-                    </div>
-                    <div className="flex-1 overflow-hidden">
-                      <h3 className="mb-1 text-sm font-semibold tracking-wide text-neutral-400 uppercase">
-                        Email
-                      </h3>
-                      <a
-                        href={`mailto:${contactData.email}`}
-                        className="text-base font-medium text-neutral-700 transition-colors hover:text-[#2ab2c7]"
-                      >
-                        {contactData.email}
-                      </a>
-                    </div>
+              {/* LinkedIn and Address Cards */}
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                {/* LinkedIn Card */}
+                <div className="group flex items-center gap-4 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm transition-all hover:shadow-md">
+                  <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#2ab2c7] to-[#0e9db3] text-white">
+                    <svg
+                      className="h-7 w-7"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                    </svg>
                   </div>
-                )}
+                  <div className="flex-1 overflow-hidden">
+                    <h3 className="mb-1 text-sm font-semibold tracking-wide text-neutral-400 uppercase">
+                      LinkedIn
+                    </h3>
+                    <a
+                      href="https://www.linkedin.com/company/fluid-process-dynamics-swin/?viewAsMember=true"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-base font-medium text-neutral-700 transition-colors hover:text-[#2ab2c7]"
+                    >
+                      Fluid & Process Dynamics
+                    </a>
+                  </div>
+                </div>
 
                 {/* Address Card */}
                 {contactData.address && (
@@ -362,52 +356,6 @@ export default function AboutPage() {
                   </div>
                 )}
               </div>
-
-              {/* Social Links */}
-              {contactData.links && contactData.links.length > 0 && (
-                <div className="rounded-2xl border border-neutral-200 bg-white p-8 shadow-sm">
-                  <div className="mb-6 flex items-center gap-2">
-                    <span className="h-px w-8 bg-[#2ab2c7]"></span>
-                    <h3 className="text-lg font-semibold text-neutral-800">
-                      Connect With Us
-                    </h3>
-                    <span className="h-px flex-1 bg-[#2ab2c7]"></span>
-                  </div>
-                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    {contactData.links.map((link, i) => (
-                      <a
-                        key={i}
-                        href={
-                          link.startsWith('http') ? link : `https://${link}`
-                        }
-                        target="_blank"
-                        rel="noreferrer"
-                        className="group flex items-center gap-4 rounded-xl border border-neutral-200 bg-neutral-50 p-4 transition-all hover:border-[#2ab2c7] hover:bg-[#2ab2c7]/5"
-                      >
-                        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-white text-[#2ab2c7] shadow-sm transition-all group-hover:scale-110 group-hover:shadow-md">
-                          <HiLink className="h-5 w-5" />
-                        </div>
-                        <span className="flex-1 truncate text-sm font-medium text-neutral-700 group-hover:text-[#2ab2c7]">
-                          {link.replace(/^https?:\/\//, '').replace(/\/$/, '')}
-                        </span>
-                        <svg
-                          className="h-4 w-4 flex-shrink-0 text-neutral-400 transition-transform group-hover:translate-x-1 group-hover:text-[#2ab2c7]"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M9 5l7 7-7 7"
-                          />
-                        </svg>
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              )}
 
               {!contactData.email &&
                 !contactData.address &&
