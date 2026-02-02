@@ -35,18 +35,30 @@ async function fetchLatestEvents() {
 function EventsContent({ events }) {
   if (events.length === 0) {
     return (
-      <>
-        {[1, 2, 3].map((i) => (
-          <div
-            key={i}
-            className="flex w-full flex-col items-start justify-start gap-4"
+      <div className="col-span-full flex min-h-[300px] w-full items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50">
+        <div className="text-center">
+          <svg
+            className="mx-auto h-12 w-12 text-gray-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            aria-hidden="true"
           >
-            <div className="h-48 w-full rounded-xl bg-gray-200"></div>
-            <div className="mt-4 h-5 w-3/4 rounded bg-gray-200"></div>
-            <div className="mt-2 h-4 w-full rounded bg-gray-200"></div>
-          </div>
-        ))}
-      </>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+            />
+          </svg>
+          <h3 className="mt-4 text-lg font-medium text-gray-900">
+            No gallery content yet
+          </h3>
+          <p className="mt-2 text-sm text-gray-500">
+            Gallery items will appear here once added
+          </p>
+        </div>
+      </div>
     );
   }
 
@@ -102,6 +114,20 @@ async function fetchLatestNews() {
 }
 
 function NewsContent({ newsList }) {
+  const stripHtmlAndDecode = (html) => {
+    return html
+      .replace(/<[^>]*>/g, '')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#039;/g, "'")
+      .replace(/&hellip;/g, '...')
+      .replace(/\s+/g, ' ')
+      .trim();
+  };
+
   if (newsList.length === 0) {
     return (
       <>
@@ -137,8 +163,10 @@ function NewsContent({ newsList }) {
               },
               {
                 text:
-                  newsItem.content.substring(0, 100) +
-                  (newsItem.content.length > 100 ? '...' : ''),
+                  stripHtmlAndDecode(newsItem.content).substring(0, 100) +
+                  (stripHtmlAndDecode(newsItem.content).length > 100
+                    ? '...'
+                    : ''),
               },
             ]}
             className="[&_p:first-of-type]:group-hover:text-primaryGradientEnd cursor-pointer [&_img]:transition-all [&_img]:duration-300 [&_img]:ease-out [&_img]:group-hover:brightness-[0.8] [&_p:first-of-type]:transition-colors [&_p:first-of-type]:duration-300 [&_p:first-of-type]:ease-out"
