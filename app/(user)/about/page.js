@@ -219,10 +219,10 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* Company Timeline */}
+        {/* Project Timeline */}
         <section className="w-full px-6 py-1 text-center">
           <h2 className="mb-12 text-left text-2xl leading-tight font-bold sm:text-3xl md:text-center md:text-4xl">
-            Company Timeline
+            Project Timeline
           </h2>
 
           {loading ? (

@@ -281,14 +281,14 @@ export default function AboutForm() {
           </button>
         </form>
 
-        {/* SECTION 2: Organization Timeline */}
+        {/* SECTION 2: Project Timeline */}
         <div className="flex flex-col gap-6 rounded-[16px] border border-gray-300 bg-white p-6">
           <div className="flex flex-col gap-1">
             <h2 className="text-lg font-bold text-gray-900">
-              Organization Timeline
+              Project Timeline
             </h2>
             <p className="text-sm text-gray-500">
-              Add key milestones for the organization.
+              Add key milestones for the project.
             </p>
           </div>
 
