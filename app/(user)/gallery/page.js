@@ -11,7 +11,7 @@ export default function GalleryPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const [tab, setTab] = useState('photos');
+  const [tab, setTab] = useState('all');
   const [filter, setFilter] = useState('All');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [openIndex, setOpenIndex] = useState(null);
@@ -74,8 +74,10 @@ export default function GalleryPage() {
 
   const filteredList = useMemo(() => {
     return processedItems.filter((item) => {
+      // Filter by tab
       if (tab === 'photos' && item.type !== 'photo') return false;
       if (tab === 'videos' && item.type !== 'video') return false;
+      // tab === 'all' shows both photos and videos
 
       if (filter !== 'All') {
         const year = item.date
@@ -127,6 +129,12 @@ export default function GalleryPage() {
             <div className="mt-4 flex h-[48px] w-full items-center justify-between">
               <div className="flex gap-6">
                 <button
+                  onClick={() => setTab('all')}
+                  className={`cursor-pointer pb-1 text-base sm:text-lg ${tab === 'all' ? 'border-b-2 border-black font-semibold' : 'text-gray-500'}`}
+                >
+                  All
+                </button>
+                <button
                   onClick={() => setTab('photos')}
                   className={`cursor-pointer pb-1 text-base sm:text-lg ${tab === 'photos' ? 'border-b-2 border-black font-semibold' : 'text-gray-500'}`}
                 >
@@ -166,8 +174,8 @@ export default function GalleryPage() {
                 />
               ))}
               {filteredList.length === 0 && (
-                <div className="col-span-full py-10 text-center text-gray-500">
-                  No items found in this category.
+                <div className="col-span-full py-20 text-center text-gray-500">
+                  No media files found
                 </div>
               )}
             </section>
