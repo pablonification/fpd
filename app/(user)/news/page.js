@@ -125,7 +125,7 @@ export default function NewsPage() {
                       <h2 className="group-hover:text-primaryGradientEnd text-2xl leading-tight font-bold break-words transition-colors duration-300 ease-out sm:text-3xl md:text-4xl">
                         {news[0].title}
                       </h2>
-                      <p className="overflow-hidden text-justify text-sm leading-relaxed break-words text-black/60 sm:text-base">
+                      <p className="overflow-hidden text-sm leading-relaxed break-words text-black/60 sm:text-base">
                         {stripHtmlAndDecode(news[0].content).substring(0, 200)}
                         {stripHtmlAndDecode(news[0].content).length > 200
                           ? '...'
