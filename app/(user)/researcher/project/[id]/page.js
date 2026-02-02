@@ -120,7 +120,7 @@ export default function DetailProject() {
   return (
     <main className="mx-auto mt-26 min-h-screen w-full overflow-visible overflow-x-hidden px-4 sm:mt-16 sm:px-6 md:mt-20 lg:mt-32 lg:px-8">
       <div className="lg:rounded-6xl relative flex w-full flex-col items-start justify-center gap-4 rounded-2xl border border-zinc-300 bg-white p-4 shadow-sm sm:gap-6 sm:rounded-3xl sm:p-6 md:rounded-4xl md:p-8 lg:p-11">
-        {/* Header with Status and Year */}
+        {/* Header with Status */}
         <div className="flex w-full flex-col items-start justify-between gap-4 sm:flex-row sm:items-center sm:gap-8">
           <div />
           <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-8">
@@ -132,9 +132,6 @@ export default function DetailProject() {
                 {getStatusText(project.status)}
               </div>
             </div>
-            <div className="text-xs font-normal text-zinc-800 sm:text-sm">
-              {project.year || 'N/A'}
-            </div>
           </div>
         </div>
 
@@ -144,20 +141,27 @@ export default function DetailProject() {
             {project.title}
           </div>
           <div className="text-sm font-medium text-black sm:text-base">
-            {project.principalInvestigator || 'N/A'}
+            {project.author || 'N/A'}
           </div>
-          <div className="text-sm font-medium text-[#2497a9] sm:text-base">
-            {project.researcherCategory || 'N/A'}
-          </div>
+          {project.doi && (
+            <a
+              href={`https://doi.org/${project.doi}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-medium text-[#2497a9] hover:underline sm:text-base"
+            >
+              DOI: {project.doi}
+            </a>
+          )}
         </div>
 
         {/* Divider */}
         <div className="h-px w-full bg-zinc-100" />
 
-        {/* Description */}
-        {project.description && (
-          <div className="prose prose-sm md:prose-base w-full max-w-none overflow-hidden break-words text-zinc-700">
-            <div dangerouslySetInnerHTML={{ __html: project.description }} />
+        {/* Abstract */}
+        {project.abstract && (
+          <div className="prose prose-sm md:prose-base w-full max-w-none overflow-hidden text-justify break-words text-zinc-700">
+            <div dangerouslySetInnerHTML={{ __html: project.abstract }} />
           </div>
         )}
 

@@ -41,12 +41,11 @@ export const projectStatusEnum = pgEnum('project_status', [
 export const projects = pgTable('projects', {
   id: serial('id').primaryKey(),
   title: text('title').notNull(),
-  year: varchar('year', { length: 4 }),
   status: projectStatusEnum('status').notNull().default('upcoming'),
-  description: text('description'),
+  author: text('author'),
+  doi: text('doi'),
+  abstract: text('abstract'),
   results: text('results'),
-  principalInvestigator: text('principal_investigator'),
-  researcherCategory: text('researcher_category'),
 
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),

@@ -36,20 +36,8 @@ export default function ResearchProject() {
 
   // Filter logic
   const filteredList = projects.filter((p) => {
-    // 1. Filter by Status (Tab)
     const matchesStatus = p.status === tab;
-    if (!matchesStatus) return false;
-
-    // 2. Filter by Category
-    const matchesCategory =
-      filter === 'All' ||
-      (p.researcherCategory &&
-        filter.toLowerCase().includes(p.researcherCategory.toLowerCase()));
-
-    // 3. Filter by Year
-    const matchesYear = year === 'All' || p.year === year;
-
-    return matchesCategory && matchesYear;
+    return matchesStatus;
   });
 
   return (
@@ -117,9 +105,9 @@ export default function ResearchProject() {
                 key={project.id}
                 id={project.id}
                 title={project.title}
-                date={project.year || 'N/A'}
-                description={project.description || ''}
-                category={project.researcherCategory}
+                date={project.author || 'N/A'}
+                description={project.abstract || ''}
+                category={project.doi}
               />
             ))
           )}

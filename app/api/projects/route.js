@@ -3,15 +3,11 @@ import { db } from '@/db/db';
 import { projects, projectMedia } from '@/db/schema';
 import { eq, desc } from 'drizzle-orm';
 
-// GET all projects
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const year = searchParams.get('year');
     const status = searchParams.get('status');
-    const category = searchParams.get('category');
 
-    // Using relational query to include media
     const allProjects = await db.query.projects.findMany({
       with: {
         media: true,
@@ -19,23 +15,10 @@ export async function GET(request) {
       orderBy: [desc(projects.createdAt)],
     });
 
-    // Filter by year if provided
     let filteredProjects = allProjects;
-    if (year) {
-      filteredProjects = filteredProjects.filter((p) => p.year === year);
-    }
-
-    // Filter by status if provided
     if (status) {
       filteredProjects = filteredProjects.filter(
         (p) => p.status === status.toLowerCase()
-      );
-    }
-
-    // Filter by category (researcher type) if provided
-    if (category && category !== 'All') {
-      filteredProjects = filteredProjects.filter(
-        (p) => p.researcherCategory === category
       );
     }
 
@@ -56,18 +39,8 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     const body = await request.json();
-    const {
-      title,
-      year,
-      status,
-      description,
-      results,
-      principalInvestigator,
-      researcherCategory,
-      images, // Array of image URLs
-    } = body;
+    const { title, status, abstract, results, author, doi, images } = body;
 
-    // Validate required fields
     if (!title) {
       return NextResponse.json(
         { success: false, error: 'Title is required' },
@@ -75,24 +48,21 @@ export async function POST(request) {
       );
     }
 
-    // Use a transaction for consistency
     const result = await db.transaction(async (tx) => {
       const newProject = await tx
         .insert(projects)
         .values({
           title,
-          year: year || null,
           status: status?.toLowerCase() || 'upcoming',
-          description: description || null,
+          abstract: abstract || null,
           results: results || null,
-          principalInvestigator: principalInvestigator || null,
-          researcherCategory: researcherCategory || null,
+          author: author || null,
+          doi: doi || null,
         })
         .returning();
 
       const projectId = newProject[0].id;
 
-      // Insert media if provided
       if (images && Array.isArray(images) && images.length > 0) {
         await tx.insert(projectMedia).values(
           images.map((url) => ({

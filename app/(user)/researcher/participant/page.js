@@ -8,7 +8,7 @@ import SkeletonProfileCard from './_components/SkeletonProfileCard';
 
 export default function TeamSection() {
   const [search, setSearch] = useState('');
-  const [selectedExpertise, setSelectedExpertise] = useState('');
+  const [selectedRole, setSelectedRole] = useState('');
   const [team, setTeam] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -64,31 +64,31 @@ export default function TeamSection() {
           .filter(Boolean)
           .some((field) => field.toLowerCase().includes(q));
 
-    const matchesExpertise = !selectedExpertise
+    const matchesRole = !selectedRole
       ? true
-      : (t.expertise || '')
-          .toLowerCase()
-          .includes(selectedExpertise.toLowerCase());
+      : (t.bidang || '').toLowerCase() === selectedRole.toLowerCase();
 
-    return matchesSearch && matchesExpertise;
+    return matchesSearch && matchesRole;
   });
 
-  // Build expertise options from team data
-  const expertiseOptions = Array.from(
-    new Set(
-      team
-        .map((t) => t.bidang)
-        .filter(Boolean)
-        .map((b) => {
-          return b
-            .replace(' and ', ' & ')
-            .replace('Advanced ', '')
-            .replace('Biomedical ', 'Biomedical ')
-            .replace('Materials ', 'Materials ')
-            .trim();
-        })
-    )
-  );
+  const roleOptions = Array.from(
+    new Set(team.map((t) => t.bidang).filter(Boolean))
+  ).sort();
+
+  // Sort by role importance when "All Roles" is selected
+  // Hierarchy: Director > Co-Deputy Director > Principal Investigator > Collaborator
+  const getRolePriority = (role) => {
+    const roleLower = (role || '').toLowerCase();
+    if (roleLower === 'director') return 1;
+    if (roleLower.includes('co-deputy')) return 2;
+    if (roleLower.includes('principal investigator')) return 3;
+    if (roleLower === 'collaborator') return 4;
+    return 5; // Others
+  };
+
+  const sortedTeam = [...filteredTeam].sort((a, b) => {
+    return getRolePriority(a.bidang) - getRolePriority(b.bidang);
+  });
 
   const openModal = (i) => {
     setIndex(i);
@@ -149,20 +149,20 @@ export default function TeamSection() {
           <FilterRow
             search={search}
             onSearchChange={setSearch}
-            selectedExpertise={selectedExpertise}
-            onExpertiseChange={setSelectedExpertise}
-            expertiseOptions={expertiseOptions}
+            selectedRole={selectedRole}
+            onRoleChange={setSelectedRole}
+            roleOptions={roleOptions}
           />
         </div>
 
         {/* Cards */}
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {filteredTeam.length === 0 ? (
+          {sortedTeam.length === 0 ? (
             <div className="col-span-full rounded-xl border border-neutral-200 bg-white p-6 text-center text-neutral-600">
               No matching participants found.
             </div>
           ) : (
-            filteredTeam.map((item, i) => (
+            sortedTeam.map((item, i) => (
               <CardProfile key={i} {...item} onClick={() => openModal(i)} />
             ))
           )}
@@ -173,10 +173,9 @@ export default function TeamSection() {
       <ProfileModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
-        data={filteredTeam[index]}
-        onNext={() => setIndex((i) => Math.min(i + 1, filteredTeam.length - 1))}
-        onPrev={() => setIndex((i) => Math.max(i - 1, 0))}
-        hasNext={index < filteredTeam.length - 1}
+        data={sortedTeam[index]}
+        onNext={() => setIndex((i) => Math.min(i + 1, sortedTeam.length - 1))}
+        hasNext={index < sortedTeam.length - 1}
         hasPrev={index > 0}
       />
     </section>

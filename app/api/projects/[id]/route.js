@@ -40,16 +40,7 @@ export async function PUT(request, { params }) {
   try {
     const { id } = await params;
     const body = await request.json();
-    const {
-      title,
-      year,
-      status,
-      description,
-      results,
-      principalInvestigator,
-      researcherCategory,
-      images, // Array of image URLs
-    } = body;
+    const { title, status, abstract, results, author, doi, images } = body;
 
     const projectId = parseInt(id);
 
@@ -58,12 +49,11 @@ export async function PUT(request, { params }) {
         .update(projects)
         .set({
           title,
-          year: year || null,
           status: status?.toLowerCase() || 'upcoming',
-          description: description || null,
+          abstract: abstract || null,
           results: results || null,
-          principalInvestigator: principalInvestigator || null,
-          researcherCategory: researcherCategory || null,
+          author: author || null,
+          doi: doi || null,
           updatedAt: new Date(),
         })
         .where(eq(projects.id, projectId))
@@ -73,9 +63,10 @@ export async function PUT(request, { params }) {
         throw new Error('Project not found');
       }
 
-      // Update media: delete existing and insert new
       if (images && Array.isArray(images)) {
-        await tx.delete(projectMedia).where(eq(projectMedia.projectId, projectId));
+        await tx
+          .delete(projectMedia)
+          .where(eq(projectMedia.projectId, projectId));
 
         if (images.length > 0) {
           await tx.insert(projectMedia).values(

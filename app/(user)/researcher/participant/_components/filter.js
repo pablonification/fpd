@@ -7,23 +7,16 @@ import { HiChevronDown, HiCheck } from 'react-icons/hi';
 export default function FilterRow({
   search = '',
   onSearchChange,
-  expertiseOptions = [],
-  selectedExpertise = '',
-  onExpertiseChange,
+  roleOptions = [],
+  selectedRole = '',
+  onRoleChange,
 }) {
   const [roleOpen, setRoleOpen] = useState(false);
-  const [expertiseOpen, setExpertiseOpen] = useState(false);
 
-  const [selectedRole, setSelectedRole] = useState('');
-
-  // Local fallback if onExpertiseChange is not provided (though page passes it)
-  const [localExpertise, setLocalExpertise] = useState('');
-
-  // Local search state fallback
+  const [localRole, setLocalRole] = useState('');
   const [localSearch, setLocalSearch] = useState('');
 
-  const roles = ['Supervisor', 'Researcher', 'Participant']; // Updated to likely roles
-  const displayedExpertise = selectedExpertise || localExpertise;
+  const displayedRole = selectedRole || localRole;
 
   return (
     <div className="flex w-full justify-center">
@@ -51,30 +44,23 @@ export default function FilterRow({
         </div>
 
         <div className="flex w-full gap-4 md:w-auto">
-          {/* Role Dropdown - Keeping logic but maybe not used by parent yet? 
-              The parent page does not seem to pass role or handle it, 
-              but we will keep it for UI consistency if needed. 
-              Alternatively, since user said 'filter bar', maybe just expertise?
-              I'll leave it but resize it.
-          */}
-          {/* Expertise Dropdown */}
+          {/* Role Dropdown */}
           <div className="relative flex-1 md:w-[220px] md:flex-none">
             <button
               onClick={() => {
-                setExpertiseOpen(!expertiseOpen);
-                setRoleOpen(false);
+                setRoleOpen(!roleOpen);
               }}
               className={`flex h-[56px] w-full cursor-pointer items-center justify-between rounded-[16px] border ${
-                displayedExpertise
+                displayedRole
                   ? 'border-blue-400 bg-blue-50'
                   : 'border-gray-300 bg-white/70'
               } px-5 text-gray-800 shadow-sm backdrop-blur-md transition hover:opacity-90`}
             >
               <span className="truncate text-lg">
-                {displayedExpertise || 'All Expertise'}
+                {displayedRole || 'All Roles'}
               </span>
               <motion.div
-                animate={{ rotate: expertiseOpen ? 180 : 0 }}
+                animate={{ rotate: roleOpen ? 180 : 0 }}
                 transition={{ duration: 0.25 }}
               >
                 <HiChevronDown className="h-6 w-6 text-gray-600" />
@@ -82,7 +68,7 @@ export default function FilterRow({
             </button>
 
             <AnimatePresence>
-              {expertiseOpen && (
+              {roleOpen && (
                 <motion.ul
                   initial={{ opacity: 0, y: -6 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -92,39 +78,36 @@ export default function FilterRow({
                 >
                   <li
                     onClick={() => {
-                      if (onExpertiseChange) onExpertiseChange('');
-                      setLocalExpertise('');
-                      setExpertiseOpen(false);
+                      if (onRoleChange) onRoleChange('');
+                      setLocalRole('');
+                      setRoleOpen(false);
                     }}
                     className="flex cursor-pointer items-center justify-between px-5 py-3 text-gray-700 hover:bg-gray-100"
                   >
-                    All Expertise
-                    {displayedExpertise === '' && (
+                    All Roles
+                    {displayedRole === '' && (
                       <HiCheck className="h-5 w-5 text-blue-500" />
                     )}
                   </li>
-                  {expertiseOptions.length > 0 ? (
-                    expertiseOptions.map((item) => (
+                  {roleOptions.length > 0 ? (
+                    roleOptions.map((item) => (
                       <li
                         key={item}
                         onClick={() => {
-                          if (onExpertiseChange) onExpertiseChange(item);
-                          setLocalExpertise(item);
-                          setExpertiseOpen(false);
+                          if (onRoleChange) onRoleChange(item);
+                          setLocalRole(item);
+                          setRoleOpen(false);
                         }}
                         className="flex cursor-pointer items-center justify-between px-5 py-3 text-gray-700 hover:bg-gray-100"
                       >
                         {item}
-                        {displayedExpertise === item && (
+                        {displayedRole === item && (
                           <HiCheck className="h-5 w-5 text-blue-500" />
                         )}
                       </li>
                     ))
                   ) : (
-                    // Fallback if no options passed
-                    <li className="px-5 py-3 text-gray-400">
-                      No expertise found
-                    </li>
+                    <li className="px-5 py-3 text-gray-400">No roles found</li>
                   )}
                 </motion.ul>
               )}
