@@ -10,6 +10,12 @@ export default function NewsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const stripHtmlAndDecode = (html) => {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || '';
+  };
+
   useEffect(() => {
     let active = true;
     const load = async () => {
@@ -34,25 +40,27 @@ export default function NewsPage() {
     };
   }, []);
 
-  const cards = news.map((item) => ({
-    imageSrc:
-      item.imageUrl || item.image_url || 'https://picsum.photos/400/250',
-    texts: [
-      {
-        text: item.title,
-        bold: true,
-        size: 'large',
-      },
-      {
-        text:
-          item.content.replace(/<[^>]*>/g, '').substring(0, 150) +
-          (item.content.replace(/<[^>]*>/g, '').length > 150 ? '...' : ''),
-      },
-      {
-        text: item.isFeatured || item.is_featured ? 'Featured' : 'News',
-      },
-    ],
-  }));
+  const cards = news.map((item) => {
+    const plainText = stripHtmlAndDecode(item.content);
+    return {
+      imageSrc:
+        item.imageUrl || item.image_url || 'https://picsum.photos/400/250',
+      texts: [
+        {
+          text: item.title,
+          bold: true,
+          size: 'large',
+        },
+        {
+          text:
+            plainText.substring(0, 150) + (plainText.length > 150 ? '...' : ''),
+        },
+        {
+          text: item.isFeatured || item.is_featured ? 'Featured' : 'News',
+        },
+      ],
+    };
+  });
 
   return (
     <main className="bg-bgMain mt-42 min-h-screen snap-y snap-mandatory overflow-y-scroll">
@@ -113,15 +121,13 @@ export default function NewsPage() {
                       />
                     </div>
 
-                    <div className="order-last flex flex-col gap-4 md:order-first">
-                      <h2 className="group-hover:text-primaryGradientEnd text-2xl leading-tight font-bold transition-colors duration-300 ease-out sm:text-3xl md:text-4xl">
+                    <div className="order-last flex min-w-0 flex-col gap-4 overflow-hidden md:order-first">
+                      <h2 className="group-hover:text-primaryGradientEnd text-2xl leading-tight font-bold break-words transition-colors duration-300 ease-out sm:text-3xl md:text-4xl">
                         {news[0].title}
                       </h2>
-                      <p className="text-justify text-sm leading-relaxed text-black/60 sm:text-base">
-                        {news[0].content
-                          .replace(/<[^>]*>/g, '')
-                          .substring(0, 200)}
-                        {news[0].content.replace(/<[^>]*>/g, '').length > 200
+                      <p className="overflow-hidden text-justify text-sm leading-relaxed break-words text-black/60 sm:text-base">
+                        {stripHtmlAndDecode(news[0].content).substring(0, 200)}
+                        {stripHtmlAndDecode(news[0].content).length > 200
                           ? '...'
                           : ''}
                       </p>

@@ -44,6 +44,13 @@ export default function NewsAdmin() {
   const [searchQuery, setSearchQuery] = useState('');
   const itemsPerPage = 10;
 
+  const stripHtmlAndDecode = (html) => {
+    if (typeof window === 'undefined') return html;
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || '';
+  };
+
   useEffect(() => {
     let active = true;
     const load = async () => {
@@ -479,7 +486,7 @@ export default function NewsAdmin() {
                   <div className="absolute top-[2.08px] left-[2px] h-5 w-5 outline outline-[1.50px] outline-offset-[-0.75px] outline-neutral-400" />
                 </div>
               </div>
-              <div className="flex flex-1 items-center gap-4 pr-4">
+              <div className="flex min-w-0 flex-1 items-center gap-4 overflow-hidden pr-4">
                 <div className="relative h-24 w-32 flex-shrink-0 overflow-hidden rounded-3xl bg-stone-300">
                   {imageUrl && (
                     <img
@@ -489,19 +496,14 @@ export default function NewsAdmin() {
                     />
                   )}
                 </div>
-                <div className="flex min-w-0 flex-1 flex-col gap-2">
-                  <div className="line-clamp-2 text-base leading-5 font-normal text-black">
+                <div className="flex max-w-full min-w-0 flex-1 flex-col gap-2 overflow-hidden">
+                  <div className="line-clamp-2 overflow-hidden text-base leading-5 font-normal break-words text-ellipsis text-black">
                     {item.title}
                   </div>
-                  <div
-                    className="line-clamp-2 text-sm leading-4 font-normal text-neutral-500"
-                    dangerouslySetInnerHTML={{
-                      __html: item.content
-                        .replace(/<[^>]*>/g, ' ')
-                        .replace(/\s+/g, ' ')
-                        .trim(),
-                    }}
-                  />
+                  <div className="line-clamp-2 overflow-hidden text-sm leading-4 font-normal break-all text-ellipsis text-neutral-500">
+                    {stripHtmlAndDecode(item.content).substring(0, 120)}
+                    {stripHtmlAndDecode(item.content).length > 120 ? '...' : ''}
+                  </div>
                 </div>
               </div>
               <div className="w-32 flex-shrink-0 text-base leading-5 font-normal text-zinc-800">
