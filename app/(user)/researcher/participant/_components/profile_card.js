@@ -1,43 +1,46 @@
 'use client';
 
+import { ArrowUpRight } from 'lucide-react';
+
 export default function CardProfile({
   imageSrc,
   imageAlt = 'Profile Image',
   name = '',
   bidang = '',
-  description = '',
   className = '',
-  expertise = '',
-  affiliation = '',
   onClick,
 }) {
   return (
     <div
       onClick={onClick}
-      className={`group flex w-full max-w-[360px] cursor-pointer flex-col items-center sm:max-w-[320px] md:max-w-[300px] ${className}`}
+      className={`group relative cursor-pointer overflow-hidden rounded-3xl bg-[#1a1a1a] ${className}`}
     >
-      {imageSrc && (
-        <img
-          src={imageSrc}
-          alt={imageAlt}
-          className="h-64 w-full rounded-2xl object-cover shadow-md transition-all duration-300 ease-out group-hover:brightness-[0.8] sm:h-72"
-        />
-      )}
-
-      <div className="mt-4 flex w-full flex-col gap-3 px-2 text-left sm:px-0">
-        <p className="text-grayDark group-hover:text-primaryGradientEnd text-lg font-bold transition-colors duration-300 ease-out sm:text-xl">
-          {name}
-        </p>
-
-        {description && (
-          <p className="line-clamp-2 text-sm text-gray-600 sm:text-base">
-            {expertise}
-          </p>
+      <div className="relative aspect-[3/4] w-full overflow-hidden">
+        {imageSrc && (
+          <img
+            src={imageSrc}
+            alt={imageAlt}
+            className="h-full w-full object-cover transition-all duration-500 ease-out group-hover:scale-105 group-hover:brightness-[0.7]"
+          />
         )}
 
-        {bidang && (
-          <p className="text-sm text-[#2497A9] sm:text-base">{affiliation}</p>
-        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+
+        <div className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 opacity-0 backdrop-blur-sm transition-all duration-300 group-hover:opacity-100">
+          <ArrowUpRight className="h-5 w-5 text-white" />
+        </div>
+
+        <div className="absolute right-0 bottom-0 left-0 p-5">
+          <h3 className="text-2xl leading-tight font-bold text-white sm:text-3xl">
+            {name}
+          </h3>
+
+          {bidang && (
+            <p className="mt-2 text-sm font-medium text-white/70 sm:text-base">
+              {bidang}
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );
