@@ -47,7 +47,7 @@ export async function POST(req) {
       description,
     } = body;
 
-    if (!name || !role || !email) {
+    if (!name || !role) {
       return NextResponse.json(
         { success: false, error: 'Missing required fields' },
         { status: 400 }

@@ -27,6 +27,9 @@ export default function Footer() {
                 Advancing innovation through science, engineering, and
                 real-world experimentation.
               </p>
+              <p className="mt-1 text-sm font-semibold text-zinc-500">
+                Department of Industry Science and Resources (DISR)
+              </p>
             </div>
           </div>
 
@@ -92,6 +95,16 @@ export default function Footer() {
                   className="text-teal-700 transition-colors hover:text-teal-900 hover:underline"
                 >
                   Universitas Gadjah Mada
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://www.pvrs.org.au/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-teal-700 transition-colors hover:text-teal-900 hover:underline"
+                >
+                  PV Solar Panel Recycling and Sustainability (PVRS)
                 </a>
               </li>
             </ul>
