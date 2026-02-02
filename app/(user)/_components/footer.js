@@ -54,7 +54,7 @@ export default function Footer() {
                   rel="noopener noreferrer"
                   className="text-teal-700 transition-colors hover:text-teal-900 hover:underline"
                 >
-                  Materials Science & Metallurgical Engineering
+                  IITH - Materials Science & Metallurgical Engineering
                 </a>
               </li>
               <li>
