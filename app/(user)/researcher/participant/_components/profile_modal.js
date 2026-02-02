@@ -119,14 +119,6 @@ export default function ProfileModal({
                     <p className="text-base font-medium">{data.affiliation}</p>
                   </div>
                 )}
-
-                {/* Contact */}
-                {data?.email && (
-                  <div>
-                    <p className="text-sm text-gray-400">Contact/Email</p>
-                    <p className="text-base font-medium">{data.email}</p>
-                  </div>
-                )}
               </div>
 
               {/* Right Arrow - hidden on mobile */}

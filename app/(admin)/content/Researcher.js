@@ -19,7 +19,6 @@ export default function ResearcherForm() {
 
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
     role: 'Principal Investigator',
     expertise: '',
     affiliation: '',
@@ -40,6 +39,10 @@ export default function ResearcherForm() {
 
   const [isCustomRole, setIsCustomRole] = useState(false);
   const [customRoleInput, setCustomRoleInput] = useState('');
+
+  const [isRolesModalOpen, setIsRolesModalOpen] = useState(false);
+  const [deleteRoleTarget, setDeleteRoleTarget] = useState(null);
+  const [isDeletingRole, setIsDeletingRole] = useState(false);
 
   const allRolesInData = [...new Set(researchers.map((r) => r.role))];
   const AVAILABLE_ROLES = [
@@ -86,8 +89,7 @@ export default function ResearcherForm() {
       setCustomRoleInput(roleIsCustom ? researcher.role : '');
       setFormData({
         name: researcher.name,
-        email: researcher.email,
-        role: roleIsCustom ? 'Other' : researcher.role,
+        role: roleIsCustom ? researcher.role : 'Other',
         expertise: researcher.expertise || '',
         affiliation: researcher.affiliation || '',
         description: researcher.description || '',
@@ -98,7 +100,6 @@ export default function ResearcherForm() {
       setCustomRoleInput('');
       setFormData({
         name: '',
-        email: '',
         role: 'Principal Investigator',
         expertise: '',
         affiliation: '',
@@ -182,6 +183,7 @@ export default function ResearcherForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
+          email: '',
           role: finalRole,
           avatarUrl,
         }),
@@ -223,6 +225,30 @@ export default function ResearcherForm() {
     }
   };
 
+  const handleDeleteRole = async () => {
+    if (!deleteRoleTarget) return;
+
+    setIsDeletingRole(true);
+    try {
+      const response = await fetch(
+        `/api/researchers/roles?role=${encodeURIComponent(deleteRoleTarget)}`,
+        {
+          method: 'DELETE',
+        }
+      );
+      const data = await response.json();
+      if (!data.success) throw new Error(data.error || 'Failed to delete role');
+
+      toast.success(`Role "${deleteRoleTarget}" deleted`);
+      setDeleteRoleTarget(null);
+      fetchResearchers();
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setIsDeletingRole(false);
+    }
+  };
+
   return (
     <div className="flex justify-center px-4 py-6">
       <div className="flex w-full max-w-full flex-col gap-6">
@@ -250,18 +276,26 @@ export default function ResearcherForm() {
 
         {/* Filter & Add */}
         <div className="flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <select
-            value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value)}
-            className="h-[44px] w-full rounded-md border border-gray-300 bg-white px-4 text-sm md:w-[220px]"
-          >
-            <option value="">All Roles</option>
-            {AVAILABLE_ROLES.map((role) => (
-              <option key={role} value={role}>
-                {role}
-              </option>
-            ))}
-          </select>
+          <div className="flex w-full flex-col gap-4 md:w-auto md:flex-row md:items-center">
+            <select
+              value={roleFilter}
+              onChange={(e) => setRoleFilter(e.target.value)}
+              className="h-[44px] w-full rounded-md border border-gray-300 bg-white px-4 text-sm md:w-[220px]"
+            >
+              <option value="">All Roles</option>
+              {AVAILABLE_ROLES.map((role) => (
+                <option key={role} value={role}>
+                  {role}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={() => setIsRolesModalOpen(true)}
+              className="h-[44px] w-full rounded-[12px] border border-gray-300 bg-white px-4 font-medium text-gray-700 transition-colors hover:bg-gray-50 md:w-auto"
+            >
+              Manage Roles
+            </button>
+          </div>
 
           <button
             onClick={() => openModal()}
@@ -457,18 +491,6 @@ export default function ResearcherForm() {
                     required
                   />
 
-                  <FormField
-                    label="Email Address"
-                    description="Contact email for collaborations."
-                    type="email"
-                    placeholder="Enter email address"
-                    value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
-                    required
-                  />
-
                   <div className="flex flex-col gap-2">
                     <label className="text-base font-medium text-gray-900">
                       Role
@@ -582,6 +604,79 @@ export default function ResearcherForm() {
           </form>
         </div>
       )}
+
+      {isRolesModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-black/20 backdrop-blur-sm transition-opacity"
+            onClick={() => setIsRolesModalOpen(false)}
+          />
+          <div className="relative flex w-full max-w-md flex-col overflow-hidden rounded-2xl bg-white shadow-xl">
+            <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Manage Roles
+              </h3>
+              <button
+                onClick={() => setIsRolesModalOpen(false)}
+                className="text-gray-400 hover:text-gray-500"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="flex max-h-[60vh] flex-col overflow-y-auto px-6 py-4">
+              <div className="flex flex-col gap-2">
+                {AVAILABLE_ROLES.map((role) => {
+                  const isPredefined = PREDEFINED_ROLES.includes(role);
+                  return (
+                    <div
+                      key={role}
+                      className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 p-3"
+                    >
+                      <span className="font-medium text-gray-700">{role}</span>
+                      {!isPredefined && (
+                        <button
+                          onClick={() => setDeleteRoleTarget(role)}
+                          className="flex h-8 w-8 items-center justify-center rounded-full text-red-500 transition-colors hover:bg-red-50"
+                          title="Delete Role"
+                        >
+                          <Image
+                            src="/icon/db-u-trash.webp"
+                            alt="Delete"
+                            width={16}
+                            height={16}
+                          />
+                        </button>
+                      )}
+                      {isPredefined && (
+                        <span className="text-xs text-gray-400">Default</span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="border-t border-gray-100 bg-gray-50 px-6 py-4">
+              <button
+                onClick={() => setIsRolesModalOpen(false)}
+                className="w-full rounded-xl bg-[#2AB2C7] py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <ConfirmModal
+        isOpen={!!deleteRoleTarget}
+        onClose={() => setDeleteRoleTarget(null)}
+        onConfirm={handleDeleteRole}
+        title="Delete Role"
+        message={`Are you sure you want to delete the role "${deleteRoleTarget}"? This will update all researchers with this role.`}
+        confirmText="Delete Role"
+        isLoading={isDeletingRole}
+        variant="danger"
+      />
 
       <ConfirmModal
         isOpen={!!deleteTarget}
