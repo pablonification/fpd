@@ -153,7 +153,7 @@ export default function NewsDetailPage() {
           </div>
         )}
 
-        <article className="prose prose-sm sm:prose-base prose-gray prose-headings:font-bold prose-headings:text-gray-900 prose-p:leading-relaxed prose-p:text-gray-600 prose-a:text-[#2497A9] prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl max-w-none">
+        <article className="prose prose-sm sm:prose-base prose-gray prose-headings:font-bold prose-headings:text-gray-900 prose-p:leading-relaxed prose-p:text-gray-600 prose-p:text-justify prose-a:text-[#2497A9] prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl max-w-none [&_p]:text-justify">
           <div dangerouslySetInnerHTML={{ __html: news.content }} />
         </article>
 
@@ -163,7 +163,7 @@ export default function NewsDetailPage() {
             <h2 className="mb-8 text-2xl tracking-tight text-neutral-950 sm:text-3xl">
               Other News
             </h2>
-            
+
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {relatedNews.map((item) => (
                 <Link
@@ -185,29 +185,23 @@ export default function NewsDetailPage() {
                       },
                       {
                         text:
-                          item.content.replace(/<[^>]*>/g, '').substring(0, 150) +
+                          item.content
+                            .replace(/<[^>]*>/g, '')
+                            .substring(0, 150) +
                           (item.content.length > 150 ? '...' : ''),
                       },
                       {
-                        text: item.isFeatured || item.is_featured ? 'Featured' : 'News',
+                        text:
+                          item.isFeatured || item.is_featured
+                            ? 'Featured'
+                            : 'News',
                       },
                     ]}
-                    className="
-                      h-full cursor-pointer
-                      [&_img]:transition-all
-                      [&_img]:duration-300
-                      [&_img]:ease-out
-                      [&_img]:group-hover:brightness-[0.8]
-                      [&_p:first-of-type]:transition-colors
-                      [&_p:first-of-type]:duration-300
-                      [&_p:first-of-type]:ease-out
-                      [&_p:first-of-type]:group-hover:text-primaryGradientEnd
-                    "
+                    className="[&_p:first-of-type]:group-hover:text-primaryGradientEnd h-full cursor-pointer [&_img]:transition-all [&_img]:duration-300 [&_img]:ease-out [&_img]:group-hover:brightness-[0.8] [&_p:first-of-type]:transition-colors [&_p:first-of-type]:duration-300 [&_p:first-of-type]:ease-out"
                   />
                 </Link>
               ))}
             </div>
-
           </section>
         )}
       </div>
