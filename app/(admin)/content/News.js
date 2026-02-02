@@ -3,6 +3,25 @@
 import { useEffect, useState, useMemo } from 'react';
 import toast from 'react-hot-toast';
 import ConfirmModal from '../_components/ConfirmModal';
+import dynamic from 'next/dynamic';
+
+// Dynamic import for ReactQuill to avoid SSR issues
+const ReactQuill = dynamic(() => import('react-quill-new'), {
+  ssr: false,
+  loading: () => (
+    <div className="h-[200px] w-full animate-pulse rounded-xl bg-gray-100" />
+  ),
+});
+import 'react-quill-new/dist/quill.snow.css';
+
+const QUILL_MODULES = {
+  toolbar: [
+    [{ header: [1, 2, false] }],
+    ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+    [{ list: 'ordered' }, { list: 'bullet' }],
+    ['link', 'clean'],
+  ],
+};
 
 export default function NewsAdmin() {
   const [items, setItems] = useState([]);
@@ -316,15 +335,18 @@ export default function NewsAdmin() {
                   <label className="mb-2 block text-sm font-medium text-zinc-700">
                     Content <span className="text-red-500">*</span>
                   </label>
-                  <textarea
-                    name="content"
-                    value={formData.content}
-                    onChange={handleInputChange}
-                    placeholder="Enter news content"
-                    rows={8}
-                    className="w-full rounded-xl border border-zinc-200 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                    required
-                  />
+                  <div className="min-h-[200px] overflow-hidden rounded-xl border border-zinc-200">
+                    <ReactQuill
+                      theme="snow"
+                      value={formData.content}
+                      onChange={(value) =>
+                        setFormData((prev) => ({ ...prev, content: value }))
+                      }
+                      modules={QUILL_MODULES}
+                      className="h-full"
+                      placeholder="Enter news content"
+                    />
+                  </div>
                 </div>
 
                 <div>
@@ -427,14 +449,20 @@ export default function NewsAdmin() {
       {/* News Content */}
       <div className="overflow-x-auto rounded-2xl bg-white px-6 py-3 shadow-sm outline outline-1 outline-offset-[-1px] outline-zinc-100">
         <div className="min-w-[900px] border-b border-zinc-100 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex w-[548px] items-center gap-6">
-              <div className="w-5 text-base text-neutral-400">Pin</div>
-              <div className="w-96 text-base text-neutral-400">Content</div>
+          <div className="flex items-center">
+            <div className="w-8 flex-shrink-0 text-base text-neutral-400">
+              Pin
             </div>
-            <div className="w-36 text-base text-neutral-400">Featured</div>
-            <div className="w-20 text-base text-neutral-400">Date</div>
-            <div className="w-28 text-base text-neutral-400">Actions</div>
+            <div className="flex-1 text-base text-neutral-400">Content</div>
+            <div className="w-32 flex-shrink-0 text-base text-neutral-400">
+              Featured
+            </div>
+            <div className="w-28 flex-shrink-0 text-base text-neutral-400">
+              Date
+            </div>
+            <div className="w-24 flex-shrink-0 text-base text-neutral-400">
+              Actions
+            </div>
           </div>
         </div>
 
@@ -445,35 +473,38 @@ export default function NewsAdmin() {
           const isFeatured = item.isFeatured || item.is_featured;
 
           return (
-            <div
-              key={item.id}
-              className="flex min-w-[900px] items-center justify-between rounded-[56px] py-3"
-            >
-              <div className="flex items-center gap-6">
+            <div key={item.id} className="flex min-w-[900px] items-center py-3">
+              <div className="w-8 flex-shrink-0">
                 <div className="relative h-6 w-6">
                   <div className="absolute top-[2.08px] left-[2px] h-5 w-5 outline outline-[1.50px] outline-offset-[-0.75px] outline-neutral-400" />
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="relative h-24 w-32 overflow-hidden rounded-3xl bg-stone-300">
-                    {imageUrl && (
-                      <img
-                        src={imageUrl}
-                        alt={item.title}
-                        className="h-full w-full object-cover"
-                      />
-                    )}
+              </div>
+              <div className="flex flex-1 items-center gap-4 pr-4">
+                <div className="relative h-24 w-32 flex-shrink-0 overflow-hidden rounded-3xl bg-stone-300">
+                  {imageUrl && (
+                    <img
+                      src={imageUrl}
+                      alt={item.title}
+                      className="h-full w-full object-cover"
+                    />
+                  )}
+                </div>
+                <div className="flex min-w-0 flex-1 flex-col gap-2">
+                  <div className="line-clamp-2 text-base leading-5 font-normal text-black">
+                    {item.title}
                   </div>
-                  <div className="flex flex-col gap-2 px-2">
-                    <div className="line-clamp-2 self-stretch text-base leading-5 font-normal text-black">
-                      {item.title}
-                    </div>
-                    <div className="line-clamp-2 w-80 text-sm leading-4 font-normal text-neutral-500">
-                      {item.content}
-                    </div>
-                  </div>
+                  <div
+                    className="line-clamp-2 text-sm leading-4 font-normal text-neutral-500"
+                    dangerouslySetInnerHTML={{
+                      __html: item.content
+                        .replace(/<[^>]*>/g, ' ')
+                        .replace(/\s+/g, ' ')
+                        .trim(),
+                    }}
+                  />
                 </div>
               </div>
-              <div className="w-36 text-base leading-5 font-normal text-zinc-800">
+              <div className="w-32 flex-shrink-0 text-base leading-5 font-normal text-zinc-800">
                 {isFeatured ? (
                   <span className="rounded-full bg-[#2AB2C7]/10 px-3 py-1 text-sm font-medium text-[#2AB2C7]">
                     Featured
@@ -482,7 +513,7 @@ export default function NewsAdmin() {
                   <span className="text-neutral-400">-</span>
                 )}
               </div>
-              <div className="w-20 text-base leading-5 font-normal text-zinc-800">
+              <div className="w-28 flex-shrink-0 text-base leading-5 font-normal text-zinc-800">
                 {createdAt
                   ? new Date(createdAt).toLocaleDateString('id-ID', {
                       day: '2-digit',
@@ -491,7 +522,7 @@ export default function NewsAdmin() {
                     })
                   : '-'}
               </div>
-              <div className="flex w-28 items-center gap-4">
+              <div className="flex w-24 flex-shrink-0 items-center gap-4">
                 <button
                   onClick={() => openModal('edit', item)}
                   className="relative h-5 w-5 cursor-pointer"
@@ -544,23 +575,24 @@ export default function NewsAdmin() {
         {loading && (
           <div className="animate-pulse">
             {[...Array(5)].map((_, i) => (
-              <div
-                key={i}
-                className="flex min-w-[900px] items-center justify-between rounded-[56px] py-3"
-              >
-                <div className="flex items-center gap-6">
+              <div key={i} className="flex min-w-[900px] items-center py-3">
+                <div className="w-8 flex-shrink-0">
                   <div className="h-6 w-6 rounded bg-gray-200" />
-                  <div className="flex items-center gap-2">
-                    <div className="h-24 w-32 rounded-3xl bg-gray-200" />
-                    <div className="flex flex-col gap-2 px-2">
-                      <div className="h-5 w-48 rounded bg-gray-200" />
-                      <div className="h-4 w-64 rounded bg-gray-200" />
-                    </div>
+                </div>
+                <div className="flex flex-1 items-center gap-4 pr-4">
+                  <div className="h-24 w-32 flex-shrink-0 rounded-3xl bg-gray-200" />
+                  <div className="flex min-w-0 flex-1 flex-col gap-2">
+                    <div className="h-5 w-3/4 rounded bg-gray-200" />
+                    <div className="h-4 w-full rounded bg-gray-200" />
                   </div>
                 </div>
-                <div className="h-6 w-20 rounded-full bg-gray-200" />
-                <div className="h-5 w-20 rounded bg-gray-200" />
-                <div className="flex w-28 items-center gap-4">
+                <div className="w-32 flex-shrink-0">
+                  <div className="h-6 w-20 rounded-full bg-gray-200" />
+                </div>
+                <div className="w-28 flex-shrink-0">
+                  <div className="h-5 w-20 rounded bg-gray-200" />
+                </div>
+                <div className="flex w-24 flex-shrink-0 items-center gap-4">
                   <div className="h-5 w-5 rounded bg-gray-200" />
                   <div className="h-5 w-5 rounded bg-gray-200" />
                 </div>
@@ -623,6 +655,25 @@ export default function NewsAdmin() {
         isLoading={isDeleting}
         variant="danger"
       />
+
+      {/* Styles for Quill */}
+      <style jsx global>{`
+        .ql-container {
+          border-bottom-left-radius: 12px;
+          border-bottom-right-radius: 12px;
+          border: none !important;
+          font-family: inherit;
+        }
+        .ql-toolbar {
+          border-top-left-radius: 12px;
+          border-top-right-radius: 12px;
+          border: none !important;
+          border-bottom: 1px solid #e5e7eb !important;
+        }
+        .ql-editor {
+          min-h: 200px;
+        }
+      `}</style>
     </div>
   );
 }

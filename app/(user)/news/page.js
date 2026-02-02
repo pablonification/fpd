@@ -45,8 +45,8 @@ export default function NewsPage() {
       },
       {
         text:
-          item.content.substring(0, 150) +
-          (item.content.length > 150 ? '...' : ''),
+          item.content.replace(/<[^>]*>/g, '').substring(0, 150) +
+          (item.content.replace(/<[^>]*>/g, '').length > 150 ? '...' : ''),
       },
       {
         text: item.isFeatured || item.is_featured ? 'Featured' : 'News',
@@ -117,9 +117,13 @@ export default function NewsPage() {
                       <h2 className="group-hover:text-primaryGradientEnd text-2xl leading-tight font-bold transition-colors duration-300 ease-out sm:text-3xl md:text-4xl">
                         {news[0].title}
                       </h2>
-                      <p className="text-sm leading-relaxed text-black/60 sm:text-base">
-                        {news[0].content.substring(0, 200)}
-                        {news[0].content.length > 200 ? '...' : ''}
+                      <p className="text-justify text-sm leading-relaxed text-black/60 sm:text-base">
+                        {news[0].content
+                          .replace(/<[^>]*>/g, '')
+                          .substring(0, 200)}
+                        {news[0].content.replace(/<[^>]*>/g, '').length > 200
+                          ? '...'
+                          : ''}
                       </p>
                       <p className="mt-2 text-xs text-gray-500 sm:text-sm">
                         {news[0].isFeatured || news[0].is_featured

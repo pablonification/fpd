@@ -153,7 +153,7 @@ export default function NewsDetailPage() {
           </div>
         )}
 
-        <article className="prose prose-sm sm:prose-base prose-gray prose-headings:font-bold prose-headings:text-gray-900 prose-p:leading-relaxed prose-p:text-gray-600 prose-p:text-justify prose-a:text-[#2497A9] prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl max-w-none [&_p]:text-justify">
+        <article className="prose prose-sm sm:prose-base prose-gray prose-headings:font-bold prose-headings:text-gray-900 prose-p:leading-relaxed prose-p:text-gray-600 prose-a:text-[#2497A9] prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl prose-ul:text-gray-600 prose-ol:text-gray-600 prose-li:text-gray-600 prose-blockquote:text-gray-600 prose-strong:text-gray-900 max-w-none text-justify [&_*]:text-justify [&_blockquote]:text-justify [&_li]:text-justify [&_p]:text-justify">
           <div dangerouslySetInnerHTML={{ __html: news.content }} />
         </article>
 
