@@ -212,7 +212,7 @@ export default function WhoAreWe() {
             </h3>
             <span className="h-px w-8 bg-[#2ab2c7]"></span>
           </div>
-          <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-5">
+          <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-6">
             {[
               {
                 name: 'Swinburne University',
@@ -222,6 +222,7 @@ export default function WhoAreWe() {
               { name: 'BRIN', src: '/institution/BRIN.webp' },
               { name: 'IIT', src: '/institution/iit.webp' },
               { name: 'Sadoway', src: '/institution/sadoway.webp' },
+              { name: 'Remind', src: '/institution/remind.webp' },
             ].map((institution, index) => (
               <motion.div
                 key={institution.name}
