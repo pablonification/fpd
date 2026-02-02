@@ -212,7 +212,7 @@ export default function WhoAreWe() {
             </h3>
             <span className="h-px w-8 bg-[#2ab2c7]"></span>
           </div>
-          <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-6">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6">
             {[
               {
                 name: 'Swinburne University',
@@ -236,13 +236,13 @@ export default function WhoAreWe() {
                   }
                   transition={{ duration: 0.5, delay: 0.7 + index * 0.1 }}
                   whileHover={{ scale: 1.05 }}
-                  className="group flex items-center justify-center rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition-all hover:shadow-md"
+                  className="group flex aspect-[4/3] items-center justify-center rounded-xl border border-gray-100 bg-white p-3 shadow-sm transition-all hover:shadow-md sm:p-4"
                 >
                   <img
                     src={institution.src}
                     alt={institution.name}
-                    className={`h-24 w-auto object-contain transition-transform duration-300 ${
-                      isRemind ? 'scale-[1.3] md:scale-[1.45]' : ''
+                    className={`h-auto max-h-full w-auto max-w-full object-contain transition-transform duration-300 ${
+                      isRemind ? 'scale-110' : ''
                     }`}
                   />
                 </motion.div>
