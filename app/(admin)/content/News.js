@@ -35,7 +35,6 @@ export default function NewsAdmin() {
   const [currentEditId, setCurrentEditId] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
-    slug: '',
     content: '',
     imageUrl: '',
     isFeatured: false,
@@ -81,7 +80,6 @@ export default function NewsAdmin() {
       setCurrentEditId(data.id);
       setFormData({
         title: data.title || '',
-        slug: data.slug || '',
         content: data.content || '',
         imageUrl: data.imageUrl || data.image_url || '',
         isFeatured: data.isFeatured || data.is_featured || false,
@@ -90,7 +88,6 @@ export default function NewsAdmin() {
       setCurrentEditId(null);
       setFormData({
         title: '',
-        slug: '',
         content: '',
         imageUrl: '',
         isFeatured: false,
@@ -102,7 +99,6 @@ export default function NewsAdmin() {
     setIsModalOpen(false);
     setFormData({
       title: '',
-      slug: '',
       content: '',
       imageUrl: '',
       isFeatured: false,
@@ -116,17 +112,6 @@ export default function NewsAdmin() {
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }));
-  };
-
-  // Auto-generate slug from title
-  const generateSlug = () => {
-    const slug = formData.title
-      .toLowerCase()
-      .trim()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-');
-    setFormData((prev) => ({ ...prev, slug }));
   };
 
   const onUploadImage = async (file) => {
@@ -154,10 +139,6 @@ export default function NewsAdmin() {
       toast.error('Title is required');
       return;
     }
-    if (!formData.slug.trim()) {
-      toast.error('Slug is required');
-      return;
-    }
     if (!formData.content.trim()) {
       toast.error('Content is required');
       return;
@@ -167,7 +148,6 @@ export default function NewsAdmin() {
     try {
       const payload = {
         title: formData.title.trim(),
-        slug: formData.slug.trim(),
         content: formData.content.trim(),
         imageUrl: formData.imageUrl.trim(),
         isFeatured: formData.isFeatured,
@@ -307,35 +287,10 @@ export default function NewsAdmin() {
                     name="title"
                     value={formData.title}
                     onChange={handleInputChange}
-                    onBlur={generateSlug}
                     placeholder="Enter news title"
                     className="w-full rounded-xl border border-zinc-200 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                     required
                   />
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-medium text-zinc-700">
-                    Slug <span className="text-red-500">*</span>
-                  </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      name="slug"
-                      value={formData.slug}
-                      onChange={handleInputChange}
-                      placeholder="url-friendly-slug"
-                      className="flex-1 rounded-xl border border-zinc-200 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={generateSlug}
-                      className="rounded-xl border border-zinc-300 bg-white px-4 py-3 text-sm font-medium text-neutral-600 hover:bg-zinc-50"
-                    >
-                      Auto-generate
-                    </button>
-                  </div>
                 </div>
 
                 <div>

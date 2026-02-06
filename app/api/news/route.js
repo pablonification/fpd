@@ -1,7 +1,41 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/db/db';
 import { news } from '@/db/schema';
-import { desc } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
+
+function generateSlug(title) {
+  return title
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .substring(0, 100);
+}
+
+async function generateUniqueSlug(title, currentId = null) {
+  let baseSlug = generateSlug(title);
+  let slug = baseSlug;
+  let counter = 1;
+  let isUnique = false;
+
+  while (!isUnique) {
+    const existing = await db
+      .select({ id: news.id })
+      .from(news)
+      .where(eq(news.slug, slug))
+      .limit(1);
+
+    if (existing.length === 0 || (currentId && existing[0].id === currentId)) {
+      isUnique = true;
+    } else {
+      slug = `${baseSlug}-${counter}`;
+      counter++;
+    }
+  }
+
+  return slug;
+}
 
 // GET /api/news - list news items
 export async function GET(request) {
@@ -22,18 +56,11 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { title, slug, content, imageUrl, isFeatured } = body;
+    const { title, content, imageUrl, isFeatured } = body;
 
-    // Validation
     if (!title || !title.trim()) {
       return NextResponse.json(
         { success: false, error: 'Title is required' },
-        { status: 400 }
-      );
-    }
-    if (!slug || !slug.trim()) {
-      return NextResponse.json(
-        { success: false, error: 'Slug is required' },
         { status: 400 }
       );
     }
@@ -44,11 +71,13 @@ export async function POST(request) {
       );
     }
 
+    const uniqueSlug = await generateUniqueSlug(title);
+
     const [created] = await db
       .insert(news)
       .values({
         title: title.trim(),
-        slug: slug.trim(),
+        slug: uniqueSlug,
         content: content.trim(),
         imageUrl: imageUrl?.trim() || null,
         isFeatured: isFeatured || false,
