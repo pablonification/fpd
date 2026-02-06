@@ -155,14 +155,14 @@ export const files = pgTable('files', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
-// Predefined researcher roles (for UI suggestions, not database constraint)
-export const PREDEFINED_RESEARCHER_ROLES = [
-  'Principal Investigator',
-  "Master's Student",
-  'Undergraduate Student',
-  'Alumni Researcher',
-  'Collaborator',
-];
+// Researcher roles table (dynamic, editable, with hierarchy order)
+export const researcherRoles = pgTable('researcher_roles', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull().unique(),
+  order: integer('order').notNull().default(999),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
 
 export const researchers = pgTable('researchers', {
   id: serial('id').primaryKey(),

@@ -10,6 +10,7 @@ export default function TeamSection() {
   const [search, setSearch] = useState('');
   const [selectedRole, setSelectedRole] = useState('');
   const [team, setTeam] = useState([]);
+  const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedMember, setSelectedMember] = useState(null);
@@ -17,17 +18,28 @@ export default function TeamSection() {
   const [modalOpen, setModalOpen] = useState(false);
   const [index, setIndex] = useState(0);
 
-  // Fetch researchers from API
   useEffect(() => {
-    const fetchTeam = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/researchers', { cache: 'no-store' });
-        const data = await response.json();
 
-        if (data.success) {
-          // Transform API data to match the expected format
-          const transformedData = data.data.map((researcher) => ({
+        const timestamp = Date.now();
+        const [rolesResponse, researchersResponse] = await Promise.all([
+          fetch(`/api/researchers/roles?_t=${timestamp}`, {
+            cache: 'no-store',
+          }),
+          fetch(`/api/researchers?_t=${timestamp}`, { cache: 'no-store' }),
+        ]);
+
+        const rolesData = await rolesResponse.json();
+        const researchersData = await researchersResponse.json();
+
+        if (rolesData.success) {
+          setRoles(rolesData.data);
+        }
+
+        if (researchersData.success) {
+          const transformedData = researchersData.data.map((researcher) => ({
             id: researcher.id,
             imageSrc:
               researcher.avatarUrl ||
@@ -45,17 +57,16 @@ export default function TeamSection() {
           setError('Failed to fetch researchers');
         }
       } catch (err) {
-        console.error('Error fetching team:', err);
+        console.error('Error fetching data:', err);
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchTeam();
+    fetchData();
   }, []);
 
-  // Apply filters
   const filteredTeam = team.filter((t) => {
     const q = search.trim().toLowerCase();
     const matchesSearch = !q
@@ -75,19 +86,15 @@ export default function TeamSection() {
     new Set(team.map((t) => t.bidang).filter(Boolean))
   ).sort();
 
-  // Sort by role importance when "All Roles" is selected
-  // Hierarchy: Director > Co-Deputy Director > Principal Investigator > Collaborator
-  const getRolePriority = (role) => {
-    const roleLower = (role || '').toLowerCase();
-    if (roleLower === 'director') return 1;
-    if (roleLower.includes('co-deputy')) return 2;
-    if (roleLower.includes('principal investigator')) return 3;
-    if (roleLower === 'collaborator') return 4;
-    return 5; // Others
+  const getRoleOrder = (roleName) => {
+    const role = roles.find(
+      (r) => r.name.toLowerCase() === (roleName || '').toLowerCase()
+    );
+    return role ? role.order : 999;
   };
 
   const sortedTeam = [...filteredTeam].sort((a, b) => {
-    return getRolePriority(a.bidang) - getRolePriority(b.bidang);
+    return getRoleOrder(a.bidang) - getRoleOrder(b.bidang);
   });
 
   const openModal = (i) => {

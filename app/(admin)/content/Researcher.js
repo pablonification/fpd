@@ -5,6 +5,68 @@ import FormField from '../_components/FormField';
 import ConfirmModal from '../_components/ConfirmModal';
 import { CgSpinner } from 'react-icons/cg';
 import toast from 'react-hot-toast';
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
+function SortableRoleItem({ role, onEdit, onDelete }) {
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: role.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="flex items-center gap-3 rounded-lg border border-gray-100 bg-gray-50 p-3"
+    >
+      <div
+        {...attributes}
+        {...listeners}
+        className="flex h-6 w-6 cursor-grab items-center justify-center text-gray-400 active:cursor-grabbing"
+      >
+        ☰
+      </div>
+      <span className="flex-1 font-medium text-gray-700">{role.name}</span>
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => onEdit(role)}
+          className="flex h-8 w-8 items-center justify-center rounded-full text-gray-500 transition-colors hover:bg-gray-200"
+          title="Edit Role"
+        >
+          <Image src="/icon/db-u-edit.webp" alt="Edit" width={16} height={16} />
+        </button>
+        <button
+          onClick={() => onDelete(role)}
+          className="flex h-8 w-8 items-center justify-center rounded-full text-red-500 transition-colors hover:bg-red-50"
+          title="Delete Role"
+        >
+          <Image
+            src="/icon/db-u-trash.webp"
+            alt="Delete"
+            width={16}
+            height={16}
+          />
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export default function ResearcherForm() {
   const [researchers, setResearchers] = useState([]);
@@ -29,57 +91,41 @@ export default function ResearcherForm() {
   const [avatarPreview, setAvatarPreview] = useState(null);
   const fileInputRef = useRef(null);
 
-  const PREDEFINED_ROLES = [
-    'Principal Investigator',
-    "Master's Student",
-    'Undergraduate Student',
-    'Alumni Researcher',
-    'Collaborator',
-  ];
-
+  const [roles, setRoles] = useState([]);
   const [isRolesModalOpen, setIsRolesModalOpen] = useState(false);
   const [deleteRoleTarget, setDeleteRoleTarget] = useState(null);
   const [isDeletingRole, setIsDeletingRole] = useState(false);
 
   const [newRoleInput, setNewRoleInput] = useState('');
   const [isAddingRole, setIsAddingRole] = useState(false);
-  const [addedRoles, setAddedRoles] = useState([]);
   const [showAddRoleInput, setShowAddRoleInput] = useState(false);
 
-  const allRolesInData = [...new Set(researchers.map((r) => r.role))];
-  const AVAILABLE_ROLES = [
-    ...new Set([...PREDEFINED_ROLES, ...allRolesInData, ...addedRoles]),
-  ];
+  const [editingRole, setEditingRole] = useState(null);
+  const [editRoleInput, setEditRoleInput] = useState('');
+  const [isUpdatingRole, setIsUpdatingRole] = useState(false);
 
-  const handleAddNewRoleFromDropdown = async () => {
-    const trimmed = newRoleInput.trim();
-    if (!trimmed) return;
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+  );
 
-    const exists = AVAILABLE_ROLES.some(
-      (r) => r.toLowerCase() === trimmed.toLowerCase()
-    );
-
-    if (exists) {
-      toast.error('Role already exists');
-      return;
-    }
-
-    setIsAddingRole(true);
+  const fetchRoles = useCallback(async () => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      setAddedRoles((prev) => [...prev, trimmed]);
-      setFormData((prev) => ({ ...prev, role: trimmed }));
-      setNewRoleInput('');
-      setShowAddRoleInput(false);
-      toast.success(`New role '${trimmed}' added`);
-    } catch (err) {
-      toast.error('Failed to add role');
-    } finally {
-      setIsAddingRole(false);
-    }
-  };
+      const response = await fetch('/api/researchers/roles', {
+        cache: 'no-store',
+      });
+      const data = await response.json();
 
-  // Fetch researchers
+      if (data.success) {
+        setRoles(data.data);
+      } else {
+        throw new Error(data.error || 'Failed to fetch roles');
+      }
+    } catch (err) {
+      toast.error('Failed to fetch roles: ' + err.message);
+      console.error(err);
+    }
+  }, []);
+
   const fetchResearchers = useCallback(async () => {
     setLoading(true);
     try {
@@ -100,17 +146,16 @@ export default function ResearcherForm() {
   }, []);
 
   useEffect(() => {
+    fetchRoles();
     fetchResearchers();
-  }, [fetchResearchers]);
+  }, [fetchRoles, fetchResearchers]);
 
-  // Filter researchers
   const filteredResearchers = researchers.filter(
     (researcher) =>
       researcher.name.toLowerCase().includes(search.toLowerCase()) &&
       (roleFilter ? researcher.role === roleFilter : true)
   );
 
-  // Modal handlers
   const openModal = (researcher = null) => {
     setCurrentResearcher(researcher);
     if (researcher) {
@@ -254,7 +299,7 @@ export default function ResearcherForm() {
     setIsDeletingRole(true);
     try {
       const response = await fetch(
-        `/api/researchers/roles?role=${encodeURIComponent(deleteRoleTarget)}`,
+        `/api/researchers/roles?id=${deleteRoleTarget.id}`,
         {
           method: 'DELETE',
         }
@@ -262,9 +307,9 @@ export default function ResearcherForm() {
       const data = await response.json();
       if (!data.success) throw new Error(data.error || 'Failed to delete role');
 
-      toast.success(`Role "${deleteRoleTarget}" deleted`);
+      toast.success(`Role "${deleteRoleTarget.name}" deleted`);
       setDeleteRoleTarget(null);
-      setAddedRoles((prev) => prev.filter((r) => r !== deleteRoleTarget));
+      fetchRoles();
       fetchResearchers();
     } catch (err) {
       toast.error(err.message);
@@ -278,8 +323,8 @@ export default function ResearcherForm() {
     if (!newRoleInput.trim()) return;
 
     const roleToAdd = newRoleInput.trim();
-    const exists = AVAILABLE_ROLES.some(
-      (r) => r.toLowerCase() === roleToAdd.toLowerCase()
+    const exists = roles.some(
+      (r) => r.name.toLowerCase() === roleToAdd.toLowerCase()
     );
 
     if (exists) {
@@ -289,22 +334,144 @@ export default function ResearcherForm() {
 
     setIsAddingRole(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      const response = await fetch('/api/researchers/roles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: roleToAdd }),
+      });
 
-      setAddedRoles((prev) => [...prev, roleToAdd]);
+      const data = await response.json();
+      if (!data.success) throw new Error(data.error);
+
       setNewRoleInput('');
       toast.success('Role added successfully');
+      fetchRoles();
     } catch (err) {
-      toast.error('Failed to add role');
+      toast.error(err.message || 'Failed to add role');
     } finally {
       setIsAddingRole(false);
+    }
+  };
+
+  const handleAddNewRoleFromDropdown = async () => {
+    const trimmed = newRoleInput.trim();
+    if (!trimmed) return;
+
+    const exists = roles.some(
+      (r) => r.name.toLowerCase() === trimmed.toLowerCase()
+    );
+
+    if (exists) {
+      toast.error('Role already exists');
+      return;
+    }
+
+    setIsAddingRole(true);
+    try {
+      const response = await fetch('/api/researchers/roles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: trimmed }),
+      });
+
+      const data = await response.json();
+      if (!data.success) throw new Error(data.error);
+
+      setFormData((prev) => ({ ...prev, role: trimmed }));
+      setNewRoleInput('');
+      setShowAddRoleInput(false);
+      toast.success(`New role '${trimmed}' added`);
+      fetchRoles();
+    } catch (err) {
+      toast.error(err.message || 'Failed to add role');
+    } finally {
+      setIsAddingRole(false);
+    }
+  };
+
+  const handleEditRole = (role) => {
+    setEditingRole(role);
+    setEditRoleInput(role.name);
+  };
+
+  const handleSaveEditRole = async () => {
+    if (!editRoleInput.trim() || !editingRole) return;
+
+    const newName = editRoleInput.trim();
+    if (newName === editingRole.name) {
+      setEditingRole(null);
+      return;
+    }
+
+    const exists = roles.some(
+      (r) =>
+        r.id !== editingRole.id &&
+        r.name.toLowerCase() === newName.toLowerCase()
+    );
+
+    if (exists) {
+      toast.error('Role name already exists');
+      return;
+    }
+
+    setIsUpdatingRole(true);
+    try {
+      const response = await fetch('/api/researchers/roles', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: editingRole.id, name: newName }),
+      });
+
+      const data = await response.json();
+      if (!data.success) throw new Error(data.error);
+
+      toast.success('Role updated successfully');
+      setEditingRole(null);
+      fetchRoles();
+      fetchResearchers();
+    } catch (err) {
+      toast.error(err.message || 'Failed to update role');
+    } finally {
+      setIsUpdatingRole(false);
+    }
+  };
+
+  const handleDragEnd = async (event) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = roles.findIndex((r) => r.id === active.id);
+    const newIndex = roles.findIndex((r) => r.id === over.id);
+
+    const reorderedRoles = arrayMove(roles, oldIndex, newIndex);
+    setRoles(reorderedRoles);
+
+    const reorderData = reorderedRoles.map((role, index) => ({
+      id: role.id,
+      order: index + 1,
+    }));
+
+    try {
+      const response = await fetch('/api/researchers/roles', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reorderData }),
+      });
+
+      const data = await response.json();
+      if (!data.success) throw new Error(data.error);
+
+      await fetchRoles();
+      toast.success('Roles reordered successfully');
+    } catch (err) {
+      toast.error('Failed to reorder roles: ' + err.message);
+      fetchRoles();
     }
   };
 
   return (
     <div className="flex justify-center px-4 py-6">
       <div className="flex w-full max-w-full flex-col gap-6">
-        {/* Header */}
         <div className="flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <h1 className="font-hanken text-2xl leading-8 font-semibold tracking-tight">
             All Researchers
@@ -326,7 +493,6 @@ export default function ResearcherForm() {
           </div>
         </div>
 
-        {/* Filter & Add */}
         <div className="flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="flex w-full flex-col gap-4 md:w-auto md:flex-row md:items-center">
             <select
@@ -335,9 +501,9 @@ export default function ResearcherForm() {
               className="h-[44px] w-full rounded-md border border-gray-300 bg-white px-4 text-sm md:w-[220px]"
             >
               <option value="">All Roles</option>
-              {AVAILABLE_ROLES.map((role) => (
-                <option key={role} value={role}>
-                  {role}
+              {roles.map((role) => (
+                <option key={role.id} value={role.name}>
+                  {role.name}
                 </option>
               ))}
             </select>
@@ -358,7 +524,6 @@ export default function ResearcherForm() {
           </button>
         </div>
 
-        {/* Table */}
         <div className="flex min-h-[500px] w-full flex-col overflow-x-auto rounded-lg border border-gray-200 bg-white">
           <div className="grid min-w-[1000px] grid-cols-[2fr_1.5fr_1.5fr_1.5fr_1fr] items-center border-b border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-700">
             <span>Researcher</span>
@@ -422,7 +587,6 @@ export default function ResearcherForm() {
                   <span className="font-semibold text-gray-900">
                     {item.name}
                   </span>
-                  {/* <span className="text-xs text-gray-500">{item.email}</span> */}
                 </div>
               </div>
 
@@ -457,7 +621,6 @@ export default function ResearcherForm() {
         </div>
       </div>
 
-      {/* Slide-over Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex justify-end">
           <div
@@ -469,7 +632,6 @@ export default function ResearcherForm() {
             onSubmit={handleSubmit}
             className="relative flex h-full w-full max-w-[800px] flex-col overflow-hidden bg-white shadow-2xl transition-transform duration-300"
           >
-            {/* Modal Header */}
             <div className="flex h-[80px] flex-shrink-0 items-center border-b border-gray-200 px-8">
               <button
                 type="button"
@@ -485,10 +647,8 @@ export default function ResearcherForm() {
               </h2>
             </div>
 
-            {/* Modal Content */}
             <div className="flex-1 overflow-y-auto px-8 py-10">
               <div className="mx-auto flex w-full max-w-[650px] flex-col gap-9">
-                {/* Profile Picture Upload */}
                 <div className="flex items-center gap-6">
                   <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-full border border-gray-200 bg-gray-100">
                     {avatarPreview ? (
@@ -568,9 +728,9 @@ export default function ResearcherForm() {
                       <option value="" disabled>
                         -- Select Role --
                       </option>
-                      {AVAILABLE_ROLES.map((role) => (
-                        <option key={role} value={role}>
-                          {role}
+                      {roles.map((role) => (
+                        <option key={role.id} value={role.name}>
+                          {role.name}
                         </option>
                       ))}
                       <option value="__ADD_NEW__">+ Add New Role</option>
@@ -645,7 +805,6 @@ export default function ResearcherForm() {
               </div>
             </div>
 
-            {/* Modal Footer */}
             <div className="flex h-[100px] flex-shrink-0 items-center justify-end gap-4 border-t border-gray-200 bg-gray-50 px-8">
               <button
                 type="button"
@@ -720,37 +879,66 @@ export default function ResearcherForm() {
               </div>
 
               <div className="flex max-h-[50vh] flex-col overflow-y-auto px-6 py-4">
+                <p className="mb-2 text-xs text-gray-500">
+                  Drag to reorder roles. Order determines hierarchy on
+                  participant page.
+                </p>
                 <div className="flex flex-col gap-2">
-                  {AVAILABLE_ROLES.map((role) => {
-                    const isPredefined = PREDEFINED_ROLES.includes(role);
-                    return (
-                      <div
-                        key={role}
-                        className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 p-3"
-                      >
-                        <span className="font-medium text-gray-700">
-                          {role}
-                        </span>
-                        {!isPredefined && (
-                          <button
-                            onClick={() => setDeleteRoleTarget(role)}
-                            className="flex h-8 w-8 items-center justify-center rounded-full text-red-500 transition-colors hover:bg-red-50"
-                            title="Delete Role"
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <SortableContext
+                      items={roles.map((r) => r.id)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      {roles.map((role) =>
+                        editingRole?.id === role.id ? (
+                          <div
+                            key={role.id}
+                            className="flex items-center gap-2 rounded-lg border border-[#2AB2C7] bg-blue-50 p-3"
                           >
-                            <Image
-                              src="/icon/db-u-trash.webp"
-                              alt="Delete"
-                              width={16}
-                              height={16}
+                            <input
+                              type="text"
+                              value={editRoleInput}
+                              onChange={(e) => setEditRoleInput(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') handleSaveEditRole();
+                                if (e.key === 'Escape') setEditingRole(null);
+                              }}
+                              className="h-8 flex-1 rounded border border-gray-300 px-2 text-sm outline-none focus:border-[#2AB2C7]"
+                              autoFocus
                             />
-                          </button>
-                        )}
-                        {isPredefined && (
-                          <span className="text-xs text-gray-400">Default</span>
-                        )}
-                      </div>
-                    );
-                  })}
+                            <button
+                              onClick={handleSaveEditRole}
+                              disabled={isUpdatingRole}
+                              className="flex h-8 min-w-[60px] items-center justify-center rounded bg-[#2AB2C7] px-3 text-xs font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                            >
+                              {isUpdatingRole ? (
+                                <CgSpinner className="animate-spin" />
+                              ) : (
+                                'Save'
+                              )}
+                            </button>
+                            <button
+                              onClick={() => setEditingRole(null)}
+                              className="flex h-8 w-8 items-center justify-center rounded text-gray-500 transition-colors hover:bg-gray-200"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ) : (
+                          <SortableRoleItem
+                            key={role.id}
+                            role={role}
+                            onEdit={handleEditRole}
+                            onDelete={setDeleteRoleTarget}
+                          />
+                        )
+                      )}
+                    </SortableContext>
+                  </DndContext>
                 </div>
               </div>
             </div>
@@ -771,7 +959,7 @@ export default function ResearcherForm() {
         onClose={() => setDeleteRoleTarget(null)}
         onConfirm={handleDeleteRole}
         title="Delete Role"
-        message={`Are you sure you want to delete the role "${deleteRoleTarget}"? This will update all researchers with this role.`}
+        message={`Are you sure you want to delete the role "${deleteRoleTarget?.name}"? All researchers with this role will be reassigned.`}
         confirmText="Delete Role"
         isLoading={isDeletingRole}
         variant="danger"
