@@ -175,6 +175,7 @@ export default function TeamSection() {
         onClose={() => setModalOpen(false)}
         data={sortedTeam[index]}
         onNext={() => setIndex((i) => Math.min(i + 1, sortedTeam.length - 1))}
+        onPrev={() => setIndex((i) => Math.max(i - 1, 0))}
         hasNext={index < sortedTeam.length - 1}
         hasPrev={index > 0}
       />
