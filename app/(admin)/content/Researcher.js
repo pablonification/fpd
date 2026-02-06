@@ -19,7 +19,7 @@ export default function ResearcherForm() {
 
   const [formData, setFormData] = useState({
     name: '',
-    role: 'Principal Investigator',
+    role: '',
     expertise: '',
     affiliation: '',
     description: '',
@@ -37,17 +37,47 @@ export default function ResearcherForm() {
     'Collaborator',
   ];
 
-  const [isCustomRole, setIsCustomRole] = useState(false);
-  const [customRoleInput, setCustomRoleInput] = useState('');
-
   const [isRolesModalOpen, setIsRolesModalOpen] = useState(false);
   const [deleteRoleTarget, setDeleteRoleTarget] = useState(null);
   const [isDeletingRole, setIsDeletingRole] = useState(false);
 
+  const [newRoleInput, setNewRoleInput] = useState('');
+  const [isAddingRole, setIsAddingRole] = useState(false);
+  const [addedRoles, setAddedRoles] = useState([]);
+  const [showAddRoleInput, setShowAddRoleInput] = useState(false);
+
   const allRolesInData = [...new Set(researchers.map((r) => r.role))];
   const AVAILABLE_ROLES = [
-    ...new Set([...PREDEFINED_ROLES, ...allRolesInData]),
+    ...new Set([...PREDEFINED_ROLES, ...allRolesInData, ...addedRoles]),
   ];
+
+  const handleAddNewRoleFromDropdown = async () => {
+    const trimmed = newRoleInput.trim();
+    if (!trimmed) return;
+
+    const exists = AVAILABLE_ROLES.some(
+      (r) => r.toLowerCase() === trimmed.toLowerCase()
+    );
+
+    if (exists) {
+      toast.error('Role already exists');
+      return;
+    }
+
+    setIsAddingRole(true);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      setAddedRoles((prev) => [...prev, trimmed]);
+      setFormData((prev) => ({ ...prev, role: trimmed }));
+      setNewRoleInput('');
+      setShowAddRoleInput(false);
+      toast.success(`New role '${trimmed}' added`);
+    } catch (err) {
+      toast.error('Failed to add role');
+    } finally {
+      setIsAddingRole(false);
+    }
+  };
 
   // Fetch researchers
   const fetchResearchers = useCallback(async () => {
@@ -84,23 +114,18 @@ export default function ResearcherForm() {
   const openModal = (researcher = null) => {
     setCurrentResearcher(researcher);
     if (researcher) {
-      const roleIsCustom = !PREDEFINED_ROLES.includes(researcher.role);
-      setIsCustomRole(roleIsCustom);
-      setCustomRoleInput(roleIsCustom ? researcher.role : '');
       setFormData({
         name: researcher.name,
-        role: roleIsCustom ? researcher.role : 'Other',
+        role: researcher.role,
         expertise: researcher.expertise || '',
         affiliation: researcher.affiliation || '',
         description: researcher.description || '',
       });
       setAvatarPreview(researcher.avatarUrl || researcher.avatar_url || null);
     } else {
-      setIsCustomRole(false);
-      setCustomRoleInput('');
       setFormData({
         name: '',
-        role: 'Principal Investigator',
+        role: '',
         expertise: '',
         affiliation: '',
         description: '',
@@ -116,8 +141,6 @@ export default function ResearcherForm() {
     setCurrentResearcher(null);
     setAvatarFile(null);
     setAvatarPreview(null);
-    setIsCustomRole(false);
-    setCustomRoleInput('');
   };
 
   const handleFileChange = (e) => {
@@ -170,7 +193,7 @@ export default function ResearcherForm() {
         : '/api/researchers';
       const method = currentResearcher ? 'PUT' : 'POST';
 
-      const finalRole = isCustomRole ? customRoleInput.trim() : formData.role;
+      const finalRole = formData.role.trim();
 
       if (!finalRole) {
         toast.error('Role is required');
@@ -241,11 +264,40 @@ export default function ResearcherForm() {
 
       toast.success(`Role "${deleteRoleTarget}" deleted`);
       setDeleteRoleTarget(null);
+      setAddedRoles((prev) => prev.filter((r) => r !== deleteRoleTarget));
       fetchResearchers();
     } catch (err) {
       toast.error(err.message);
     } finally {
       setIsDeletingRole(false);
+    }
+  };
+
+  const handleAddRole = async (e) => {
+    e?.preventDefault();
+    if (!newRoleInput.trim()) return;
+
+    const roleToAdd = newRoleInput.trim();
+    const exists = AVAILABLE_ROLES.some(
+      (r) => r.toLowerCase() === roleToAdd.toLowerCase()
+    );
+
+    if (exists) {
+      toast.error('Role already exists');
+      return;
+    }
+
+    setIsAddingRole(true);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      setAddedRoles((prev) => [...prev, roleToAdd]);
+      setNewRoleInput('');
+      toast.success('Role added successfully');
+    } catch (err) {
+      toast.error('Failed to add role');
+    } finally {
+      setIsAddingRole(false);
     }
   };
 
@@ -370,7 +422,7 @@ export default function ResearcherForm() {
                   <span className="font-semibold text-gray-900">
                     {item.name}
                   </span>
-                  <span className="text-xs text-gray-500">{item.email}</span>
+                  {/* <span className="text-xs text-gray-500">{item.email}</span> */}
                 </div>
               </div>
 
@@ -496,40 +548,56 @@ export default function ResearcherForm() {
                       Role
                     </label>
                     <span className="text-xs text-gray-500 italic">
-                      Select the appropriate role or choose "Other" to add a
-                      custom role.
+                      Select a role for the researcher.
                     </span>
                     <select
-                      value={isCustomRole ? 'Other' : formData.role}
+                      value={formData.role}
                       onChange={(e) => {
-                        if (e.target.value === 'Other') {
-                          setIsCustomRole(true);
-                          setFormData({ ...formData, role: 'Other' });
+                        const value = e.target.value;
+                        if (value === '__ADD_NEW__') {
+                          setShowAddRoleInput(true);
+                          setFormData({ ...formData, role: '' });
                         } else {
-                          setIsCustomRole(false);
-                          setCustomRoleInput('');
-                          setFormData({ ...formData, role: e.target.value });
+                          setShowAddRoleInput(false);
+                          setFormData({ ...formData, role: value });
                         }
                       }}
                       className="h-[44px] w-full rounded-xl border border-zinc-300 bg-white px-4 text-base outline-none focus:border-[#2AB2C7]"
-                      required={!isCustomRole}
+                      required
                     >
-                      {PREDEFINED_ROLES.map((role) => (
+                      <option value="" disabled>
+                        -- Select Role --
+                      </option>
+                      {AVAILABLE_ROLES.map((role) => (
                         <option key={role} value={role}>
                           {role}
                         </option>
                       ))}
-                      <option value="Other">Other (Custom Role)</option>
+                      <option value="__ADD_NEW__">+ Add New Role</option>
                     </select>
-                    {isCustomRole && (
-                      <input
-                        type="text"
-                        value={customRoleInput}
-                        onChange={(e) => setCustomRoleInput(e.target.value)}
-                        placeholder="Enter custom role name"
-                        className="mt-2 h-[44px] w-full rounded-xl border border-zinc-300 bg-white px-4 text-base outline-none focus:border-[#2AB2C7]"
-                        required
-                      />
+
+                    {showAddRoleInput && (
+                      <div className="mt-2 flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={newRoleInput}
+                          onChange={(e) => setNewRoleInput(e.target.value)}
+                          placeholder="Enter new role name"
+                          className="h-[44px] flex-1 rounded-xl border border-zinc-300 bg-white px-4 text-sm outline-none focus:border-[#2AB2C7]"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleAddNewRoleFromDropdown}
+                          disabled={!newRoleInput.trim() || isAddingRole}
+                          className="flex h-[44px] min-w-[80px] items-center justify-center rounded-xl bg-[#2AB2C7] px-4 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                        >
+                          {isAddingRole ? (
+                            <CgSpinner className="animate-spin text-xl" />
+                          ) : (
+                            'Add'
+                          )}
+                        </button>
+                      </div>
                     )}
                   </div>
 
@@ -623,36 +691,67 @@ export default function ResearcherForm() {
                 ✕
               </button>
             </div>
-            <div className="flex max-h-[60vh] flex-col overflow-y-auto px-6 py-4">
-              <div className="flex flex-col gap-2">
-                {AVAILABLE_ROLES.map((role) => {
-                  const isPredefined = PREDEFINED_ROLES.includes(role);
-                  return (
-                    <div
-                      key={role}
-                      className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 p-3"
-                    >
-                      <span className="font-medium text-gray-700">{role}</span>
-                      {!isPredefined && (
-                        <button
-                          onClick={() => setDeleteRoleTarget(role)}
-                          className="flex h-8 w-8 items-center justify-center rounded-full text-red-500 transition-colors hover:bg-red-50"
-                          title="Delete Role"
-                        >
-                          <Image
-                            src="/icon/db-u-trash.webp"
-                            alt="Delete"
-                            width={16}
-                            height={16}
-                          />
-                        </button>
-                      )}
-                      {isPredefined && (
-                        <span className="text-xs text-gray-400">Default</span>
-                      )}
-                    </div>
-                  );
-                })}
+            <div className="flex w-full flex-col">
+              <div className="flex flex-col gap-2 border-b border-gray-100 px-6 py-4">
+                <label className="text-sm font-medium text-gray-900">
+                  Add New Role
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={newRoleInput}
+                    onChange={(e) => setNewRoleInput(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleAddRole(e)}
+                    placeholder="Enter role name"
+                    className="h-[44px] flex-1 rounded-xl border border-zinc-300 bg-white px-4 text-sm outline-none focus:border-[#2AB2C7]"
+                  />
+                  <button
+                    onClick={handleAddRole}
+                    disabled={!newRoleInput.trim() || isAddingRole}
+                    className="flex h-[44px] min-w-[100px] items-center justify-center rounded-xl bg-[#2AB2C7] px-4 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                  >
+                    {isAddingRole ? (
+                      <CgSpinner className="animate-spin text-xl" />
+                    ) : (
+                      'Add Role'
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex max-h-[50vh] flex-col overflow-y-auto px-6 py-4">
+                <div className="flex flex-col gap-2">
+                  {AVAILABLE_ROLES.map((role) => {
+                    const isPredefined = PREDEFINED_ROLES.includes(role);
+                    return (
+                      <div
+                        key={role}
+                        className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 p-3"
+                      >
+                        <span className="font-medium text-gray-700">
+                          {role}
+                        </span>
+                        {!isPredefined && (
+                          <button
+                            onClick={() => setDeleteRoleTarget(role)}
+                            className="flex h-8 w-8 items-center justify-center rounded-full text-red-500 transition-colors hover:bg-red-50"
+                            title="Delete Role"
+                          >
+                            <Image
+                              src="/icon/db-u-trash.webp"
+                              alt="Delete"
+                              width={16}
+                              height={16}
+                            />
+                          </button>
+                        )}
+                        {isPredefined && (
+                          <span className="text-xs text-gray-400">Default</span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
             <div className="border-t border-gray-100 bg-gray-50 px-6 py-4">
