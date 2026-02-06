@@ -7,6 +7,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import Card from './../../_components/card';
 
+function decodeHtmlEntities(text) {
+  const textarea = document.createElement('textarea');
+  textarea.innerHTML = text;
+  return textarea.value;
+}
+
 export default function NewsDetailPage() {
   const params = useParams();
   const [news, setNews] = useState(null);
@@ -184,11 +190,17 @@ export default function NewsDetailPage() {
                         size: 'large',
                       },
                       {
-                        text:
-                          item.content
-                            .replace(/<[^>]*>/g, '')
-                            .substring(0, 150) +
-                          (item.content.length > 150 ? '...' : ''),
+                        text: (() => {
+                          const plainText = item.content
+                            .replace(/<[^>]*>/g, ' ')
+                            .replace(/\s+/g, ' ')
+                            .trim();
+                          const decoded = decodeHtmlEntities(plainText);
+                          return (
+                            decoded.substring(0, 150) +
+                            (decoded.length > 150 ? '...' : '')
+                          );
+                        })(),
                       },
                       {
                         text:
