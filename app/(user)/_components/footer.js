@@ -30,6 +30,19 @@ export default function Footer() {
               <p className="mt-1 text-sm font-semibold text-zinc-500">
                 Department of Industry Science and Resources (DISR)
               </p>
+              <div className="mt-4 flex flex-col gap-3">
+                <p className="text-xs leading-relaxed text-zinc-500">
+                  The Si-ZERO Research Program initiation is funded by the
+                  Australian Government through the Department of Industry,
+                  Science and Resources, and the Department of Climate Change,
+                  Energy, the Environment and Water.
+                </p>
+                <img
+                  src="/arc.png"
+                  alt="Australian Government"
+                  className="h-auto w-full max-w-[220px] object-contain"
+                />
+              </div>
             </div>
           </div>
 
