@@ -13,6 +13,7 @@ import { Suspense } from 'react';
 import { db } from '@/db/db';
 import { news, galleryItems } from '@/db/schema';
 import { desc } from 'drizzle-orm';
+import { unstable_noStore as noStore } from 'next/cache';
 
 function getYoutubeThumbnail(url) {
   if (!url) return null;
@@ -24,6 +25,7 @@ function getYoutubeThumbnail(url) {
 }
 
 async function fetchLatestEvents() {
+  noStore();
   const items = await db
     .select()
     .from(galleryItems)
@@ -105,6 +107,7 @@ async function LatestEvents() {
 }
 
 async function fetchLatestNews() {
+  noStore();
   const items = await db
     .select()
     .from(news)

@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import ConfirmModal from '../_components/ConfirmModal';
 
 export default function GalleryAdmin() {
+  const defaultActivityTypes = ['Laboratory Activities', 'Field Research'];
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -15,6 +16,7 @@ export default function GalleryAdmin() {
   const [modalType, setModalType] = useState('add');
   const [contentType, setContentType] = useState('image');
   const [currentEditId, setCurrentEditId] = useState(null);
+  const [isEnteringCustomType, setIsEnteringCustomType] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -27,6 +29,14 @@ export default function GalleryAdmin() {
   const [filterType, setFilterType] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const itemsPerPage = 10;
+
+  const activityTypeOptions = useMemo(() => {
+    const types = new Set(defaultActivityTypes);
+    items.forEach((item) => {
+      if (item.category) types.add(item.category);
+    });
+    return Array.from(types).sort();
+  }, [items]);
 
   useEffect(() => {
     let active = true;
@@ -54,6 +64,7 @@ export default function GalleryAdmin() {
   const openModal = (type, data = null) => {
     setModalType(type);
     setIsModalOpen(true);
+    setIsEnteringCustomType(false);
     if (data) {
       setCurrentEditId(data.id);
       const itemType = data.media_type_column || data.type;
@@ -91,6 +102,7 @@ export default function GalleryAdmin() {
 
   const closeModal = () => {
     setIsModalOpen(false);
+    setIsEnteringCustomType(false);
     setFormData({
       title: '',
       description: '',
@@ -106,6 +118,18 @@ export default function GalleryAdmin() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleActivityTypeChange = (e) => {
+    const { value } = e.target;
+
+    if (value === '__custom_new__') {
+      setIsEnteringCustomType(true);
+      setFormData((prev) => ({ ...prev, activityType: '' }));
+      return;
+    }
+
+    setFormData((prev) => ({ ...prev, activityType: value }));
   };
 
   const youtubeEmbedUrl = useMemo(() => {
@@ -137,11 +161,13 @@ export default function GalleryAdmin() {
   };
 
   const handleSubmit = async () => {
+    const normalizedActivityType = formData.activityType.trim();
+
     if (!formData.title.trim()) {
       toast.error('Title is required');
       return;
     }
-    if (!formData.activityType) {
+    if (!normalizedActivityType) {
       toast.error('Activity Type is required');
       return;
     }
@@ -168,7 +194,7 @@ export default function GalleryAdmin() {
             : formData.youtubeUrl.trim(),
         title: formData.title.trim(),
         description: formData.description.trim(),
-        category: formData.activityType,
+        category: normalizedActivityType,
         activityDate: formData.activityDate,
       };
 
@@ -376,19 +402,50 @@ export default function GalleryAdmin() {
                   <label className="mb-2 block text-sm font-medium text-zinc-700">
                     Activity Type <span className="text-red-500">*</span>
                   </label>
-                  <select
-                    name="activityType"
-                    value={formData.activityType}
-                    onChange={handleInputChange}
-                    className="w-full rounded-xl border border-zinc-200 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                    required
-                  >
-                    <option value="">Select Activity Type</option>
-                    <option value="Laboratory Activities">
-                      Laboratory Activities
-                    </option>
-                    <option value="Field Research">Field Research</option>
-                  </select>
+                  {isEnteringCustomType ? (
+                    <div className="flex w-full items-center gap-2">
+                      <input
+                        type="text"
+                        name="activityType"
+                        value={formData.activityType}
+                        onChange={handleInputChange}
+                        placeholder="Type new activity type"
+                        className="flex-1 rounded-xl border border-zinc-200 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                        autoFocus
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsEnteringCustomType(false);
+                          setFormData((prev) => ({
+                            ...prev,
+                            activityType: '',
+                          }));
+                        }}
+                        className="rounded-xl bg-zinc-100 px-4 py-3 text-sm font-medium whitespace-nowrap text-zinc-600 hover:bg-zinc-200"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <select
+                      name="activityType"
+                      value={formData.activityType}
+                      onChange={handleActivityTypeChange}
+                      className="w-full rounded-xl border border-zinc-200 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                      required
+                    >
+                      <option value="">Select Activity Type</option>
+                      {activityTypeOptions.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                      <option value="__custom_new__">
+                        + Create New Activity Type...
+                      </option>
+                    </select>
+                  )}
                 </div>
 
                 <div>

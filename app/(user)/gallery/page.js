@@ -68,6 +68,8 @@ export default function GalleryPage() {
         thumbnail,
         videoUrl: mediaUrl,
         date: it.activityDate,
+        typeLabel: it.category || (type === 'photo' ? 'Photo' : 'Video'),
+        activityType: it.category || (type === 'photo' ? 'Photo' : 'Video'),
       };
     });
   }, [items]);
