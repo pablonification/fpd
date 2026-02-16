@@ -222,7 +222,7 @@ export default function AboutPage() {
         {/* Project Timeline */}
         <section className="w-full px-6 py-1 text-center">
           <h2 className="mb-12 text-left text-2xl leading-tight font-bold sm:text-3xl md:text-center md:text-4xl">
-            Project Timeline
+            Acknowledgement of Country
           </h2>
 
           {loading ? (
